@@ -1,0 +1,55 @@
+﻿[ExtensionOf(classStr(FormLetterJournalCreateCorrection))]
+final class FormLetterJournalCreateCorrection_KPMGCommon_Extension
+{
+    public void createJournalLine(Common _parmLine)
+    {
+        Common                              journalLine;
+        CustPackingSlipTrans                custPackingSlipTrans;
+        FormLetterVersionableJournalCreate  _versioning = this.parmFormLetterVersionableJournalCreate();
+        InventTrans                         inventTrans;
+        InventTransOrigin                   inventTransOrigin;
+        KPMGCommon_Trazability              trazabilityTable;
+
+        next createJournalLine(_parmLine);
+
+        journalLine           = formLetterVersionableJournalCreate.findJournalLine(_parmLine);
+
+        if(_versioning.parmCallerTable().TableId == tableNum(CustPackingSlipTrans) ||
+           _versioning.parmCallerTable().TableId == tableNum(CustPackingSlipJour))
+        {
+            custPackingSlipTrans = journalLine as CustPackingSlipTrans;
+        }
+
+        if(custPackingSlipTrans.RecId && !custPackingSlipTrans.Qty )
+        {
+            inventTransOrigin = InventTransOrigin::findByInventTransId(custPackingSlipTrans.InventTransId);
+           
+            while select inventTrans
+                where inventTrans.InventTransOrigin == inventTransOrigin.RecId
+                && inventTrans.PackingSlipId == custPackingSlipTrans.PackingSlipId
+                && inventTrans.ItemId == custPackingSlipTrans.ItemId
+            {
+                if(inventTrans.inventDim().LicensePlateId)
+                {
+                    select firstonly trazabilityTable
+                    where trazabilityTable.ItemId == custPackingSlipTrans.ItemId
+                    && trazabilityTable.ProducedLicensePlateId == inventTrans.inventDim().LicensePlateId;
+            
+                    if(trazabilityTable.RecId)
+                    {
+                        ttsbegin;
+                        trazabilityTable.selectForUpdate(true);
+                        trazabilityTable.CustAccount = "";
+                        trazabilityTable.PackingSlipId = "";
+                        trazabilityTable.SalesId = "";
+                        trazabilityTable.update();
+                        ttscommit;
+                    }
+                }
+            }
+            
+            
+        }
+    }
+
+}

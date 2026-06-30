@@ -1,0 +1,21 @@
+﻿internal final class KPMGCommon_CustPackingSlipJournal_Form_EventHandlers
+{
+      /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    [FormEventHandler(formStr(CustPackingSlipJournal), FormEventType::Initialized)]
+    public static void CustPackingSlipJournal_OnInitialized(xFormRun sender, FormEventArgs e)
+    {
+        FormRun formRun = sender;
+        FormControl formButtonControl = formRun.design().controlName("KPMGCommon_PrintDeclarationOfConformityCert");
+
+        if(formButtonControl)
+        {
+            formButtonControl.visible(true);
+        }
+
+    }
+
+}

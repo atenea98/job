@@ -1,0 +1,30 @@
+﻿[ExtensionOf(tableStr(KPMGCommon_KaytekIntegrationTable))]
+class KPMGCommon_KaytekIntegrationTable_KPMGCommon_Extension
+{
+    void delete()
+    {
+        next delete();
+        this.deleteError();
+    }
+
+    private void deleteError()
+    {
+        KPMGCommon_KaytekIntegrationTable logMsg;
+
+        try
+        {
+            if (logMsg.Status == KPMGCommon_OperationStatus::Error)
+            {
+                ttsbegin;
+                logMsg.delete();
+                ttscommit;
+            }
+        }
+        catch
+        {
+            throw error(strFmt("No se puede eliminar un registro que este en estado Registrado o Pendiente"));
+        }
+
+    }
+
+}

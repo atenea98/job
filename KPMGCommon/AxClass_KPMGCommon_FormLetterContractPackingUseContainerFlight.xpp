@@ -1,0 +1,17 @@
+﻿final class KPMGCommon_FormLetterContractPackingUseContainerFlight extends Flight
+{
+    private static KPMGCommon_FormLetterContractPackingUseContainerFlight singleton = new KPMGCommon_FormLetterContractPackingUseContainerFlight();
+
+    [Hookable(false)]
+    protected boolean isEnabledByDefault()
+    {
+        return true;
+    }
+
+    [Hookable(false)]
+    public static KPMGCommon_FormLetterContractPackingUseContainerFlight instance()
+    {
+        return singleton;
+    }
+
+}

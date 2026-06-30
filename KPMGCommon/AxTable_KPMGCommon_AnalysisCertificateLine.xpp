@@ -1,0 +1,43 @@
+﻿public class KPMGCommon_AnalysisCertificateLine extends common
+{
+    /// <summary>
+    ///
+    /// </summary>
+    public static KPMGCommon_AnalysisCertificateLine find(
+        InventCertificateOfAnalysisId   _certificateOfAnalysisId,
+        ProdId                          _prodId,
+        InventTestSequence              _testSequence,
+        InventTestId                    _testId,
+        boolean                         _update = false
+        )
+    {
+        KPMGCommon_AnalysisCertificateLine    analysisCertificateLine;
+
+        analysisCertificateLine.selectForUpdate(_update);
+
+        select firstonly analysisCertificateLine
+            where analysisCertificateLine.InventCertificateOfAnalysisId    == _certificateOfAnalysisId
+                && analysisCertificateLine.ProdId                          == _prodId
+                && analysisCertificateLine.TestSequence                    == _testSequence
+                && analysisCertificateLine.TestId                          == _testId;
+
+        return analysisCertificateLine;
+    }
+
+    public void initFromInventQualityOrderLine(InventQualityOrderLine _inventQualityOrderLine)
+    {
+        this.TestId                     = _inventQualityOrderLine.TestId;
+        this.TestSequence               = _inventQualityOrderLine.TestSequence;
+        this.TestUnitId                 = _inventQualityOrderLine.TestUnitId;
+        this.TestUnit                   = _inventQualityOrderLine.KPMGCommon_CertOfAnalysisTestUnit;
+        this.StandardValue              = _inventQualityOrderLine.StandardValue;
+        this.LowerLimit                 = _inventQualityOrderLine.LowerLimit;
+        this.LowerTolerance             = _inventQualityOrderLine.LowerTolerance;
+        this.UpperLimit                 = _inventQualityOrderLine.UpperLimit;
+        this.UpperTolerance             = _inventQualityOrderLine.UpperTolerance;
+        this.LimitValue                 = _inventQualityOrderLine.KPMGCommon_CertOfAnalysisTestLimitValue;
+        this.TestResult                 = _inventQualityOrderLine.TestResult;
+        this.VariableOutcomeIdStandard  = _inventQualityOrderLine.VariableOutcomeIdStandard;
+    }
+
+}

@@ -1,0 +1,11 @@
+﻿[ExtensionOf(tableStr(ProdBOM))]
+final class ProdBOM_Table_Extension
+{
+    public void initFromBOM(BOM _bom)
+    {
+        next initFromBOM(_bom);
+
+        this.KPMGCommon_PercentConsumption = _bom.KPMGCommon_PercentConsumption;
+    }
+
+}

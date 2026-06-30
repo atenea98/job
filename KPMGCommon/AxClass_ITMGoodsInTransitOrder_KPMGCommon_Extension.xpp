@@ -1,0 +1,22 @@
+﻿[ExtensionOf(tableStr(ITMGoodsInTransitOrder))]
+final class ITMGoodsInTransitOrder_KPMGCommon_Extension
+{
+
+    public void insert(NoYes _dropEstimated, NoYes _updateReservation)
+    {
+        this.KPMGCommon_PendienteActualizarKaytek = true;
+        next insert(_dropEstimated, _updateReservation);
+    }
+
+    void update(NoYes _dropEstimated, NoYes _updateReservation)
+    {
+        ITMGoodsInTransitOrder ITMGoodsInTransitOrder = this.orig();
+
+        if (ITMGoodsInTransitOrder.KPMGCommon_PendienteActualizarKaytek == false)
+        {
+            this.KPMGCommon_PendienteActualizarKaytek = true;
+        }
+        next update(_dropEstimated,_updateReservation);
+    }
+
+}

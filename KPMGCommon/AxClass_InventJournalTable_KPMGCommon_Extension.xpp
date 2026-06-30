@@ -1,0 +1,42 @@
+﻿[ExtensionOf(tableStr(InventJournalTable))]
+final class InventJournalTable_KPMGCommon_Extension
+{
+    void insert()
+    {
+        next insert();
+        this.insertKaytekJournal();
+    }
+
+    public void insertKaytekJournal()
+    {
+        KPMGCommon_KaytekIntegrationTable msg;
+
+        if(InventJournalName::find(this.JournalNameId).KPMGCommon_KaytekIntegration)
+        {
+            msg.clear();
+
+            msg.OperationType = this.mapJournalTypeToOperationType(this.JournalType);
+            msg.DateTime = DateTimeUtil::utcNow();
+            msg.JournalId = this.JournalId;
+            msg.Status = KPMGCommon_OperationStatus::Pending;
+            msg.ErrorMessage = "";
+            msg.DateTimeLastTry = Global::utcDateTimeNull();
+
+            msg.insert();
+        }
+    }
+
+    private KPMGCommon_OperationType mapJournalTypeToOperationType (InventJournalType _journalType)
+    {
+        switch(_journalType)
+        {
+            case InventJournalType::Transfer:
+                return KPMGCommon_OperationType::TransferJournal;
+            case InventJournalType::LossProfit:
+                return KPMGCommon_OperationType::AdjustmentJournal;
+            default:
+                return KPMGCommon_OperationType::Blank;
+        }
+    }
+
+}

@@ -1,0 +1,59 @@
+﻿public class KPMGCommon_InventTestCertOfAnalysisLine_PackingSlip extends common
+{
+    /// <summary>
+    /// Finds an <c>InventTestCertOfAnalysisLine</c> table buffer with the specified unique key index
+    /// fields.
+    /// </summary>
+    /// <param name="_certificateOfAnalysisId">
+    /// The ID of the analysis certificate.
+    /// </param>
+    /// <param name="_testSequence">
+    /// The test sequence number.
+    /// </param>
+    /// <param name="_testId">
+    /// The ID for the test.
+    /// </param>
+    /// <param name="_update">
+    /// A Boolean value that indicates whether the returned table buffer can be updated; optional.
+    /// </param>
+    /// <returns>
+    /// An <c>InventTestCertOfAnalysisLine</c> table buffer.
+    /// </returns>
+    public static KPMGCommon_InventTestCertOfAnalysisLine_PackingSlip find(
+        InventCertificateOfAnalysisId   _certificateOfAnalysisId,
+        ProdId                          _prodId,
+        InventTestSequence              _testSequence,
+        InventTestId                    _testId,
+        boolean                         _update = false
+        )
+    {
+        KPMGCommon_InventTestCertOfAnalysisLine_PackingSlip    inventTestCertOfAnalysisLine_PackingSlip;
+
+        inventTestCertOfAnalysisLine_PackingSlip.selectForUpdate(_update);
+
+        select firstonly inventTestCertOfAnalysisLine_PackingSlip
+            where inventTestCertOfAnalysisLine_PackingSlip.InventCertificateOfAnalysisId    == _certificateOfAnalysisId
+                && inventTestCertOfAnalysisLine_PackingSlip.ProdId                          == _prodId
+                && inventTestCertOfAnalysisLine_PackingSlip.TestSequence                    == _testSequence
+                && inventTestCertOfAnalysisLine_PackingSlip.TestId                          == _testId;
+
+        return inventTestCertOfAnalysisLine_PackingSlip;
+    }
+
+    public void initFromInventQualityOrderLine(InventQualityOrderLine _inventQualityOrderLine)
+    {
+        this.TestId                     = _inventQualityOrderLine.TestId;
+        this.TestSequence               = _inventQualityOrderLine.TestSequence;
+        this.TestUnitId                 = _inventQualityOrderLine.TestUnitId;
+        this.TestUnit                   = _inventQualityOrderLine.KPMGCommon_CertOfAnalysisTestUnit;
+        this.StandardValue              = _inventQualityOrderLine.StandardValue;
+        this.LowerLimit                 = _inventQualityOrderLine.LowerLimit;
+        this.LowerTolerance             = _inventQualityOrderLine.LowerTolerance;
+        this.UpperLimit                 = _inventQualityOrderLine.UpperLimit;
+        this.UpperTolerance             = _inventQualityOrderLine.UpperTolerance;
+        this.LimitValue                 = _inventQualityOrderLine.KPMGCommon_CertOfAnalysisTestLimitValue;
+        this.TestResult                 = _inventQualityOrderLine.TestResult;
+        this.VariableOutcomeIdStandard  = _inventQualityOrderLine.VariableOutcomeIdStandard;
+    }
+
+}

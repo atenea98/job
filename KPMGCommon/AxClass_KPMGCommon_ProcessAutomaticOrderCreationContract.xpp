@@ -1,0 +1,4 @@
+﻿[DataContractAttribute]
+class KPMGCommon_ProcessAutomaticOrderCreationContract
+{
+}

@@ -1,0 +1,243 @@
+﻿[ExtensionOf(formControlStr(JmgProductionFloorExecutionAdjustMaterial, OKButton))]
+final class JmgProductionFloorExecutionAdjustMaterial_OKButton_Extension
+{
+    public LineNum lastLineNum;
+    public boolean deleteLine;
+
+    public void clicked()
+    {
+        this.KPMGCommon_GeneratePercentageConsumption();
+
+        next clicked();
+    }
+
+    public void KPMGCommon_GeneratePercentageConsumption()
+    {
+        JmgTmpJobBundleProdFeedback             jmgTmpJobBundleProdFeedback;
+        FormControl                             formButtonControl = any2Object(this) as FormControl;
+        FormDataSource                          JmgTmpJobBundleProdFeedback_ds = formButtonControl.formRun().dataSource(tableStr(JmgTmpJobBundleProdFeedback)),
+                                                ProdJournalBOM_ds = formButtonControl.formRun().dataSource(tableStr(ProdJournalBOM));
+        ProdJournalTable                        prodJournalTableBOM;
+        ProdJournalBOM                          prodJournalBOM, prodJournalBOMNew, prodJournalBOMLineNum;
+        KPMGCommon_PercentConsumptionProduction percentConsumptionProduction, percentConsumptionProduction_TotalMouthByTypeId, _percent, _percentExist;
+        int                                     roundDecimal = 0, TotalMouth = 0;
+        Qty                                     wMSLocationQty;
+        WHSInventStatus                         wHSInventStatus;
+        container                               inventransIdDelete = conNull();
+        int                                     reginventransIdDelete = 0;
+
+        jmgTmpJobBundleProdFeedback = JmgTmpJobBundleProdFeedback_ds.getFirst(1) ?
+                                       JmgTmpJobBundleProdFeedback_ds.getFirst(1) :
+                                       JmgTmpJobBundleProdFeedback_ds.cursor();
+
+        while (jmgTmpJobBundleProdFeedback)
+        {
+            lastLineNum = 0;
+            select firstonly wHSInventStatus
+                where wHSInventStatus.InventStatusBlocking;
+            prodJournalTableBOM = ProdJournalTable::find(jmgTmpJobBundleProdFeedback.ProdJournalIdBOM, true);
+
+            if (prodJournalTableBOM && prodJournalTableBOM.Posted == NoYes::No)
+            {
+                Select firstonly prodJournalBOMLineNum
+                    order by LineNum desc
+                    where prodJournalBOMLineNum.JournalId == prodJournalTableBOM.JournalId;
+                if (prodJournalBOMLineNum)
+                {
+                    lastLineNum = prodJournalBOMLineNum.LineNum;
+
+                    ttsbegin;
+                    while select forupdate prodJournalBOM
+                        order by JournalId, LineNum
+                        where prodJournalBOM.JournalId == jmgTmpJobBundleProdFeedback.ProdJournalIdBOM
+                        exists join _percentExist
+                            where _percentExist.InventTransIdProdBOM == prodJournalBOM.InventTransId
+                               && !_percentExist.DisableMouth
+                    {
+                        deleteLine = false;
+
+                        select firstonly _percent
+                            where _percent.InventTransIdProdBOM == prodJournalBOM.InventTransId
+                               && !_percent.DisableMouth
+                               && _percent.Percent > 0;
+                        {
+                            if (!_percent.RecId)
+                            {
+                                deleteLine = true;
+                            }
+                            else
+                            {
+                                while select percentConsumptionProduction
+                                    where percentConsumptionProduction.InventTransIdProdBOM == prodJournalBOM.InventTransId
+                                       && !percentConsumptionProduction.DisableMouth
+                                {
+                                    TotalMouth = 0;
+                                    while select percentConsumptionProduction_TotalMouthByTypeId
+                                        group by InventTransIdProdBOM, TypeId, ResourceMouth
+                                        where percentConsumptionProduction_TotalMouthByTypeId.InventTransIdProdBOM == prodJournalBOM.InventTransId
+                                           && percentConsumptionProduction_TotalMouthByTypeId.TypeId == percentConsumptionProduction.TypeId
+                                           && !percentConsumptionProduction_TotalMouthByTypeId.DisableMouth
+                                    {
+                                        ++TotalMouth;
+                                    }
+                                    roundDecimal = InventTable::inventDecimals(prodJournalBOM.ItemId);
+                                    wMSLocationQty        = DecRound((((prodJournalBOM.BOMConsump * (percentConsumptionProduction.TypePercent/100))/TotalMouth) * (percentConsumptionProduction.DryerPercent/100)) * (percentConsumptionProduction.Percent/100), roundDecimal);
+                            
+                                    wMSLocationQty = this.KPMGCommon_CreateProdJournalBOMPercentageConsumption(prodJournalBOM,
+                                                                                                       percentConsumptionProduction,
+                                                                                                       wMSLocationQty);
+
+                                    //Generamos Linea a la Tolva que toque contra el articulo generico si queda cantidad a consumir
+                                    if (wMSLocationQty > 0)
+                                    {
+                                        ++lastLineNum;
+                                        prodJournalBOMNew.clear();
+                                        prodJournalBOMNew.initValue();
+                                        prodJournalBOMNew.JournalId = prodJournalBOM.JournalId;
+                                        prodJournalBOMNew.ProdId = prodJournalBOM.ProdId;
+                                        prodJournalBOMNew.ItemId = prodJournalBOM.ItemId;
+                                        roundDecimal = InventTable::inventDecimals(prodJournalBOMNew.ItemId);
+                                        prodJournalBOMNew.TransDate = prodJournalBOM.TransDate;
+                                        prodJournalBOMNew.BOMUnitId = prodJournalBOM.BOMUnitId;
+                                        prodJournalBOMNew.LineNum = lastLineNum;
+                                        prodJournalBOMNew.InventTransId = prodJournalBOM.InventTransId;
+                                        if (prodJournalBOM.BOMProposal)
+                                            prodJournalBOMNew.BOMProposal       = DecRound(wMSLocationQty, roundDecimal);
+                                        if (prodJournalBOM.BOMConsump)
+                                            prodJournalBOMNew.BOMConsump        = DecRound(wMSLocationQty, roundDecimal);
+                                        if (prodJournalBOM.InventProposal)
+                                            prodJournalBOMNew.InventProposal    = DecRound(wMSLocationQty, roundDecimal);
+                                        if (prodJournalBOM.InventConsump)
+                                            prodJournalBOMNew.InventConsump     = DecRound(wMSLocationQty, roundDecimal);
+                                        if (prodJournalBOM.BOMScrap)
+                                            prodJournalBOMNew.BOMScrap          = DecRound(wMSLocationQty, roundDecimal);
+                                        InventDim inventDimNew = prodJournalBOM.inventDim();
+                                        inventDimNew.wMSLocationId = percentConsumptionProduction.WMSLocationId;
+                                        inventDimNew.InventLocationId = percentConsumptionProduction.InventLocationId;
+                                        prodJournalBOMNew.inventDimId = InventDim::findOrCreate(inventDimNew).inventDimId;
+                                        prodJournalBOMNew.insert();
+
+                                        deleteLine = true;
+                                        wMSLocationQty = 0;
+                                    }
+                                }
+                            }
+                            if (deleteLine)
+                            {
+                                prodJournalBOM.delete();
+                            }
+                        }
+                    }
+                    ttscommit;
+                }
+                ttsbegin;
+                Select count(LineNum) from prodJournalBOMLineNum
+                        where prodJournalBOMLineNum.JournalId == prodJournalTableBOM.JournalId;
+                prodJournalTableBOM.NumOfLines = prodJournalBOMLineNum.LineNum;
+                prodJournalTableBOM.Update();
+
+                ttscommit;
+            }
+            jmgTmpJobBundleProdFeedback = JmgTmpJobBundleProdFeedback_ds.getNext();
+        }
+    }
+
+    Qty KPMGCommon_CreateProdJournalBOMPercentageConsumption(ProdJournalBOM prodJournalBOM,
+                                                                    KPMGCommon_PercentConsumptionProduction percentConsumptionProduction,
+                                                                    Qty wMSLocationQty)
+    {
+        ProdJournalBOM                          prodJournalBOMNew, prodJournalBOMLineNum;
+        int                                     roundDecimal = 0;
+        InventSum                               inventSum;
+        InventDim                               inventDim;
+        InventBatch                             inventBatch;
+        Qty                                     batchQty;
+        WHSInventStatus                         wHSInventStatus;
+        ;
+
+        select firstonly wHSInventStatus
+                where wHSInventStatus.InventStatusBlocking;
+        while select inventSum
+            where inventSum.AvailPhysical > 0
+                && !inventSum.Closed
+                && inventSum.ItemId == prodJournalBOM.ItemId
+            join inventDim
+            //order by InventBatchId asc
+            where inventDim.inventDimId == inventSum.InventDimId
+                && inventDim.wMSLocationId == percentConsumptionProduction.WMSLocationId
+                && inventDim.InventStatusId != wHSInventStatus.InventStatusId
+                && inventDim.InventLocationId == percentConsumptionProduction.InventLocationId
+            join inventBatch
+            order by KPMGCommon_DateEntryHopper asc
+            where inventBatch.inventBatchId == inventDim.inventBatchId
+               && inventBatch.itemId == inventSum.ItemId
+        {
+            if (wMSLocationQty > 0)
+            {
+                ttsbegin;
+                if (inventSum.AvailPhysical >= wMSLocationQty)
+                {
+                    batchQty = wMSLocationQty;
+                }
+                else
+                {
+                    batchQty = inventSum.AvailPhysical;
+                }
+                                    
+                ++lastLineNum;
+                prodJournalBOMNew.clear();
+                prodJournalBOMNew.initValue();
+                prodJournalBOMNew.JournalId = prodJournalBOM.JournalId;
+                prodJournalBOMNew.ProdId = prodJournalBOM.ProdId;
+                prodJournalBOMNew.ItemId = inventSum.ItemId;
+                roundDecimal = InventTable::inventDecimals(prodJournalBOMNew.ItemId);
+                prodJournalBOMNew.TransDate = prodJournalBOM.TransDate;
+                prodJournalBOMNew.BOMUnitId = prodJournalBOM.BOMUnitId;
+                prodJournalBOMNew.LineNum = lastLineNum;
+                prodJournalBOMNew.InventTransId = prodJournalBOM.InventTransId;
+                if (prodJournalBOM.BOMProposal)
+                                    prodJournalBOMNew.BOMProposal       = DecRound(batchQty, roundDecimal);
+                if (prodJournalBOM.BOMConsump)
+                                    prodJournalBOMNew.BOMConsump        = DecRound(batchQty, roundDecimal);
+                if (prodJournalBOM.InventProposal)
+                                    prodJournalBOMNew.InventProposal    = DecRound(batchQty, roundDecimal);
+                if (prodJournalBOM.InventConsump)
+                                    prodJournalBOMNew.InventConsump     = DecRound(batchQty, roundDecimal);
+                if (prodJournalBOM.BOMScrap)
+                                    prodJournalBOMNew.BOMScrap          = DecRound(batchQty, roundDecimal);
+                prodJournalBOMNew.inventDimId = inventSum.InventDimId;
+                prodJournalBOMNew.insert();
+
+                deleteLine = true;
+                wMSLocationQty = wMSLocationQty - batchQty;
+                ttscommit;
+
+                this.reservationProdJournalBOMNew(prodJournalBOMNew);
+
+            }
+            else
+            {
+                continue;
+            }
+        }
+
+        return wMSLocationQty;
+    }
+
+    public void reservationProdJournalBOMNew(ProdJournalBOM prodJournalBOM)
+    {
+        InventUpd_Reservation   reservation;
+        InventMovement          movement;
+        InventQty               reserveQuantity;
+        ;
+
+        movement = InventMovement::construct(prodJournalBOM);
+        reserveQuantity = prodJournalBOM.BOMConsump - abs(movement.transIdSum().reserved());
+        if(reserveQuantity)
+        {
+            reservation = InventUpd_Reservation::newInventDim(movement,prodJournalBOM.inventDim(), -reserveQuantity,true);
+            reservation.updateNow();
+        }
+    }
+
+}

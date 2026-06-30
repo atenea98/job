@@ -1,0 +1,344 @@
+﻿public class KPMGCommon_KaytekIntegrationService extends SysOperationServiceBase
+{
+    PurchFormLetterParmData purchFormLetterParmData;
+    PurchParmTable          purchParmTable;
+    PurchParmUpdate         purchParmUpdate;
+
+    public void process(KPMGCommon_KaytekIntegrationContract _contract)
+    {
+        KPMGCommon_KaytekIntegrationTable logMess, logMessError, logMessPost;
+        InventJournalTable               journalInv;
+        WMSJournalTable                  journalWms;
+        boolean                          processed;
+
+        while select logMess
+            where logMess.Status == KPMGCommon_OperationStatus::Pending
+               || logMess.Status == KPMGCommon_OperationStatus::Error
+        {
+            processed = false;
+            switch(logMess.OperationType)
+            {
+                case KPMGCommon_OperationType::AdjustmentJournal:
+                {
+                    journalInv = InventJournalTable::find(logMess.JournalId, true);
+                    if (journalInv && !journalInv.SystemBlocked)
+                    {
+                        if (journalInv.Posted == NoYes::Yes)
+                        {
+                            processed = true;
+                        }
+                        else
+                        {
+                            try
+                            {
+                                ttsBegin;
+                                JournalCheckPost journalCheckPost =
+                                    InventJournalCheckPost::newPostJournal(journalInv);
+                                journalCheckPost.run();
+                                ttsCommit;
+                            }
+                            catch (Exception::Error)
+                            {
+                                ttsAbort;
+                                this.updateError(logMess);
+                                continue;
+                            }
+
+                            journalInv = InventJournalTable::find(logMess.JournalId, true);
+                            if (journalInv.Posted == NoYes::Yes)
+                            {
+                                processed = true;
+                            }
+                            else
+                            {
+                                this.updateError(logMess);
+                                continue;
+                            }
+                        }
+                    }
+
+                    break;
+                }
+
+                case KPMGCommon_OperationType::DailyReceiptItemJournal:
+                {
+                    journalWms = WMSJournalTable::find(logMess.JournalId, true);
+                    if (journalWms && !journalWms.systemBlocked)
+                    {
+                        if (journalWms.Posted == NoYes::Yes)
+                        {
+                            processed = true;
+                        }
+                        else
+                        {
+                            try
+                            {
+                                if (!journalWms.packingSlip)
+                                {
+                                    throw error(strFmt("@WAX2996", "@SYS11549"));
+                                }
+                                else
+                                {
+                                    if (!PurchTable::exist(journalWms.inventTransRefId))
+                                    {
+                                        throw error(strFmt("@SYS70691", "@SYS36260"));
+                                    }
+                                    else
+                                    {
+                                        VendAccount vendAccount = journalWms.vendAccount;
+                                        if (!journalWms.vendAccount)
+                                            vendAccount = PurchTable::find(journalWms.inventTransRefId).OrderAccount;
+                                            
+                                        if (PurchParameters::find().CheckPackingSlip != ReuseVoucher::AcceptDuplicate)
+                                        {
+                                            if (!VendTable::find(vendAccount).checkPackingSlip(journalWms.packingSlip))
+                                            throw error("Error");
+                                        }
+                                    }
+                                }
+
+                                ttsBegin;
+                                JournalCheckPost wmsPost =
+                                WMSJournalCheckPostReception::newTypeJournalTable(
+                                    JournalCheckPostType::Post,
+                                    journalWms);
+                                wmsPost.parmAutoBlock(true);
+                                wmsPost.run();
+                                ttsCommit;
+                            }
+                            catch (Exception::Error)
+                            {
+                                ttsAbort;
+                                this.updateError(logMess);
+                                continue;
+                            }
+
+                            journalWms = WMSJournalTable::find(logMess.JournalId, true);
+                            if (journalWms.Posted == NoYes::Yes)
+                            {
+                                processed = true;
+                            }
+                            else
+                            {
+                                this.updateError(logMess);
+                                continue;
+                            }
+                        }
+                    }
+
+                    break;
+                }
+
+                default:
+                {
+                    ttsBegin;
+                    select firstonly forupdate logMessError
+                        where logMessError.RecId == logMess.RecId;
+                    if (logMessError)
+                    {
+                        logMessError.Status         = KPMGCommon_OperationStatus::Error;
+                        logMessError.ErrorMessage   = strFmt("@KPMGCommon:KaytekIntegrationTypeExecutionError", "@SYS112372", "@SCM:InventInventoryAdjustmentJournalEntityLabel", "@SCM:WMSItemArrivalJournalEntityLabel");
+                        logMessError.DateTimeLastTry = DateTimeUtil::utcNow();
+                        logMessError.update();
+                    }
+                    ttsCommit;
+                    break;
+                }
+            }
+
+            if (processed)
+            {
+                ttsBegin;
+                select firstonly forupdate logMessPost
+                    where logMessPost.RecId == logMess.RecId;
+                if (logMessPost)
+                {
+                    logMessPost.Status         = KPMGCommon_OperationStatus::Success;
+                    logMessPost.ErrorMessage   = "";
+                    logMessPost.DateTimeLastTry = DateTimeUtil::utcNow();
+                    logMessPost.update();
+                }
+                ttsCommit;
+
+                if (logMess.OperationType == KPMGCommon_OperationType::DailyReceiptItemJournal && journalWms)
+                {
+                    this.createPackingSlip(journalWms);
+                }
+            }
+        }
+    }
+
+    public void updateError(KPMGCommon_KaytekIntegrationTable _table)
+    {
+        KPMGCommon_KaytekIntegrationTable tableError;
+        SysInfologEnumerator infologEnum = SysInfologEnumerator::newData(infolog.infologData());
+        SysInfologMessageStruct infoLogMessage;
+        str errorMsg;
+
+        while (infologEnum.moveNext())
+        {
+
+            infoLogMessage = SysInfologMessageStruct::construct(infologEnum.currentMessage());
+            errorMsg += infoLogMessage.message() + '\n';
+        }
+
+        if (strStartsWith(errorMsg, "Se ha registrado el diario.\n"))
+        {
+            int removeLen = strLen("Se ha registrado el diario.\n");
+            errorMsg = subStr(errorMsg, removeLen + 1, strLen(errorMsg)); // +1 para eliminar también el espacio o tab si lo hay
+        }
+
+        ttsBegin;
+        select firstonly forupdate tableError
+            where tableError.RecId == _table.RecId;
+        if (tableError)
+        {
+            tableError.ErrorMessage    = errorMsg;
+            tableError.Status          = KPMGCommon_OperationStatus::Error;
+            tableError.DateTimeLastTry = DateTimeUtil::utcNow();
+            tableError.update();
+        }
+        ttsCommit;
+    }
+
+    private void createPackingSlip(WMSJournalTable _wmsJournalTable)
+    {
+        WMSJournalTrans        wmsTrans;
+        InventTransOrigin      inventTransOrigin;
+        ITMGoodsInTransitOrder transitOrder;
+        PurchId                purchId;
+        PurchTable             purchTable;
+        PurchFormLetter        purchFormLetter;
+        PurchaseOrderId        packSlipId;
+        date                   transDate;
+
+        select firstonly wmsTrans
+        where wmsTrans.JournalId == _wmsJournalTable.journalId;
+
+        if (!wmsTrans.RecId)
+        {
+            warning(strFmt("@KPMGCommon:KaytekErrorNoLines", _wmsJournalTable.journalId));
+            return;
+        }
+
+        inventTransOrigin = InventTransOrigin::findByInventTransId(wmsTrans.InventTransId);
+        switch (inventTransOrigin.ReferenceCategory)
+        {
+            case InventTransType::Purch:
+                purchId = inventTransOrigin.ReferenceId;
+                break;
+
+            case InventTransType::ITMGIT:
+                transitOrder = ITMGoodsInTransitOrder::find(inventTransOrigin.ReferenceId);
+                if (!transitOrder.RecId)
+                {
+                    warning(strFmt("@KPMGCommon:KaytekErrorNoTransitOrder", inventTransOrigin.ReferenceId));
+                    return;
+                }
+                purchId = transitOrder.TransRefId;
+                break;
+
+            default:
+                warning(strFmt("@KPMGCommon:KaytekErrorNoAssociation", _wmsJournalTable.journalId));
+                return;
+        }
+
+        purchTable = PurchTable::find(purchId, true);
+        if (!purchTable.RecId)
+        {
+            warning(strFmt("@KPMGCommon:KaytekErrorPackingSlip", purchId));
+            return;
+        }
+
+        if (purchTable.DocumentState != VersioningDocumentState::Confirmed)
+        {
+            ttsBegin;
+            PurchFormLetter confirmForm = PurchFormLetter::construct(DocumentStatus::PurchaseOrder);
+            PurchaseOrderId newVersion = strFmt("%1-%2", purchTable.PurchId,VendPurchOrderJour::numberOfPurchaseOrderVersions(purchTable) + 1);
+            confirmForm.update(purchTable, newVersion, systemDateGet());
+            ttsCommit;
+        }
+
+        /*
+        ttsBegin;
+        purchFormLetter = PurchFormLetter::construct(DocumentStatus::PackingSlip);
+        packSlipId = strFmt("%1", _wmsJournalTable.packingSlip);
+        transDate  = systemDateGet();
+        purchFormLetter.showQueryForm(false);
+
+        purchFormLetter.update(purchTable, packSlipId, transDate, PurchUpdate::All, AccountOrder::None, NoYes::No, NoYes::No);
+        ttsCommit;
+        */
+
+        packSlipId = strFmt("%1", _wmsJournalTable.packingSlip);
+        this.insertParmTableData(purchTable, packSlipId);
+        this.insertParmLineData(_wmsJournalTable);
+        this.processProductReceipt(purchTable);
+
+        info(strFmt("@KPMGCommon:KaytekCreatePackingSlip", packSlipId, purchTable.PurchId));
+    }
+
+    private void insertParmTableData(PurchTable _purchTable, PackingSlipId _packingSlipId)
+    {
+        purchFormLetterParmData =  PurchFormletterParmData::newData(DocumentStatus::PackingSlip,
+                                     VersioningUpdateType::Initial);
+        purchFormLetterParmData.parmOnlyCreateParmUpdate(true);
+        purchFormLetterParmData.createData(false);
+        purchParmUpdate = purchFormLetterParmData.parmParmUpdate();
+
+        purchParmTable.clear();
+        purchParmTable.TransDate                = SystemDateGet();
+        purchParmTable.Ordering                 = DocumentStatus::PackingSlip;
+        purchParmTable.ParmJobStatus            = ParmJobStatus::Waiting;
+        purchParmTable.Num                      = _packingSlipId;
+        purchParmTable.PurchId                  = _purchTable.PurchId;
+        purchParmTable.PurchName                = _purchTable.PurchName;
+        purchParmTable.DeliveryName             = _purchTable.DeliveryName;
+        purchParmTable.DeliveryPostalAddress    = _purchTable.DeliveryPostalAddress;
+        purchParmTable.OrderAccount             = _purchTable.OrderAccount;
+        purchParmTable.CurrencyCode             = _purchTable.CurrencyCode;
+        purchParmTable.InvoiceAccount           = _purchTable.InvoiceAccount;
+        purchParmTable.ParmId                   = purchParmUpdate.ParmId;
+        purchParmTable.insert();
+    }
+
+    private void insertParmLineData(WMSJournalTable _wmsJournalTable)
+    {
+        WMSJournalTrans     wmsTrans;
+        PurchLine           purchLine;
+        PurchParmLine       purchParmLine;
+
+        while Select wmsTrans
+            where wmsTrans.journalId == _wmsJournalTable.journalId
+        {
+            purchLine = PurchLine::findInventTransId(wmsTrans.inventTransId);
+            purchParmLine.clear();
+
+            purchParmLine.InitFromPurchLine(purchLine);
+
+            purchParmLine.ReceiveNow  = wmsTrans.qty;
+            purchParmLine.InventDimId = wmsTrans.inventDimId;
+            purchParmLine.ParmId      = purchParmTable.ParmId;
+            purchParmLine.TableRefId  = purchParmTable.TableRefId;
+            purchParmLine.setQty(DocumentStatus::PackingSlip, false, true);
+            purchParmLine.setLineAmount();
+            purchParmLine.insert();
+        }
+    }
+
+    public void processProductReceipt(PurchTable _purchTable)
+    {
+        PurchFormLetter        purchFormLetter;
+        
+        purchFormLetter = PurchFormLetter::construct(DocumentStatus::PackingSlip);
+        purchFormLetter.transDate(DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone()));
+        purchFormLetter.proforma(false);
+        purchFormLetter.specQty(PurchUpdate::Recorded);
+        purchFormLetter.purchTable(_purchTable);
+        purchFormLetter.parmParmTableNum(purchParmTable.ParmId);
+        purchFormLetter.parmId(purchParmTable.ParmId);
+        purchFormLetter.purchParmUpdate(purchFormLetterParmData.parmParmUpdate());
+        purchFormLetter.run();
+    }
+
+}

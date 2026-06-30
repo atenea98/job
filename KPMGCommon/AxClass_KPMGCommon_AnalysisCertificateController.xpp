@@ -1,0 +1,31 @@
+﻿public class KPMGCommon_AnalysisCertificateController extends SrsReportRunController
+{
+   
+    public static void main(Args _args)
+    {
+        KPMGCommon_AnalysisCertificateController controller = new KPMGCommon_AnalysisCertificateController();
+        KPMGCommon_AnalysisCertificateContract contract = new KPMGCommon_AnalysisCertificateContract();
+
+        CustPackingSlipJour     custPackingSlipJour;
+
+        if(_args && _args.record() && _args.record().TableId == tableNum(CustPackingSlipJour))
+        {
+            custPackingSlipJour = _args.record();
+            contract.parmPackingSlipId(custPackingSlipJour.PackingSlipId);
+            contract.parmDeliveryDate(custPackingSlipJour.DeliveryDate);
+        }
+
+        controller.parmReportName(ssrsReportStr(KPMGCommon_AnalysisCertifcateReport, ReportDesign));
+        controller.parmShowDialog(false);
+        controller.parmExecutionMode(SysOperationExecutionMode::Synchronous);
+        controller.parmReportContract().parmRdpContract(contract);
+                
+        controller.startOperation();
+    }
+
+    public ClassDescription defaultCaption()
+    {
+        return "@SYS113621"; //Certificado de análisis
+    }
+
+}

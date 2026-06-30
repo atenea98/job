@@ -1,0 +1,53 @@
+﻿[ExtensionOf(classStr(SalesFormLetter_PackingSlip))]
+final class SalesFormLetter_PackingSlip_KPMGCommon_Extension
+{   
+    public void  run()
+    {
+        CustPackingslipJour custPackingslipJour;
+        Args                args = new Args();
+        MenuFunction        menuFunction;
+        CompanyInfo         companyInfo;
+
+        next run();
+
+        companyInfo = CompanyInfo::find();
+        custPackingslipJour = this.parmJournalRecord();
+        args.record(custPackingslipJour);
+        
+        if(this.KPMGCommon_PrintDeclarationOfConformityCert() && companyInfo.DataArea == "omt")
+        {
+            menuFunction = new MenuFunction(menuitemActionStr(KPMGCommon_PrintDeclarationOfConformityCert), MenuItemType::Action);
+
+            if (menuFunction && menuFunction.checkAccessRights())
+            menuFunction.run(args);
+        }
+        
+        if (this.KPMGCommon_PrintFormLetterPackingList())
+        {
+            if(this.KPMGCommon_GroupProductLines())
+            {
+                menuFunction = new MenuFunction(menuitemActionStr(KPMGCommon_SalesPrintPackingList), MenuItemType::Action);
+            }
+            else
+            {
+                menuFunction = new MenuFunction(menuItemOutputStr(SalesPackingSlipOriginal), MenuItemType::Output);
+            }
+            
+
+            if (menuFunction && menuFunction.checkAccessRights())
+                menuFunction.run(args);
+            
+        }
+
+        if (this.KPMGCommon_PrintFormLetterWayBill())
+        {
+            menuFunction = new MenuFunction(menuitemActionStr(KPMGCommon_SalesPrintWayBill), MenuItemType::Action);
+
+            if (menuFunction && menuFunction.checkAccessRights())
+                menuFunction.run(args);
+            
+        }
+
+    }
+
+}

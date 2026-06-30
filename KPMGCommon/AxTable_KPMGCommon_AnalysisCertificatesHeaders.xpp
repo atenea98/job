@@ -1,0 +1,65 @@
+﻿public class KPMGCommon_AnalysisCertificatesHeaders extends common
+{
+    /// <summary>
+    ///
+    /// </summary>
+    public void initFromCustPckSlpJour(CustPackingSlipJour _custPackingSlipJour)
+    {
+        this.PackingSlipId      = _custPackingSlipJour.PackingSlipId;
+        this.DeliveryDate       = _custPackingSlipJour.DeliveryDate;
+        this.AccountRelation    = _custPackingSlipJour.OrderAccount;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public void insert()
+    {
+        if (!this.InventCertificateOfAnalysisId)
+        {
+            this.InventCertificateOfAnalysisId = this.initInventCertificateOfAnalysisId(false);
+        }
+
+        super();
+
+    }
+
+    static boolean exist(InventCertificateOfAnalysisId _inventCertificateOfAnalysisId)
+    {
+        return _inventCertificateOfAnalysisId &&
+            (select  firstonly   KPMGCommon_AnalysisCertificateHeader
+             where  KPMGCommon_AnalysisCertificateHeader.InventCertificateOfAnalysisId == _inventCertificateOfAnalysisId).RecId != 0;
+    }
+
+    static KPMGCommon_AnalysisCertificatesHeaders find(
+        InventCertificateOfAnalysisId   _inventCertificateOfAnalysisId,
+        boolean                         _forUpdate = false)
+    {
+        KPMGCommon_AnalysisCertificatesHeaders   analysisCertificateHeader;
+
+        analysisCertificateHeader.selectForUpdate(_forUpdate);
+
+        if (_inventCertificateOfAnalysisId)
+        {
+            select firstonly    analysisCertificateHeader
+            where   analysisCertificateHeader.InventCertificateOfAnalysisId == _inventCertificateOfAnalysisId;
+        }
+
+        return analysisCertificateHeader;
+    }
+
+    public static NumberSeq numberSeqInventCertificateOfAnalysisId(boolean makeDecisionLater = true)
+    {
+        return NumberSeq::newGetNum(InventParameters::numRefCertificateOfAnalysisId(),makeDecisionLater);
+    }
+
+    InventCertificateOfAnalysisId initInventCertificateOfAnalysisId(boolean makeDecisionLater = true)
+    {
+        NumberSeq numberSeqInventCertificateOfAnalysisId = KPMGCommon_AnalysisCertificatesHeaders::numberSeqInventCertificateOfAnalysisId(makeDecisionLater);
+
+        InventCertificateOfAnalysisId inventCertificateOfAnalysisId = numberSeqInventCertificateOfAnalysisId.num();
+
+        return inventCertificateOfAnalysisId;
+    }
+
+}

@@ -1,0 +1,25 @@
+﻿[ExtensionOf(classStr(FormLetterServiceController))]
+final class FormLetterServiceController_KPMGCommon_Extension
+{
+
+    boolean  KPMGCommon_PrintFormLetterPackingList(boolean  _KPMGCommon_PrintFormLetterPackingList = contract.KPMGCommon_parmPrintFormLetterPackingList())
+    {
+        return contract.KPMGCommon_parmPrintFormLetterPackingList(_KPMGCommon_PrintFormLetterPackingList);
+    }
+
+    boolean  KPMGCommon_PrintFormLetterWayBill(boolean  _KPMGCommon_PrintFormLetterWayBill = contract.KPMGCommon_parmPrintFormLetterWayBill())
+    {
+        return contract.KPMGCommon_parmPrintFormLetterWayBill(_KPMGCommon_PrintFormLetterWayBill);
+    }
+
+    boolean  KPMGCommon_PrintDeclarationOfConformityCert(boolean  _KPMGCommon_PrintDeclarationOfConformityCert = contract.KPMGCommon_parmPrintDeclarationOfConformityCert())
+    {
+        return contract.KPMGCommon_parmPrintDeclarationOfConformityCert(_KPMGCommon_PrintDeclarationOfConformityCert);
+    }
+
+    boolean  KPMGCommon_GroupProductLines(boolean  _KPMGCommon_GroupProductLines = contract.KPMGCommon_parmGroupProductLines())
+    {
+        return contract.KPMGCommon_parmGroupProductLines(_KPMGCommon_GroupProductLines);
+    }
+
+}

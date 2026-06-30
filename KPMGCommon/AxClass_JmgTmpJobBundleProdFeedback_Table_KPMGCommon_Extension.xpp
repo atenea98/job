@@ -1,0 +1,41 @@
+﻿[ExtensionOf(tableStr(JmgTmpJobBundleProdFeedback))]
+final class JmgTmpJobBundleProdFeedback_Table_KPMGCommon_Extension
+{
+    /// <summary>
+    ///     Checks if the co/by-product is warehouse and license plate enabled.
+    /// </summary>
+    /// <returns>
+    ///     true if the co/by-product is warehouse and license plate enabled; otherwise false.
+    /// </returns>
+    [Hookable(false)]
+    public boolean KPMGCommon_checkWhsLicensePlateEnabledForCoByProduct()
+    {
+        InventTable inventTable = InventTable::find(this.ItemId);
+        if (this.isForLastOperation() && this.KPMGCommon_isCoByProduct() && inventTable.whsItemIsWHSControlled())
+        {
+            if (this.InventTransId) // Is not co/by product variation
+            {
+                InventDim coByInventDim = InventDim::find(PmfProdCoBy::findTransId(this.InventTransId).InventDimId);
+
+                if (coByInventDim.wMSLocationId)
+                {
+                    return WMSLocation::find(coByInventDim.wMSLocationId, coByInventDim.InventLocationId).whsLocationIsLPControlled();
+                }
+            }
+
+            ProdTable prodTable = ProdTable::find(this.JobRef);
+            var currentDate = DateTimeUtil::date(DateTimeUtil::applyTimeZoneOffset(DateTimeUtil::getSystemDateTime(), DateTimeUtil::getUserPreferredTimeZone()));
+            return prodTable && prodTable.defaultOutputLocationIsLPControlled(this.ItemId, currentDate);
+        }
+
+        return false;
+    }
+
+    [Hookable(false)]
+    public boolean KPMGCommon_isCoByProduct()
+    {
+        return (this.ProductType == PmfProductType::By_Product
+            || this.ProductType == PmfProductType::Co_Product);
+    }
+
+}

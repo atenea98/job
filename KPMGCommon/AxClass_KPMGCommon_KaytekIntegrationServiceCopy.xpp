@@ -1,0 +1,213 @@
+﻿public class KPMGCommon_KaytekIntegrationServiceCopy extends SysOperationServiceBase
+{
+
+
+    public void process(KPMGCommon_KaytekIntegrationContract _contract)
+    {
+        KPMGCommon_KaytekIntegrationTable logMess;
+        InventJournalTable               journalInv;
+        WMSJournalTable                  journalWms;
+        boolean                          processed;
+
+        while select forUpdate logMess
+            where logMess.Status == KPMGCommon_OperationStatus::Pending
+               || logMess.Status == KPMGCommon_OperationStatus::Error
+        {
+            processed = false;
+
+            journalInv = InventJournalTable::find(logMess.JournalId, true);
+            if (journalInv && !journalInv.SystemBlocked)
+            {
+                if (journalInv.Posted == NoYes::Yes)
+                {
+                    processed = true;
+                }
+                else
+                {
+                    try
+                    {
+                        ttsBegin;
+                        JournalCheckPost journalCheckPost =
+                            InventJournalCheckPost::newPostJournal(journalInv);
+                        journalCheckPost.run();
+                        ttsCommit;
+                    }
+                    catch (Exception::Error)
+                    {
+                        ttsAbort;
+                        this.updateError(logMess);
+                        continue;
+                    }
+
+                    journalInv = InventJournalTable::find(logMess.JournalId, true);
+                    if (journalInv.Posted == NoYes::Yes)
+                    {
+                        processed = true;
+                    }
+                    else
+                    {
+                        this.updateError(logMess);
+                        continue;
+                    }
+                }
+            }
+            else
+            {
+                journalWms = WMSJournalTable::find(logMess.JournalId, true);
+                if (journalWms && !journalWms.systemBlocked)
+                {
+                    if (journalWms.Posted == NoYes::Yes)
+                    {
+                        processed = true;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            ttsBegin;
+                            JournalCheckPost wmsPost =
+                                WMSJournalCheckPostReception::newTypeJournalTable(
+                                    JournalCheckPostType::Post,
+                                    journalWms);
+                            wmsPost.parmAutoBlock(true);
+                            wmsPost.run();
+                            ttsCommit;
+                        }
+                        catch (Exception::Error)
+                        {
+                            ttsAbort;
+                            this.updateError(logMess);
+                            continue;
+                        }
+
+                        journalWms = WMSJournalTable::find(logMess.JournalId, true);
+                        if (journalWms.Posted == NoYes::Yes)
+                        {
+                            processed = true;
+                        }
+                        else
+                        {
+                            this.updateError(logMess);
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            if (processed)
+            {
+                ttsBegin;
+                logMess.selectForUpdate(true);
+                logMess.Status         = KPMGCommon_OperationStatus::Success;
+                logMess.ErrorMessage   = "";
+                logMess.DateTimeLastTry = DateTimeUtil::utcNow();
+                logMess.update();
+                ttsCommit;
+
+                if (logMess.OperationType == KPMGCommon_OperationType::DailyReceiptItemJournal && journalWms)
+                {
+                    this.createPackingSlip(journalWms.JournalId);
+                }
+            }
+        }
+    }
+
+    public void updateError(KPMGCommon_KaytekIntegrationTable _table)
+    {
+        SysInfologEnumerator infologEnum = SysInfologEnumerator::newData(infolog.infologData());
+        SysInfologMessageStruct infoLogMessage;
+        str errorMsg;
+
+        while (infologEnum.moveNext())
+        {
+
+            infoLogMessage = SysInfologMessageStruct::construct(infologEnum.currentMessage());
+            errorMsg += infoLogMessage.message() + '\n';
+        }
+
+        if (strStartsWith(errorMsg, "Se ha registrado el diario.\n"))
+        {
+            int removeLen = strLen("Se ha registrado el diario.\n");
+            errorMsg = subStr(errorMsg, removeLen + 1, strLen(errorMsg)); // +1 para eliminar también el espacio o tab si lo hay
+        }
+
+        ttsBegin;
+        _table.selectForUpdate(true);
+        _table.ErrorMessage    = errorMsg;
+        _table.Status          = KPMGCommon_OperationStatus::Error;
+        _table.DateTimeLastTry = DateTimeUtil::utcNow();
+        _table.update();
+        ttsCommit;
+    }
+
+    private void createPackingSlip(WMSJournalId _wmsJournalId)
+    {
+        WMSJournalTrans        wmsTrans;
+        InventTransOrigin      inventTransOrigin;
+        ITMGoodsInTransitOrder transitOrder;
+        PurchId                purchId;
+        PurchTable             purchTable;
+        PurchFormLetter        purchFormLetter;
+        PurchaseOrderId        packSlipId;
+        date                   transDate;
+
+        select firstonly wmsTrans
+        where wmsTrans.JournalId == _wmsJournalId;
+
+        if (!wmsTrans.RecId)
+        {
+            warning(strFmt("@KPMGCommon:KaytekErrorNoLines", _wmsJournalId));
+            return;
+        }
+
+        inventTransOrigin = InventTransOrigin::findByInventTransId(wmsTrans.InventTransId);
+        switch (inventTransOrigin.ReferenceCategory)
+        {
+            case InventTransType::Purch:
+                purchId = inventTransOrigin.ReferenceId;
+                break;
+
+            case InventTransType::ITMGIT:
+                transitOrder = ITMGoodsInTransitOrder::find(inventTransOrigin.ReferenceId);
+                if (!transitOrder.RecId)
+                {
+                    warning(strFmt("@KPMGCommon:KaytekErrorNoTransitOrder", inventTransOrigin.ReferenceId));
+                    return;
+                }
+                purchId = transitOrder.TransRefId;
+                break;
+
+            default:
+                warning(strFmt("@KPMGCommon:KaytekErrorNoAssociation", _wmsJournalId));
+                return;
+        }
+
+        purchTable = PurchTable::find(purchId, true);
+        if (!purchTable.RecId)
+        {
+            warning(strFmt("@KPMGCommon:KaytekErrorPackingSlip", purchId));
+            return;
+        }
+
+        if (purchTable.DocumentState != VersioningDocumentState::Confirmed)
+        {
+            ttsBegin;
+            PurchFormLetter confirmForm = PurchFormLetter::construct(DocumentStatus::PurchaseOrder);
+            PurchaseOrderId newVersion = strFmt("%1-%2", purchTable.PurchId,VendPurchOrderJour::numberOfPurchaseOrderVersions(purchTable) + 1);
+            confirmForm.update(purchTable, newVersion, systemDateGet());
+            ttsCommit;
+        }
+
+        ttsBegin;
+        purchFormLetter = PurchFormLetter::construct(DocumentStatus::PackingSlip);
+        purchFormLetter.showQueryForm(false);
+        packSlipId = strFmt("%1", purchTable.PurchId);
+        transDate  = systemDateGet();
+
+        purchFormLetter.update(purchTable, packSlipId, transDate,PurchUpdate::All, AccountOrder::None, NoYes::No, NoYes::No);
+        ttsCommit;
+
+        info(strFmt("@KPMGCommon:KaytekCreatePackingSlip", packSlipId, purchTable.PurchId));
+    }
+
+}

@@ -1,0 +1,126 @@
+﻿[ExtensionOf(formStr(JmgProductionFloorExecutionReportProgressDetail))]
+final class JmgProductionFloorExecutionReportProgressDetail_KPMGCommon_Extension
+{
+    public void run()
+    {
+        next run();
+        
+        /*JmgTmpJobBundleProdFeedback jmgTmpJobBundleProdFeedback;        
+        FormDataSource              fds;
+        FormRun                     _caller = this.args().caller();        
+        
+        if (_caller.name() == formStr(JmgProductionFloorExecutionReportCoByProduct))
+        {
+            _caller.args().caller
+            fds = _caller.dataSource(FormDatasourceStr(JmgProductionFloorExecutionReportCoByProduct,JmgTmpJobBundleProdFeedback));
+            //jmgTmpJobBundleProdFeedback = fds.cursor();
+            for(jmgTmpJobBundleProdFeedback = fds.getFirst(true) ? fds.getFirst(true): fds.cursor();
+                jmgTmpJobBundleProdFeedback;
+                jmgTmpJobBundleProdFeedback = fds.getNext())
+            {
+                this.KPMGCommon_UpdatePercent(jmgTmpJobBundleProdFeedback);
+            }
+            
+        }  */            
+    }
+
+    /// <summary>
+    ///     Update percent
+    /// </summary>
+    public void KPMGCommon_UpdatePercent(JmgTmpJobBundleProdFeedback _jobBundleProdFeedback)
+    {
+        KPMGCommon_PercentConsumptionProduction percentConsumptionProductionTable;
+        ItemId itemId;
+        WMSLocationId wmsLocationId;
+        InventLocationId inventLocationId;
+        ProdId prodId = _jobBundleProdFeedback.JobRef;
+        Qty qtyPerRecord;
+        Qty qtyTotal;
+        container cont;
+
+        if(prodId)
+        {
+            while select percentConsumptionProductionTable
+                where percentConsumptionProductionTable.ProdId == prodId
+            {
+                qtyPerRecord = this.KPMGCommon_OnHand(percentConsumptionProductionTable.ItemId,
+                    percentConsumptionProductionTable.InventLocationId,
+                    percentConsumptionProductionTable.WMSLocationId);
+
+                cont += [percentConsumptionProductionTable.ItemId,
+                    percentConsumptionProductionTable.InventLocationId,
+                    percentConsumptionProductionTable.WMSLocationId, qtyPerRecord];
+                
+                qtyTotal += qtyPerRecord;
+            }
+            while (cont)
+            {
+                itemId = conPeek(cont, 1);
+                inventLocationId = conPeek(cont, 2);
+                wmsLocationId = conPeek(cont, 3);
+                qtyPerRecord = conPeek(cont, 4);
+                
+
+                select percentConsumptionProductionTable
+                        where percentConsumptionProductionTable.ProdId == prodId
+                        && percentConsumptionProductionTable.ItemId == itemid
+                        && percentConsumptionProductionTable.InventLocationId == inventLocationId
+                        && percentConsumptionProductionTable.WMSLocationId == wmsLocationId;
+
+                if(percentConsumptionProductionTable.RecId)
+                {
+                    ttsbegin;
+                    percentConsumptionProductionTable.selectForUpdate(true);
+                    if(qtyPerRecord > 0)
+                    {
+                        percentConsumptionProductionTable.Percent = (qtyPerRecord / qtyTotal) * 100;
+                    }
+                    else
+                    {
+                        percentConsumptionProductionTable.Percent = 0;
+                    }
+                    percentConsumptionProductionTable.update();
+                    ttscommit;
+                }
+                cont = conDel(cont, 1, 1);
+            }
+        }
+    }
+
+    public Qty KPMGCommon_OnHand(ItemId _itemId, InventLocationId _inventLocationId, WMSLocationId _wmsLocationId)
+    {
+        InventDim               inventDimCriteria;
+        InventDimParm           inventDimParmCriteria;
+        InventQty               inventQty;
+        InventDimOnHand         inventDimOnHand;
+        InventDimOnHandIterator inventDimOnHandIterator;
+        InventDimOnHandMember   inventDimOnHandMember;
+ 
+        // Inventory dimensions range
+        inventDimCriteria.InventLocationId    = _inventLocationId;
+        inventDimCriteria.wMSLocationId       = _wmsLocationId;
+        inventDimCriteria = InventDim::findOrCreate(inventDimCriteria);
+ 
+        inventDimParmCriteria.InventLocationIdFlag     = NoYes::Yes;
+        inventDimParmCriteria.wmsLocationIdFlag        = NoYes::Yes;
+ 
+        //inventDimOnHand            = InventDimOnHand_Physical::newPhysical(_itemId, inventDimCriteria, inventDimParmCriteria, inventDimOnHandLevel::Item, null);
+        inventDimOnHand = InventDimOnHand::newAvailPhysical(_itemId, inventDimCriteria, inventDimParmCriteria, inventDimOnHandLevel::Item, null);
+ 
+        inventDimOnHandIterator    = inventDimOnHand.onHandIterator();
+ 
+        while (inventDimOnHandIterator.more())
+        {
+            // A location can contain multiple items in it.
+            // Class <c>InventDimOnHand</c> consists of InventDimOnHandMember classes.
+            // Each class <c>InventDimOnHandMember</c> instance contains information about item, inventory dimensions and quantity.
+            inventDimOnHandMember    = inventDimOnHandIterator.value();
+ 
+            inventQty += inventDimOnHandMember.parmInventQty();
+ 
+            inventDimOnHandIterator.next();
+        }
+        return inventQty;
+    }
+
+}

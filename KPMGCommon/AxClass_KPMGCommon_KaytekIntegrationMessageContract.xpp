@@ -1,0 +1,61 @@
+﻿[DataContract]
+public class KPMGCommon_KaytekIntegrationMessageContract
+{
+    JournalId                   journalNum;
+    KPMGCommon_OperationType    operationType;
+    DateTimeExecuted            dateTime;
+    KPMGCommon_OperationStatus  status;
+    str                         errorMessage;
+    UserId                      user;
+    DateTimeExecuted            dateTimeLastTry;
+
+    [DataMember]
+    public JournalId parmJournalId (JournalId _jum = journalNum)
+    {
+        journalNum = _jum;
+        return journalNum;
+    }
+
+    [DataMember]
+    public KPMGCommon_OperationType parmOperationType (KPMGCommon_OperationType _oT = operationType)
+    {
+        operationType = _oT;
+        return operationType;
+    }
+
+    [DataMember]
+    public DateTimeExecuted parmDateTime (DateTimeExecuted _dT = dateTime)
+    {
+        dateTime = _dT;
+        return dateTime;
+    }
+
+    [DataMember]
+    public KPMGCommon_OperationStatus parmStatus (KPMGCommon_OperationStatus _status = status)
+    {
+        status = _status;
+        return status;
+    }
+
+    [DataMember]
+    public str parmErrorMessage (str _errorMessage = errorMessage)
+    {
+        errorMessage = _errorMessage;
+        return errorMessage;
+    }
+
+    [DataMember]
+    public UserId parmUserId (UserId _user = user)
+    {
+        user = _user;
+        return user;
+    }
+
+    [DataMember]
+    public DateTimeExecuted parmDateTimeLastTry (DateTimeExecuted _dTLastTry = dateTimeLastTry)
+    {
+        dateTimeLastTry = _dTLastTry;
+        return dateTimeLastTry;
+    }
+
+}

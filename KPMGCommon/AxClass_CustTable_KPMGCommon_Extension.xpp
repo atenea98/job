@@ -1,0 +1,22 @@
+﻿[ExtensionOf(tableStr(CustTable))]
+final class CustTable_KPMGCommon_Extension
+{
+
+    void insert(DirPartyType _partyType, Name _name ,boolean _updateCRM)
+    {
+        this.KPMGCommon_PendienteActualizarKaytek = true;
+        next insert(_partyType,_name,_updateCRM);
+    }
+
+    void update(boolean _updateSmmBusRelTable, boolean _updateParty)
+    {
+        CustTable custTable = this.orig();
+
+        if (custTable.KPMGCommon_PendienteActualizarKaytek == false)
+        {
+            this.KPMGCommon_PendienteActualizarKaytek = true;
+        }
+        next update(_updateSmmBusRelTable,_updateParty);
+    }
+
+}

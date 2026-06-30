@@ -1,0 +1,30 @@
+﻿[ExtensionOf(tableStr(WMSJournalName))]
+final class WMSJournalName_KPMGCommon_Extension
+{
+    public boolean validateWrite()
+    {
+        boolean ret = next validateWrite();
+        if (!ret)
+        {
+            return false;
+        }
+
+        if (this.KPMGCommon_KaytekIntegration == NoYes::Yes)
+        {
+            WMSJournalName existingRec;
+
+            select firstonly existingRec
+                where existingRec.JournalType               == this.JournalType
+                   && existingRec.KPMGCommon_KaytekIntegration == NoYes::Yes
+                   && existingRec.RecId                      != this.RecId;
+
+            if (existingRec.RecId)
+            {
+                throw error(strFmt("@KPMGCommon:KaytekIntegrationLimitField"));
+                return false;
+            }
+        }
+        return true;
+    }
+
+}

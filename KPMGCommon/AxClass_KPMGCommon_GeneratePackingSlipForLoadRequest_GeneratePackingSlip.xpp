@@ -1,0 +1,20 @@
+﻿/// <summary>
+/// Class for the generate packingslip for load service request structure
+/// </summary>
+class KPMGCommon_GeneratePackingSlipForLoadRequest_GeneratePackingSlip extends KPMGCommon_RequestBase
+{
+    WHSLoadId   loadId;
+     
+    /// <summary>
+    /// LoadId for the request
+    /// </summary>
+    /// <param name = "parmKPMGCommon_LoadId"loadId data as input</param>
+    /// <returns>Header data as output</returns>
+    [DataMemberAttribute('LoadId'), AifCollectionTypeAttribute("return", Types::String, extendedTypeStr(WHSLoadId))]
+    public WHSLoadId parmLoadId(WHSLoadId _loadId = loadId)
+    {
+        loadId = _loadId;
+        return loadId;
+    }
+
+}

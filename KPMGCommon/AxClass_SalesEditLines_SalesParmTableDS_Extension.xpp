@@ -1,0 +1,21 @@
+﻿[ExtensionOf(formDataSourceStr(SalesEditLines, SalesParmTable))]
+final class SalesEditLines_SalesParmTableDS_Extension
+{
+    int  active()
+    {
+        int ret;
+        FormDataSource fds = this;
+        SalesParmTable salesParmTable;
+
+        ret = next active();
+
+        salesParmTable = fds.formRun().dataSource(formDataSourceStr(SalesEditLines, SalesParmTable)).cursor();
+
+        fds.object(fieldNum(SalesParmTable, KPMGCommon_InvoiceObservation)).visible(false);
+        if (salesParmTable.Ordering == DocumentStatus::Invoice)
+            fds.object(fieldNum(SalesParmTable, KPMGCommon_InvoiceObservation)).visible(true);
+
+        return ret;
+    }
+
+}

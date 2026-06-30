@@ -1,0 +1,14 @@
+﻿[Form]
+public class KPMGCommon_TrazabilityForm extends FormRun
+{
+    /// <summary>
+    ///
+    /// </summary>
+    public void init()
+    {
+        super();
+        KPMGCommon_Trazability_ds.query().dataSourceTable(tableNum(KPMGCommon_Trazability)).addSortField(
+            fieldNum(KPMGCommon_Trazability, JournalId), SortOrder::Descending);
+    }
+
+}

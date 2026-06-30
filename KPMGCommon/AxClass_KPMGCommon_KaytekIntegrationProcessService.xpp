@@ -1,0 +1,44 @@
+﻿public class KPMGCommon_KaytekIntegrationProcessService
+{
+    [SysEntryPointAttribute]
+    public void process(KPMGCommon_KaytekIntegrationProcessContract contract)
+    {
+        KPMGCommon_KaytekIntegrationTable msg;
+        Query                   qry = new Query();
+        QueryBuildDataSource    qbds;
+        QueryRun                     qr;
+        InventJournalTable           journal;
+
+
+        qbds = qry.addDataSource(tableNum(KPMGCommon_KaytekIntegrationTable));
+        qbds.addRange(fieldNum(KPMGCommon_KaytekIntegrationTable, Status))
+            .value(queryValue(contract.parmStatus()));
+
+        if (!contract.parmOperationType())
+        {
+            qbds.addRange(fieldNum(KPMGCommon_KaytekIntegrationTable, OperationType))
+                .value(queryValue(contract.parmOperationType()));
+        }
+
+        qr = new QueryRun(qry);
+
+        while (qr.next())
+        {
+            msg = qr.get(tableNum(KPMGCommon_KaytekIntegrationTable));
+
+            ttsBegin;
+
+            select firstOnly forUpdate journal
+            where journal.JournalId == msg.JournalId;
+
+            if (journal.RecId)
+            {
+                msg.RecId = journal.RecId;
+                msg.update();
+            }
+
+            ttsCommit;
+        }
+    }
+
+}

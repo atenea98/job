@@ -1,0 +1,112 @@
+﻿[ExtensionOf(classStr(JmgJobBundleProdFeedbackForm))]
+final class JmgJobBundleProdFeedbackForm_KPMGCommon_Extension
+{
+    /// <summary>
+    ///     Checks if the Location number is enabled for <c>JmgTmpJobBundleProdFeedback</c>.
+    /// </summary>
+    /// <param name = "_jobBundleProdFeedback">
+    ///     The <c>JmgTmpJobBundleProdFeedback</c> to make this check for.
+    /// </param>
+    /// <returns>
+    ///     true if Location is enabled for job; otherwise, false.
+    /// </returns>
+    /// <remarks>
+    /// The check passes when item is Location number enabled,
+    /// batch number group is not set for an item or
+    /// physical update is set to No for the batch number group.
+    /// </remarks>
+    [Hookable(false)]
+    internal boolean wMSLocationRequired(JmgTmpJobBundleProdFeedback _jobBundleProdFeedback)
+    {
+        if (!_jobBundleProdFeedback.isForLastOperation())
+        {
+            return false;
+        }
+
+        if (!_jobBundleProdFeedback.ItemId)
+        {
+            throw Error(strFmt("@SYS50104", "@ENG185"));
+        }
+        
+        if (!InventTable::IsWMSLocationReceiptRequired(_jobBundleProdFeedback.ItemId))
+        {
+            return false;
+        }
+        
+        return true;
+    }
+
+    /// <summary>
+    /// Saves the quantity for the corresponding <c>JmgJobBundle</c> record.
+    /// </summary>
+    /// <param name = "_feedbackParams"> Feedback parameters for a specific job. </param>
+    /// <param name = "_jobBundleProdFeedback"> The feedback provided by the user on the specific job. </param>
+    /// <param name = "_tmpJobBundleProdFeedback"> A temporary buffer that contains the feedback provided by the user. </param>
+    protected void saveQuantity(JmgRegistrationParameters _feedbackParams, JmgTmpJobBundleProdFeedback _jobBundleProdFeedback, JmgTmpJobBundleProdFeedback _tmpJobBundleProdFeedback)
+    {
+        next saveQuantity(_feedbackParams, _jobBundleProdFeedback, _tmpJobBundleProdFeedback);
+
+        _feedbackParams.parmWMSLocationId((_jobBundleProdFeedback.GoodNow > 0 && this.wMSLocationRequired(_jobBundleProdFeedback)) ? _jobBundleProdFeedback.KPMGCommon_WMSlocation : "");
+                
+    }
+
+    /// <summary>
+    /// Initializes the production job feedback from the production jobs.
+    /// </summary>
+    /// <param name = "_jmgTmpJobBundleProdFeedback">A production job feedback record.</param>
+    /// <param name = "_prodJob">A production job object to initialize from.</param>
+    protected void initializeTmpJobBundleProdFeedbackFromProductionJob(JmgTmpJobBundleProdFeedback _jmgTmpJobBundleProdFeedback, JmgTermJob_Prod _prodJob)
+    {
+
+        next initializeTmpJobBundleProdFeedbackFromProductionJob(_jmgTmpJobBundleProdFeedback, _prodJob);
+
+        _jmgTmpJobBundleProdFeedback.KPMGCommon_WMSlocation  = this.wMSLocationRequired(_jmgTmpJobBundleProdFeedback)
+                                                                    ? _prodJob.getWMSLocationId() : null;
+
+    }
+
+    /// <summary>
+    /// Initializes the production job feedback from the co/by product.
+    /// </summary>
+    /// <param name = "_jmgTmpJobBundleProdFeedback">A production job feedback record.</param>
+    /// <param name = "_job">A production job object for a main item/formula to initialize from.</param>
+    /// <param name = "_prodCoBy">A <c>PmfProdCoBy</c> object to initialize from.</param>
+    protected void initializeTmpJobBundleProdFeedbackFromCoByProduct(JmgTmpJobBundleProdFeedback _jmgTmpJobBundleProdFeedback, JmgTermJob_Prod _job, PmfProdCoBy _prodCoBy)
+    {
+        next initializeTmpJobBundleProdFeedbackFromCoByProduct(_jmgTmpJobBundleProdFeedback, _Job, _prodCoBy);
+
+        _jmgTmpJobBundleProdFeedback.KPMGCommon_WMSlocation  = this.wMSLocationRequired(_jmgTmpJobBundleProdFeedback)
+                                                                    ? InventDim::find(_prodCoBy.InventDimId).wMSLocationId : null;
+    }
+
+    /// <summary>
+    ///     Builds a lookup query for the <c>WMSLocationId</c> field.
+    /// </summary>
+    /// <param name = "_prodId">The <c>ProdId</c> of the reported production order.</param>
+    /// <param name = "_itemId">The <c>ItemId</c> of the reported product.</param>
+    /// <param name = "_inventTransId">The <c>InventTransId</c> of the reported product. It is null for reporting co-product variation. </param>
+    /// <param name = "_wMSLocationValue">The <c>iWMSLocationId</c> value if the location number checking in the lookup list needed. Optional.
+    /// </param>
+    /// <returns>
+    ///     A query for selecting all non-empty location numbers for this production order
+    ///     or a query for checking the location number in the location number lookup list.
+    /// </returns>
+    [Hookable(false)]
+    internal static Query buildWMSLocationNumberLookupQuery(ProdId _prodId, ItemId _itemId, InventTransId _inventTransId = null, str _wMSLocationValue = SysQuery::valueNotEmptyString())
+    {
+        Query                   query = new Query();
+        QueryBuildDataSource    queryBuildWMSLocationDataSource;
+        InventLocationId        inventLocationId = ProdTable::find(_prodId).inventDim().InventLocationId;
+        InventTable             inventTable = InventTable::find(_itemId);
+
+
+        queryBuildWMSLocationDataSource = query.addDataSource(tableNum(WMSLocation));
+        queryBuildWMSLocationDataSource.addRange(fieldNum(WMSLocation, WMSLocationId)).value(_wMSLocationValue);
+        queryBuildWMSLocationDataSource.addRange(fieldNum(WMSLocation, LocProfileId)).value(inventTable.KPMGCommon_LocProfileId);
+        if (inventLocationId)
+            queryBuildWMSLocationDataSource.addRange(fieldNum(WMSLocation, InventLocationId)).value(inventLocationId);
+
+        return query;
+    }
+
+}

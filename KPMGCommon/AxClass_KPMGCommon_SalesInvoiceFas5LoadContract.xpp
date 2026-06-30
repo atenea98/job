@@ -1,0 +1,13 @@
+﻿[DataContractAttribute]
+class KPMGCommon_SalesInvoiceFas5LoadContract
+{
+    private boolean postJournals;
+
+    [DataMember, SysOperationLabel(literalStr("@KPMGCommon:PostJournals")),SysOperationDisplayOrder('1')]
+    public boolean parmPostJournals(boolean _postJournals = postJournals)
+    {
+        postJournals = _postJournals;
+        return postJournals;
+    }
+
+}

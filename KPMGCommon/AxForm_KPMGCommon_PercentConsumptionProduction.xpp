@@ -1,0 +1,161 @@
+﻿[Form]
+public class KPMGCommon_PercentConsumptionProduction extends FormRun
+{
+    JmgTmpJobBundleProdFeedback jmgTmpJobBundleProdFeedback;
+
+   /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public boolean canClose()
+    {
+        boolean ret;
+        KPMGCommon_PercentConsumptionProduction percentConsumptionProductionExists, percentConsumptionProductionGroup, percentConsumptionProductionGroupType,
+                                                percentConsumptionProductionGroupMouthDryer, _TotalpercentConsumptionProductionMouthDryer,
+                                                percentConsumptionProductionGroupHooper, _TotalpercentConsumptionProductionHopper;
+        Percent     typePercent, TotalDryerPercent;
+        ErrorMsg    errormessage;
+   
+        ret = super();
+        
+        if (ret)
+        {
+            Select firstonly percentConsumptionProductionExists
+                    group by WrkCtrId, ProdId
+                where percentConsumptionProductionExists.ProdId == KPMGCommon_PercentConsumptionProduction.ProdId
+                   && !percentConsumptionProductionExists.DisableMouth;    
+            if (percentConsumptionProductionExists)
+            {
+                while select percentConsumptionProductionGroup
+                    group by ProdId, LineNum, OprNum, ItemId, WrkCtrId
+                    where percentConsumptionProductionGroup.ProdId == KPMGCommon_PercentConsumptionProduction.ProdId
+                       && !percentConsumptionProductionGroup.DisableMouth
+                {
+                    typePercent = 0;
+                    while select percentConsumptionProductionGroupType
+                        group by ProdId, LineNum, OprNum, ItemId, WrkCtrId, TypeId, TypePercent
+                        where percentConsumptionProductionGroupType.ProdId   == percentConsumptionProductionGroup.ProdId
+                           && percentConsumptionProductionGroupType.LineNum  == percentConsumptionProductionGroup.LineNum
+                           && percentConsumptionProductionGroupType.OprNum   == percentConsumptionProductionGroup.OprNum
+                           && percentConsumptionProductionGroupType.ItemId   == percentConsumptionProductionGroup.ItemId
+                           && percentConsumptionProductionGroupType.WrkCtrId == percentConsumptionProductionGroup.WrkCtrId
+                           && !percentConsumptionProductionGroupType.DisableMouth
+                    {
+                        typePercent = typePercent + percentConsumptionProductionGroupType.TypePercent;
+                    }
+                    
+                    if (typePercent != 100)
+                    {
+                        if (errormessage)
+                                errormessage += "/n";
+
+                        errormessage += strFmt("@KPMGCommon:ErrorTypePercentageConsumption", typePercent); //El porcentaje Tipo total de consumo debe ser 100% y no %1.
+                    }
+
+                    while select percentConsumptionProductionGroupMouthDryer
+                        group by ProdId, LineNum, OprNum, ItemId, WrkCtrId, typeId, ResourceMouth
+                        where percentConsumptionProductionGroupMouthDryer.ProdId   == percentConsumptionProductionGroup.ProdId
+                           && percentConsumptionProductionGroupMouthDryer.LineNum  == percentConsumptionProductionGroup.LineNum
+                           && percentConsumptionProductionGroupMouthDryer.OprNum   == percentConsumptionProductionGroup.OprNum
+                           && percentConsumptionProductionGroupMouthDryer.ItemId   == percentConsumptionProductionGroup.ItemId
+                           && percentConsumptionProductionGroupMouthDryer.WrkCtrId == percentConsumptionProductionGroup.WrkCtrId
+                           && !percentConsumptionProductionGroupMouthDryer.DisableMouth
+                    {
+                        TotalDryerPercent = 0;
+                        while select _TotalpercentConsumptionProductionMouthDryer
+                            group by ProdId, LineNum, OprNum, ItemId, WrkCtrId, typeId, ResourceMouth, ResourceDryer, DryerPercent
+                            where _TotalpercentConsumptionProductionMouthDryer.ProdId   == percentConsumptionProductionGroupMouthDryer.ProdId
+                               && _TotalpercentConsumptionProductionMouthDryer.LineNum  == percentConsumptionProductionGroupMouthDryer.LineNum
+                               && _TotalpercentConsumptionProductionMouthDryer.OprNum   == percentConsumptionProductionGroupMouthDryer.OprNum
+                               && _TotalpercentConsumptionProductionMouthDryer.ItemId   == percentConsumptionProductionGroupMouthDryer.ItemId
+                               && _TotalpercentConsumptionProductionMouthDryer.WrkCtrId == percentConsumptionProductionGroupMouthDryer.WrkCtrId
+                               && _TotalpercentConsumptionProductionMouthDryer.TypeId == percentConsumptionProductionGroupMouthDryer.TypeId
+                               && _TotalpercentConsumptionProductionMouthDryer.ResourceMouth   == percentConsumptionProductionGroupMouthDryer.ResourceMouth
+                               && !_TotalpercentConsumptionProductionMouthDryer.DisableMouth
+                        {
+                            TotalDryerPercent = TotalDryerPercent + _TotalpercentConsumptionProductionMouthDryer.DryerPercent;
+                        }
+
+                        if (TotalDryerPercent != 100)
+                        {
+                            if (errormessage)
+                                errormessage += "/n";
+
+                            errormessage += strFmt("@KPMGCommon:ErrorDryerForMouthPercentageConsumption", percentConsumptionProductionGroupMouthDryer.ResourceMouth,
+                                                                                                          TotalDryerPercent); //El Total porcentaje secador para boca %1 debe ser 100% y no %2.
+                        }
+                    }
+            
+                    /*while select percentConsumptionProductionGroupHooper
+                    group by ProdId, LineNum, OprNum, ItemId, WrkCtrId, typeId, ResourceMouth, ResourceDryer, InventLocationId
+                        where percentConsumptionProductionGroupHooper.ProdId   == percentConsumptionProductionGroup.ProdId
+                           && percentConsumptionProductionGroupHooper.LineNum  == percentConsumptionProductionGroup.LineNum
+                           && percentConsumptionProductionGroupHooper.OprNum   == percentConsumptionProductionGroup.OprNum
+                           && percentConsumptionProductionGroupHooper.ItemId   == percentConsumptionProductionGroup.ItemId
+                           && percentConsumptionProductionGroupHooper.WrkCtrId == percentConsumptionProductionGroup.WrkCtrId
+                           && !percentConsumptionProductionGroupHooper.DisableMouth
+                    {
+                        select sum(percent) from _TotalpercentConsumptionProductionHopper
+                            where _TotalpercentConsumptionProductionHopper.ProdId   == percentConsumptionProductionGroupHooper.ProdId
+                               && _TotalpercentConsumptionProductionHopper.LineNum  == percentConsumptionProductionGroupHooper.LineNum
+                               && _TotalpercentConsumptionProductionHopper.OprNum   == percentConsumptionProductionGroupHooper.OprNum
+                               && _TotalpercentConsumptionProductionHopper.ItemId   == percentConsumptionProductionGroupHooper.ItemId
+                               && _TotalpercentConsumptionProductionHopper.WrkCtrId == percentConsumptionProductionGroupHooper.WrkCtrId
+                               && _TotalpercentConsumptionProductionHopper.TypeId == percentConsumptionProductionGroupHooper.TypeId
+                               && _TotalpercentConsumptionProductionHopper.ResourceMouth == percentConsumptionProductionGroupHooper.ResourceMouth
+                               && !_TotalpercentConsumptionProductionHopper.DisableMouth
+                               && _TotalpercentConsumptionProductionHopper.ResourceDryer == percentConsumptionProductionGroupHooper.ResourceDryer
+                               && _TotalpercentConsumptionProductionHopper.InventLocationId == percentConsumptionProductionGroupHooper.InventLocationId;
+                        if (_TotalpercentConsumptionProductionHopper.Percent != 100)
+                        {
+                            if (errormessage)
+                                errormessage += "/n";
+
+                            errormessage += strFmt("@KPMGCommon:ErrorWarehouseHopperPercentageConsumption", _TotalpercentConsumptionProductionHopper.InventLocationId, 
+                                                                                                            _TotalpercentConsumptionProductionHopper.Percent); //El porcentaje total de Tolva para almacén %1 debe ser 100% y no %2.
+                        }
+                    }*/
+                }
+                if (errormessage)
+                    ret = checkFailed(errormessage);
+            }
+        }
+
+        return ret;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public void init()
+    {
+        if (element.args().caller()  &&
+            element.args().dataset() == tableNum(JmgTmpJobBundleProdFeedback))
+        {
+            jmgTmpJobBundleProdFeedback = element.args().record();
+        }
+
+        super();
+    }
+
+    [DataSource]
+    class KPMGCommon_PercentConsumptionProduction
+    {
+        /// <summary>
+        ///
+        /// </summary>
+        public void init()
+        {
+            super();
+            this.query().dataSourceTable(tableNum(KPMGCommon_PercentConsumptionProduction)).addSortField(fieldNum(KPMGCommon_PercentConsumptionProduction, ProdId),SortOrder::Descending);
+            this.query().dataSourceTable(tableNum(KPMGCommon_PercentConsumptionProduction)).addSortField(fieldNum(KPMGCommon_PercentConsumptionProduction, LineNum),SortOrder::Ascending);
+            this.query().dataSourceTable(tableNum(KPMGCommon_PercentConsumptionProduction)).addSortField(fieldNum(KPMGCommon_PercentConsumptionProduction, OprNum),SortOrder::Ascending);
+                
+          
+            if (jmgTmpJobBundleProdFeedback)
+                this.query().dataSourceTable(tableNum(KPMGCommon_PercentConsumptionProduction)).addRange(fieldNum(KPMGCommon_PercentConsumptionProduction, ProdId)).value(queryValue(jmgTmpJobBundleProdFeedback.JobRef));
+        }
+
+    }
+
+}

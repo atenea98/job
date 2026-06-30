@@ -1,0 +1,54 @@
+﻿[ExtensionOf(classStr(JmgProdMultiStartUp))]
+final class JmgProdMultiStartUp_Class_Extension
+{
+    protected void startProductionOrder(ProdParmStartUp prodParmStartUp, ProdPurch prodPurch)
+    {
+        next startProductionOrder(prodParmStartUp, prodPurch);
+
+        this.KPMGCommon_CreateWarehouseEntityWHSLicensePlateId(prodParmStartUp.prodTable());
+
+    }
+
+    public void KPMGCommon_CreateWarehouseEntityWHSLicensePlateId (ProdTable _prodTable)
+    {
+        JmgParameters   jmgParameters = JmgParameters::find();
+        ProdBOM         prodBOM;
+        ProdRoute       prodRoute;
+        WrkCtrCapRes    wrkCtrCapRes;
+        WrkCtrTable     wrkCtrTable;
+
+        if (jmgParameters.KPMGCommon_AssignmentIntelligentLicensePlateCode &&
+            InventTable::find(_prodTable.ItemId).KPMGCommon_AssignmentIntelligentLicensePlateCode &&
+            _prodTable.ProdStatus == ProdStatus::StartedUp)
+        {
+            select prodBOM
+                where prodBOM.ProdId == _prodTable.prodId
+                join prodRoute
+                where prodRoute.ProdId == prodBOM.ProdId
+                   && prodRoute.OprNum == prodBOM.OprNum
+                join wrkCtrCapRes
+                group by RefId, OprNum, OprPriority, WrkCtrId
+                where wrkCtrCapRes.RefId        == prodRoute.ProdId
+                    && wrkCtrCapRes.OprNum       == prodRoute.OprNum
+                    && wrkCtrCapRes.OprPriority  == prodRoute.OprPriority
+                    && wrkCtrCapRes.WrkCtrId;
+
+             select  wrkCtrTable
+                where wrkCtrTable.WrkCtrId == wrkCtrCapRes.WrkCtrId
+                   && wrkCtrTable.KPMGCommon_WHSLicensePlateIdLine;
+            
+            ttsbegin;
+            _prodTable.selectForUpdate(true);
+            
+            _prodTable.KPMGCommon_WHSLicensePlateIdDay = dayOfMth(_prodTable.StUpDate);
+            _prodTable.KPMGCommon_WHSLicensePlateIdMonth = mthOfYr(_prodTable.StUpDate);
+            _prodTable.KPMGCommon_WHSLicensePlateIdYear = str2Int(subStr(Int2str(year(_prodTable.StUpDate)),3,2));
+            _prodTable.KPMGCommon_WHSLicensePlateIdLine = wrkCtrTable.KPMGCommon_WHSLicensePlateIdLine;
+            _prodTable.KPMGCommon_WHSLicensePlateIdNumberSack = 1;
+
+            _prodTable.doUpdate();
+            ttscommit;
+        }
+    }
+
+}

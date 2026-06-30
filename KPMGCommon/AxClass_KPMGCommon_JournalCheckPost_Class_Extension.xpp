@@ -1,0 +1,79 @@
+﻿[ExtensionOf(classstr(JournalCheckPost))]
+final class KPMGCommon_JournalCheckPost_Class_Extension
+{
+    public void run()
+    {
+        str errorMessages;
+        InventJournalTable      inventJournalTable;
+        WMSJournalTable         wmsJournalTable;
+
+        infolog().clear();
+
+        next run();
+
+        inventJournalTable = InventJournalTable::find(this.journalId);
+        wmsJournalTable = WMSJournalTable::find(this.journalId);
+
+        if(inventJournalTable.Posted == NoYes::Yes || wmsJournalTable.posted == NoYes::Yes)
+        {
+            this.updateExternalTable(true, "");
+        }
+        else
+        {
+            errorMessages = this.getInfologMessages();
+            this.updateExternalTable(false, errorMessages);
+        }
+
+    }
+
+    protected void updateExternalTable(boolean _isPosted, str _message)
+    {
+        KPMGCommon_KaytekIntegrationTable trackingTable;
+
+        ttsbegin;
+
+        select forupdate trackingTable
+            where trackingTable.JournalId == this.journalId; // Usa el JournalId de la clase base
+
+        if (trackingTable.RecId)
+        {
+            if (_isPosted)
+            {
+                trackingTable.selectForUpdate(true);
+                trackingTable.Status     = KPMGCommon_OperationStatus::Success;
+                trackingTable.DateTimeLastTry = DateTimeUtil::utcNow();
+            }
+            else
+            {
+                trackingTable.Status     = KPMGCommon_OperationStatus::Error;
+            }
+
+            trackingTable.ErrorMessage = _message;
+            trackingTable.update();
+        }
+
+        ttscommit;
+    }
+
+    protected str getInfologMessages()
+    {
+        SysInfologEnumerator infoEnum = SysInfologEnumerator::newData(infolog.infologData());
+        SysInfologMessageStruct infoLogMessage;
+        str allMessages;
+
+        while (infoEnum.moveNext())
+        {
+            infoLogMessage = SysInfologMessageStruct::construct(infoEnum.currentMessage());
+            allMessages += infoLogMessage.message() + "\n";
+        }
+
+        if (strStartsWith(allMessages, "Se ha registrado el diario.\n"))
+        {
+            int removeLen = strLen("Se ha registrado el diario.\n");
+            allMessages = subStr(allMessages, removeLen + 1, strLen(allMessages)); // +1 para eliminar también el espacio o tab si lo hay
+        }
+
+        return allMessages;
+    }
+
+}

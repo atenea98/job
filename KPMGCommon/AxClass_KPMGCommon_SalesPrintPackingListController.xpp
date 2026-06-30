@@ -1,0 +1,36 @@
+﻿final class KPMGCommon_SalesPrintPackingListController extends SysOperationServiceController
+{
+    protected void new()
+    {
+        super(classStr(KPMGCommon_SalesPrintPackingListService), methodStr(KPMGCommon_SalesPrintPackingListService, process), SysOperationExecutionMode::Synchronous); //¿Qué modo de ejecución queremos?
+    }
+
+    public ClassDescription defaultCaption()
+    {
+        return "@KPMGCommon:PackingListPrint"; //Imprimir Packinglist
+    }
+
+    public static KPMGCommon_SalesPrintPackingListController construct(SysOperationExecutionMode _executionMode = SysOperationExecutionMode::Synchronous)
+    {
+        KPMGCommon_SalesPrintPackingListController controller;
+        controller = new KPMGCommon_SalesPrintPackingListController();
+        controller.parmExecutionMode(_executionMode);
+        controller.parmShowDialog(false);
+        return controller;
+    }
+
+    public static void main (Args _args)
+    {
+        KPMGCommon_SalesPrintPackingListContract   contract;
+        KPMGCommon_SalesPrintPackingListController controller;
+        CustPackingSlipJour                             custPackingSlipJour;
+
+        controller = KPMGCommon_SalesPrintPackingListController::construct();
+        controller.parmArgs(_args);
+        custPackingSlipJour = _args.record();
+        contract = controller.getDataContractObject();
+        contract.parmCustPackingSlipJour(custPackingSlipJour);
+        controller.startOperation();
+    }
+
+}

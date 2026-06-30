@@ -1,0 +1,153 @@
+﻿[ExtensionOf(classStr(JmgJobBundle))]
+final class JmgJobBundle_KPMGCommon_Extension
+{
+    /// <summary>
+    /// Posts time journals for the registrations made on this job bundle.
+    /// </summary>
+    void postTime()
+    {
+        next postTime();
+
+        this.KPMGCommon_Reorganizate_ProdParmReportFinished();
+        this.KPMGCommon_printLabels_CoProducts();
+    }
+
+    public void KPMGCommon_Reorganizate_ProdParmReportFinished()
+    {
+        ProdParmReportFinished  prodParmReportFinishedFirst, prodParmReportFinishedReorganizate, prodParmReportFinishedCreate;
+        InventDim               inventDim;
+        
+        if (jmgProdMultiReportFinished && registrationSetup.PrintLabel && JmgParameters::find().KPMGCommon_PrintCoProductLabel)
+        {
+            MapIterator activeJobsIterator = this.getActiveJobsIterator();
+            while (activeJobsIterator.more())
+            {
+                JmgTermJob job = activeJobsIterator.value();
+
+                if (job.module() == JmgModuleEnum::PROD && job.jobRef())
+                {
+                    JmgTermJob_Prod prodJob = job;
+                    ProdRoute prodRoute = prodJob.prodRoute();
+
+                    if ((!KPMGCommon_JmgJobBundlePrintLabelPrimaryOprPriorityFlight::instance().isEnabled() && prodRoute.isLastOpr()) ||
+                    (KPMGCommon_JmgJobBundlePrintLabelPrimaryOprPriorityFlight::instance().isEnabled() &&
+                    prodRoute.OprPriority == RouteOprPriority::Primary &&
+                    prodJob.prodJobType() == RouteJobType::Process &&
+                    prodRoute.isLastOpr()))
+                    {
+                        prodParmReportFinishedFirst = ProdParmReportFinished::find(jmgProdMultiReportFinished.parmId(), prodJob.jobRef());
+                        if (prodParmReportFinishedFirst &&
+                            prodParmReportFinishedFirst.PmfProductType == PmfProductType::Co_Product &&
+                            InventDim::find(prodParmReportFinishedFirst.InventDimId).LicensePlateId)
+                        {
+                            ttsbegin;
+                            select firstonly forupdate prodParmReportFinishedReorganizate
+                                where prodParmReportFinishedReorganizate.ParmId == jmgProdMultiReportFinished.parmId()
+                                   && prodParmReportFinishedReorganizate.ProdId == prodJob.jobRef()
+                                   && prodParmReportFinishedReorganizate.PmfProductType != PmfProductType::Co_Product;
+                            if (prodParmReportFinishedReorganizate)
+                            {
+                                prodParmReportFinishedCreate.data(prodParmReportFinishedReorganizate);
+                                prodParmReportFinishedCreate.LineNum = 1;
+                                prodParmReportFinishedReorganizate.delete();
+                                prodParmReportFinishedCreate.insert();
+                            }
+                            ttscommit;
+                            ttsbegin;
+                            int linenum = 1;
+                            while select forupdate prodParmReportFinishedReorganizate
+                                where prodParmReportFinishedReorganizate.ParmId == jmgProdMultiReportFinished.parmId()
+                                   && prodParmReportFinishedReorganizate.ProdId == prodJob.jobRef()
+                                   && prodParmReportFinishedReorganizate.PmfProductType == PmfProductType::Co_Product
+                            {
+                                ++linenum;
+                                prodParmReportFinishedCreate.data(prodParmReportFinishedReorganizate);
+                                prodParmReportFinishedCreate.LineNum = linenum;
+                                prodParmReportFinishedReorganizate.delete();
+                                prodParmReportFinishedCreate.insert();
+                            }
+                            ttscommit;
+                        }
+                    }
+                }
+                activeJobsIterator.next();
+            }
+        }
+    }
+
+    public void KPMGCommon_printLabels_CoProducts()
+    {
+        ProdParmReportFinished  prodParmReportFinished;
+        InventDim               inventDim;
+        //JmgProductionFloorExecutionClientIdentifier     clientId = JmgProductionFloorExecutionClientIdentifier::findOrCreateClientIdentifier(str2Guid(clientGuid));
+        //JmgProductionFloorExecutionClientConfiguration  configurationRelation = JmgProductionFloorExecution.parmConfigurationRelation();
+        //JmgProductionFloorExecutionConfiguration        jmgExecutionSetup = JmgProductionFloorExecutionConfiguration::find(configurationRelation.ConfigurationId);
+        
+        if (jmgProdMultiReportFinished && registrationSetup.PrintLabel && JmgParameters::find().KPMGCommon_PrintCoProductLabel)
+        {
+            MapIterator activeJobsIterator = this.getActiveJobsIterator();
+            while (activeJobsIterator.more())
+            {
+                JmgTermJob job = activeJobsIterator.value();
+
+                if (job.module() == JmgModuleEnum::PROD && job.jobRef())
+                {
+                    JmgTermJob_Prod prodJob = job;
+                    ProdRoute prodRoute = prodJob.prodRoute();
+
+                    if ((!KPMGCommon_JmgJobBundlePrintLabelPrimaryOprPriorityFlight::instance().isEnabled() && prodRoute.isLastOpr()) ||
+                    (KPMGCommon_JmgJobBundlePrintLabelPrimaryOprPriorityFlight::instance().isEnabled() &&
+                    prodRoute.OprPriority == RouteOprPriority::Primary &&
+                    prodJob.prodJobType() == RouteJobType::Process &&
+                    prodRoute.isLastOpr()))
+                    {
+                        while select prodParmReportFinished
+                            where prodParmReportFinished.ParmId == jmgProdMultiReportFinished.parmId()
+                               && prodParmReportFinished.ProdId == prodJob.jobRef()
+                            && prodParmReportFinished.PmfProductType == PmfProductType::Co_Product
+                               && prodParmReportFinished.QtyGood
+                            join inventDim
+                            where inventDim.inventDimId == prodParmReportFinished.InventDimId
+                               && inventDim.LicensePlateId
+                        {
+                            KPMGCommon_ProdLicensePlateLabelBuild licensePlateLabelBuild = new KPMGCommon_ProdLicensePlateLabelBuild(prodParmReportFinished, WHSWorkTransType::ProdProcessPut);
+                            licensePlateLabelBuild.parmJmgJobId(prodJob.jobId());
+
+                            if (!KPMGCommon_JmgJobBundlePrintLabelBatchSerialNumberFlight::instance().isEnabled() || !FeatureStateProvider::isFeatureEnabled(KPMGCommon_ProdMultiLineReportAsFinishSerialNumFeature::instance()))
+                            {
+                                WHSLabelId labelId = licensePlateLabelBuild.buildLicensePlateLabel();
+                                licensePlateLabelBuild.printLicensePlateLabel(labelId);
+                            }
+                            else if (prodParmReportFinished.QtyGood && !InventTable::find(prodParmReportFinished.ItemId).isItemSerialNumberActivated())
+                            {
+                                WHSLabelId labelId = licensePlateLabelBuild.buildLicensePlateLabel(prodParmReportFinished.InventDimId, prodParmReportFinished.QtyGood);
+                                licensePlateLabelBuild.printLicensePlateLabel(labelId);
+                            }
+                            else if (JmgSerialNumberSpecification::KPMGCommon_existsByParmIdItemIdProdId(prodParmReportFinished.ParmId, prodParmReportFinished.ItemId, prodParmReportFinished.ProdId))
+                            {
+                                this.KPMGCommon_printLicensePlateWithSerialNumbers(prodParmReportFinished, licensePlateLabelBuild);
+                            }
+                        }
+                    }
+                }
+                activeJobsIterator.next();
+            }
+        }  
+    }
+
+    public void KPMGCommon_printLicensePlateWithSerialNumbers(ProdParmReportFinished _prodParmReportFinished, KPMGCommon_ProdLicensePlateLabelBuild _licensePlateLabelBuild)
+    {
+        JmgSerialNumberSpecification jmgSerialNumberSpecification;
+
+        while select InventDimId, QtyGood from  jmgSerialNumberSpecification where
+                                       jmgSerialNumberSpecification.ParmId == _prodParmReportFinished.ParmId
+                                    && jmgSerialNumberSpecification.ProdId == _prodParmReportFinished.ProdId
+                                    && jmgSerialNumberSpecification.ItemId == _prodParmReportFinished.ItemId
+                                    && jmgSerialNumberSpecification.QtyGood > 0
+        {
+            WHSLabelId labelId = _licensePlateLabelBuild.buildLicensePlateLabel(jmgSerialNumberSpecification.InventDimId, jmgSerialNumberSpecification.QtyGood);
+            _licensePlateLabelBuild.printLicensePlateLabel(labelId);
+        }
+    }
+
+}

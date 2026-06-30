@@ -1,0 +1,21 @@
+﻿[DataContractAttribute]
+public class KPMGCommon_AnalysisCertificateContract
+{
+    private PackingSlipId   packingSlipId;
+    private SalesShippingDate   deliveryDate;
+
+    [DataMemberAttribute]
+    public PackingSlipId parmPackingSlipId(PackingSlipId _packingSlipId = packingSlipId)
+    {
+        packingSlipId = _packingSlipId;
+        return packingSlipId;
+    }
+
+    [DataMemberAttribute]
+    public SalesShippingDate parmDeliveryDate(SalesShippingDate _deliveryDate = deliveryDate)
+    {
+        deliveryDate = _deliveryDate;
+        return deliveryDate;
+    }
+
+}

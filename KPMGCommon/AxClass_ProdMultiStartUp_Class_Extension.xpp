@@ -1,0 +1,155 @@
+﻿[ExtensionOf(classStr(ProdMultiStartUp))]
+final class ProdMultiStartUp_Class_Extension
+{
+    protected void startProductionOrder(ProdParmStartUp prodParmStartUp, ProdPurch prodPurch)
+    {
+        next startProductionOrder(prodParmStartUp, prodPurch);
+
+        this.KPMGCommon_CreatePercentConsumptionProduction(prodParmStartUp.ProdId);
+
+        this.KPMGCommonautomaticOrderCreation_ReportFinished(prodParmStartUp);
+
+    }
+
+    public void KPMGCommon_CreatePercentConsumptionProduction (ProdId prodId)
+    {
+        ProdBOM                                 prodBOM;
+        ProdRoute                               prodRoute;
+        WrkCtrCapRes                            wrkCtrCapRes;
+        KPMGCommon_PercentConsumptionByResource percentConsumptionByResource;
+        KPMGCommon_PercentConsumptionProduction percentConsumptionProduction;
+
+        delete_from percentConsumptionProduction where percentConsumptionProduction.ProdId == prodId;
+
+        while select prodBOM
+            where prodBOM.ProdId == prodId
+               && prodBOM.KPMGCommon_PercentConsumption
+            join prodRoute 
+            where prodRoute.ProdId == prodBOM.ProdId
+               && prodRoute.OprNum == prodBOM.OprNum
+        {
+            while Select wrkCtrCapRes
+                group by RefId, OprNum, OprPriority, WrkCtrId
+                where wrkCtrCapRes.RefId        == prodRoute.ProdId
+                   && wrkCtrCapRes.OprNum       == prodRoute.OprNum
+                   && wrkCtrCapRes.OprPriority  == prodRoute.OprPriority
+            {
+                while select  percentConsumptionByResource
+                    where percentConsumptionByResource.WrkCtrId == wrkCtrCapRes.WrkCtrId
+                {
+                    percentConsumptionProduction.clear();
+                    percentConsumptionProduction.initValue();
+                    percentConsumptionProduction.ProdId                 = prodBOM.ProdId;
+                    percentConsumptionProduction.LineNum                = prodBOM.LineNum;
+                    percentConsumptionProduction.ItemId                 = prodBOM.ItemId;
+                    percentConsumptionProduction.OprNum                 = prodBOM.OprNum;
+                    percentConsumptionProduction.InventTransIdProdBOM   = prodBOM.InventTransId;
+                    percentConsumptionProduction.WrkCtrId               = percentConsumptionByResource.WrkCtrId;
+                    percentConsumptionProduction.TypeId                 = percentConsumptionByResource.TypeId;
+                    percentConsumptionProduction.TypePercent            = percentConsumptionByResource.TypePercent;
+                    percentConsumptionProduction.ResourceMouth          = percentConsumptionByResource.ResourceMouth;
+                    percentConsumptionProduction.ResourceDryer          = percentConsumptionByResource.ResourceDryer;
+                    percentConsumptionProduction.DryerPercent           = percentConsumptionByResource.DryerPercent;
+                    percentConsumptionProduction.InventLocationId       = percentConsumptionByResource.InventLocationId;
+                    percentConsumptionProduction.WMSLocationId          = percentConsumptionByResource.WMSLocationId;
+                    percentConsumptionProduction.Percent                = percentConsumptionByResource.Percent;
+                    percentConsumptionProduction.insert();
+                }
+            }
+        }
+    }
+
+    public void KPMGCommonautomaticOrderCreation_ReportFinished(ProdParmStartUp prodParmStartUp)
+    {
+        KPMGCommon_AutomaticOrderCreationParameters     automaticOrderCreationParameters, automaticOrderCreationParametersExist;
+        ProdParameters                                  prodParameters = ProdParameters::find();
+        ProdTable                                       prodTableReportFinished, prodTableStartUp = prodParmStartUp.prodTable();
+        InventDim                                       inventDim;
+
+        if (prodParameters.KPMGCommon_AutomaticOrderCreation)
+        {
+            select firstonly automaticOrderCreationParametersExist
+                where automaticOrderCreationParametersExist.ItemId             == prodTableStartUp.ItemId
+                   && automaticOrderCreationParametersExist.FormulaId          == prodTableStartUp.BOMId
+                   && automaticOrderCreationParametersExist.RouteId            == prodTableStartUp.RouteId
+                   && automaticOrderCreationParametersExist.PdsCWBatchSched    == prodTableStartUp.PdsCWBatchSched
+                   && automaticOrderCreationParametersExist.InventLocationId   == prodTableStartUp.InventDim().InventLocationId
+                   && automaticOrderCreationParametersExist.PreviousClosing;
+            if (automaticOrderCreationParametersExist)
+            {
+                while select prodTableReportFinished
+                    where prodTableReportFinished.ItemId            == automaticOrderCreationParametersExist.ItemId
+                       && prodTableReportFinished.BOMId             == automaticOrderCreationParametersExist.FormulaId
+                       && prodTableReportFinished.RouteId           == automaticOrderCreationParametersExist.RouteId
+                       && prodTableReportFinished.PdsCWBatchSched   == automaticOrderCreationParametersExist.PdsCWBatchSched
+                       && prodTableReportFinished.ProdStatus        == ProdStatus::StartedUp
+                       && prodTableReportFinished.DlvDate           <= prodTableStartUp.Dlvdate
+                       && prodTableReportFinished.RecId             != prodTableStartUp.RecId
+                    join inventDim
+                    where inventDim.InventDimId      == prodTableReportFinished.InventDimId
+                       && inventDim.InventLocationId == automaticOrderCreationParametersExist.InventLocationId
+                {
+                    try
+                    {
+                        this.KPMGCommonautomaticOrderCreation_Register_ReportFinished(prodTableReportFinished);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
+    }
+
+    public void KPMGCommonautomaticOrderCreation_Register_ReportFinished(ProdTable prodTable)
+    {
+        ProdMultiReportFinished                         ProdMultiReportFinished;
+        prodParmreportFinished                          prodParmreportFinished,prodParmreportFinishedUPD;
+        Boolean                                         RAF,Ended;
+        
+        ttsbegin;
+        ProdMultiReportFinished = ProdMultiReportFinished::construct(new Args());
+        RunBaseMultiParm::initParm(ProdMultiReportFinished);
+        prodParmreportFinished = ProdMultiReportFinished.defaultParmBuffer();
+        ProdMultiReportFinished.insert(prodTable,prodParmreportFinished);
+        ProdMultiReportFinished.pmfInsertPost(prodTable,prodParmreportFinished);
+/*        
+        prodParmreportFinishedUPD = prodParmreportFinished::find(prodParmreportFinished.ParmId,prodParmreportFinished.ProdId,True);
+        if(prodParmreportFinishedUPD)
+        {
+            prodParmreportFinishedUPD.QtyGood = 0;
+            prodParmreportFinishedUPD.PdsCWBatchGood = 0;
+            /*
+            prodParmreportFinishedUPD.EndRouteCard = NoYes::Yes;
+            prodParmreportFinishedUPD.RouteAutoConsump = RouteAutoConsump::Always;
+            prodParmreportFinishedUPD.BOMAutoConsump =          BomAutoConsump::FlushingPrincip;
+            prodParmreportFinishedUPD.EndPicklist = NoYes::Yes;
+            prodParmreportFinishedUPD.EndJob = NoYes::Yes;
+            prodParmreportFinishedUPD.AcceptError = Noyes::Yes;
+            */
+            prodParmreportFinishedUPD.update();
+        }
+*/       
+        while select forupdate prodParmreportFinishedUPD
+            where prodParmreportFinishedUPD.ParmId == prodParmreportFinished.ParmId
+               && prodParmreportFinishedUPD.ProdId == prodParmreportFinished.ProdId
+        {
+            prodParmreportFinishedUPD.QtyGood = 0;
+            prodParmreportFinishedUPD.PdsCWBatchGood = 0;
+            prodParmreportFinishedUPD.EndJob = NoYes::Yes;
+            /*
+            prodParmreportFinishedUPD.EndRouteCard = NoYes::Yes;
+            prodParmreportFinishedUPD.RouteAutoConsump = RouteAutoConsump::Always;
+            prodParmreportFinishedUPD.BOMAutoConsump =          BomAutoConsump::FlushingPrincip;
+            prodParmreportFinishedUPD.EndPicklist = NoYes::Yes;
+            prodParmreportFinishedUPD.EndJob = NoYes::Yes;
+            prodParmreportFinishedUPD.AcceptError = Noyes::Yes;
+            */
+            prodParmreportFinishedUPD.update();
+        }
+
+        ProdMultiReportFinished.run();
+        ttscommit;
+    }
+
+}

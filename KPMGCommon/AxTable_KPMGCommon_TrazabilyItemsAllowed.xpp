@@ -1,0 +1,49 @@
+﻿public class KPMGCommon_TrazabilyItemsAllowed extends common
+{
+    /// <summary>
+    /// find method
+    /// </summary>
+    /// <param name = "_itemId"></param>
+    public static KPMGCommon_TrazabilyItemsAllowed find(ItemId _itemId)
+    {
+        KPMGCommon_TrazabilyItemsAllowed    kpmgCommon_TrazabilyItemsAllowed;
+
+        if(_itemId)
+        {
+            select firstonly kpmgCommon_TrazabilyItemsAllowed
+                where kpmgCommon_TrazabilyItemsAllowed.ItemId == _itemId;
+        }
+
+        return kpmgCommon_TrazabilyItemsAllowed;
+    }
+
+    /// <summary>
+    /// exists method
+    /// </summary>
+    /// <param name = "_itemId"></param>
+    public static boolean exist(ItemId _itemId)
+    {
+        KPMGCommon_TrazabilyItemsAllowed    kpmgCommon_TrazabilyItemsAllowed;
+
+        return _itemId && (select firstonly ItemId from KPMGCommon_TrazabilyItemsAllowed
+                                    index hint ItemIdIdx
+                                    where KPMGCommon_TrazabilyItemsAllowed.itemid == _itemId).RecId != 0;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name = "_fieldId"></param>
+    public void modifiedField(FieldId _fieldId)
+    {
+        super(_fieldId);
+
+        switch(_fieldId)
+        {
+            case fieldNum(KPMGCommon_TrazabilyItemsAllowed, ItemId):
+                this.ItemName = InventTable::find(this.ItemId).itemName();
+                break;
+        }
+    }
+
+}

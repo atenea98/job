@@ -1,0 +1,41 @@
+﻿[ExtensionOf(tableStr(WMSJournalTable))]
+final class WMSJournalTable_KPMGCommon_Extension
+{
+
+    public void insert()
+    {
+        next insert();
+        this.insertKaytekJournal();
+    }
+
+    public void insertKaytekJournal()
+    {
+        KPMGCommon_KaytekIntegrationTable msg;
+
+        if(WMSJournalName::find(this.JournalNameId).KPMGCommon_KaytekIntegration)
+        {
+            msg.clear();
+
+            msg.OperationType   = this.mapWmsJournalTypeToOperationType(this.journalType);
+            msg.DateTime        = DateTimeUtil::utcNow();
+            msg.JournalId       = this.journalId;
+            msg.Status          = KPMGCommon_OperationStatus::Pending;
+            msg.ErrorMessage    = "";
+            msg.DateTimeLastTry = Global::utcDateTimeNull();
+
+            msg.insert();
+        }
+    }
+
+    private KPMGCommon_OperationType mapWmsJournalTypeToOperationType(WMSJournalType _journalType)
+    {
+        switch (_journalType)
+        {
+            case WMSJournalType::Reception:
+                return KPMGCommon_OperationType::DailyReceiptItemJournal;
+            default:
+                return KPMGCommon_OperationType::Blank;
+        }
+    }
+
+}

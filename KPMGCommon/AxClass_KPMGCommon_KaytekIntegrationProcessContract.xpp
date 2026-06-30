@@ -1,0 +1,21 @@
+﻿[DataContract]
+public class KPMGCommon_KaytekIntegrationProcessContract
+{
+    KPMGCommon_OperationStatus   status = KPMGCommon_OperationStatus::Success;
+    KPMGCommon_OperationType       operationType;
+
+    [DataMember("Status")]
+    public KPMGCommon_OperationStatus parmStatus(KPMGCommon_OperationStatus _e = status)
+    {
+        status = _e;
+        return status;
+    }
+
+    [DataMember("OperationType")]
+    public KPMGCommon_OperationType parmOperationType(KPMGCommon_OperationType _t = operationType)
+    {
+        operationType = _t; 
+        return operationType;
+    }
+
+}

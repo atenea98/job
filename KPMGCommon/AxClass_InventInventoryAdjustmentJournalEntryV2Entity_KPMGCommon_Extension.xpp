@@ -1,0 +1,133 @@
+﻿[ExtensionOf(tableStr(InventInventoryAdjustmentJournalEntryV2Entity))]
+final class InventInventoryAdjustmentJournalEntryV2Entity_KPMGCommon_Extension
+{
+        public static void updateJournalWithJournalNumberAndLineNumber(DMFDefinitionGroupExecution _dmfDefinitionGroupExecution,
+                                                                   InventJournalNameId         _journalNameId,
+                                                                   InventJournalId             _journalNumber,
+                                                                   RecId                       _firstRecordId,
+                                                                   RecId                       _lastRecordId)
+    {
+        next updateJournalWithJournalNumberAndLineNumber(_dmfDefinitionGroupExecution,
+                                                         _journalNameId,
+                                                         _journalNumber,
+                                                         _firstRecordId,
+                                                         _lastRecordId);
+
+        #OCCRetryCount
+        InventInventoryAdjustmentJournalEntryV2Staging journalStaging;
+        InventJournalTable journalTable;
+
+         select firstonly journalStaging
+            where journalStaging.DefinitionGroup == _dmfDefinitionGroupExecution.DefinitionGroup
+               && journalStaging.ExecutionId == _dmfDefinitionGroupExecution.ExecutionId
+               && journalStaging.JournalNumber == _journalNumber;
+        if (journalStaging)
+        {
+            try
+            {
+                ttsbegin;
+                journalTable = InventJournalTable::find(_journalNumber, true);
+                if (journalTable)
+                {
+                    journalTable.SystemBlocked      = journalStaging.SystemBlocked;
+                    journalTable.BlockUserGroupId   = journalStaging.BlockUserGroupId;
+                    journalTable.BlockUserId        = journalStaging.BlockUserId;
+                    journalTable.doUpdate();
+                }
+                ttscommit;
+            }
+            catch (Exception::Deadlock)
+            {
+                retry;
+            }
+            catch (Exception::UpdateConflict)
+            {
+                if (appl.ttsLevel() == 0)
+                {
+                    if (xSession::currentRetryCount() >= #RetryNum)
+                    {
+                        throw Exception::UpdateConflictNotRecovered;
+                    }
+                    else
+                    {
+                        retry;
+                    }
+                }
+                else
+                {
+                    throw Exception::UpdateConflict;
+                }
+            }
+        }
+        
+    }
+
+    /// <summary>
+    /// Executes logic for updating journal headers.
+    /// </summary>
+    /// <param name="_dmfDefinitionGroupExecution">
+    /// The definition group that should be processed.
+    /// </param>
+    /// <remarks>
+    /// The number of journal lines gets updated on the journal header.
+    /// </remarks>
+    public static void postTargetProcess(DMFDefinitionGroupExecution _dmfDefinitionGroupExecution)
+    {
+        next postTargetProcess(_dmfDefinitionGroupExecution);
+
+        #OCCRetryCount
+        DictTable dictTable = new DictTable(tableNum(InventInventoryAdjustmentJournalEntryV2Staging));
+        InventInventoryJournalEntryStagingMap journalStaging = dictTable.makeRecord();
+        InventJournalTable journalTable, journalTableBolcked;
+
+        InventInventoryJournalEntryStagingToEntityMap::deleteMapping(_dmfDefinitionGroupExecution);
+
+        // Update number of lines on journal headers
+        while select JournalNumber from journalStaging
+            group by JournalNumber
+            where journalStaging.DefinitionGroup == _dmfDefinitionGroupExecution.DefinitionGroup
+                && journalStaging.ExecutionId == _dmfDefinitionGroupExecution.ExecutionId
+            join journalTableBolcked
+            where journalTableBolcked.JournalId == journalStaging.JournalNumber
+               && journalTableBolcked.NumOfLines
+               && (journalTableBolcked.SystemBlocked ||
+                   journalTableBolcked.BlockUserGroupId ||
+                   journalTableBolcked.BlockUserId)
+        {
+            try
+            {
+                ttsbegin;
+                journalTable = InventJournalTable::find(journalStaging.JournalNumber, true);
+                journalTable.SystemBlocked = NoYes::No;
+                journalTable.BlockUserGroupId = '';
+                journalTable.BlockUserId = '';
+                journalTable.doUpdate();
+                ttscommit;
+            }
+            catch (Exception::Deadlock)
+            {
+                retry;
+            }
+            catch (Exception::UpdateConflict)
+            {
+                if (appl.ttsLevel() == 0)
+                {
+                    if (xSession::currentRetryCount() >= #RetryNum)
+                    {
+                        throw Exception::UpdateConflictNotRecovered;
+                    }
+                    else
+                    {
+                        retry;
+                    }
+                }
+                else
+                {
+                    throw Exception::UpdateConflict;
+                }
+            }
+        }
+
+    }
+
+}

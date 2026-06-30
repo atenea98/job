@@ -1,0 +1,73 @@
+﻿/// <summary>
+/// Base contract class for processing data response for the KPMG service.
+/// </summary>
+[DataContract]
+public class KPMGCommon_ResponseBase
+{
+    private KPMGCommon_ResponseStatusCode statusCode;
+    private DataAreaId dataAreaId;
+    private KPMGCommon_ErrorTxt errorTxt;
+    private KPMGCommon_MessageType messageType;
+     
+        /// <summary>
+    /// Get and set the legal entity.
+    /// </summary>
+    /// <param name = "_value">The value to set.</param>
+    /// <returns>Current value of parameter.</returns>
+    [DataMember('LegalEntity')]
+    public DataAreaId parmDataAreaId(DataAreaId _value = dataAreaId)
+    {
+        dataAreaId = _value;
+
+        return dataAreaId;
+    }
+
+    /// <summary>
+    /// Get and set the status code.
+    /// </summary>
+    /// <param name = "_value">The value to set.</param>
+    /// <returns>Current value of parameter.</returns>
+    [DataMember('StatusCode')]
+    public KPMGCommon_ResponseStatusCode parmStatusCode(KPMGCommon_ResponseStatusCode _value = statusCode)
+    {
+        statusCode = _value;
+
+        return statusCode;
+    }
+
+    /// <summary>
+    /// Get and set the error message.
+    /// </summary>
+    /// <param name = "_value">The value to set.</param>
+    /// <returns>Current value of parameter.</returns>
+    [DataMember('Error')]
+    public KPMGCommon_ErrorTxt parmErrorTxt(KPMGCommon_ErrorTxt _value = errorTxt)
+    {
+        errorTxt = _value;
+
+        return errorTxt;
+    }
+
+    /// <summary>
+    /// Get and set the error message.
+    /// </summary>
+    /// <param name = "_value">The value to set.</param>
+    /// <returns>Current value of parameter.</returns>
+    [DataMember('MessageType')]
+    public KPMGCommon_MessageType parmMessageType(KPMGCommon_MessageType _value = messageType)
+    {
+        messageType = _value;
+
+        return messageType;
+    }
+
+    /// <summary>
+    /// Gets the message type of response.
+    /// </summary>
+    /// <returns>The message type</returns>
+    public KPMGCommon_MessageType getMessageType()
+    {
+        return (new SysDictClass(classIdGet(this)).getAttribute(classStr(DataContractAttribute)) as DataContractAttribute).Name();
+    }
+
+}

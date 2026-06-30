@@ -1,0 +1,117 @@
+﻿[ExtensionOf(formStr(JmgProductionFloorExecutionReportCoByProduct))]
+final class JmgProductionFloorExecutionReportCoByProduct_KPMGCommon_Extension
+{
+    /// <summary>
+    /// Initializes the data source from active job.
+    /// </summary>
+    /// <param name = "_prodJob">
+    /// The production job for which the relevant data must be selected and added to the data source.
+    /// </param>
+    protected void initDataSource(JmgTermJob_Prod _prodJob)
+    {
+        next initDataSource(_prodJob);
+
+        this.KPMGCommon_UpdatePercent(_prodJob.jobRef());
+                                 
+    }
+
+    /// <summary>
+    ///     Update percent
+    /// </summary>
+    public void KPMGCommon_UpdatePercent(ProdId _prodId)
+    {
+        KPMGCommon_PercentConsumptionProduction percentConsumptionProductionTable;
+        ItemId                                  itemId;
+        WMSLocationId                           wmsLocationId;
+        InventLocationId                        inventLocationId;
+        ProdId                                  prodId = _prodId;
+        Qty                                     qtyPerRecord;
+        Qty                                     qtyTotal;
+        container                               cont;
+
+        if(prodId)
+        {
+            while select percentConsumptionProductionTable
+                where percentConsumptionProductionTable.ProdId == prodId
+            {
+                qtyPerRecord = this.KPMGCommon_OnHand(percentConsumptionProductionTable.ItemId,
+                                                      percentConsumptionProductionTable.InventLocationId,
+                                                      percentConsumptionProductionTable.WMSLocationId);
+
+                cont += [percentConsumptionProductionTable.ItemId,
+                         percentConsumptionProductionTable.InventLocationId,
+                         percentConsumptionProductionTable.WMSLocationId, qtyPerRecord];
+                
+                qtyTotal += qtyPerRecord;
+            }
+            while (cont)
+            {
+                itemId              = conPeek(cont, 1);
+                inventLocationId    = conPeek(cont, 2);
+                wmsLocationId       = conPeek(cont, 3);
+                qtyPerRecord        = conPeek(cont, 4);
+                
+
+                select percentConsumptionProductionTable
+                        where percentConsumptionProductionTable.ProdId == prodId
+                        && percentConsumptionProductionTable.ItemId == itemid
+                        && percentConsumptionProductionTable.InventLocationId == inventLocationId
+                        && percentConsumptionProductionTable.WMSLocationId == wmsLocationId;
+
+                if(percentConsumptionProductionTable.RecId)
+                {
+                    ttsbegin;
+                    percentConsumptionProductionTable.selectForUpdate(true);
+                    if(qtyPerRecord > 0)
+                    {
+                        percentConsumptionProductionTable.Percent = (qtyPerRecord / qtyTotal) * 100;
+                    }
+                    else
+                    {
+                        percentConsumptionProductionTable.Percent = 0;
+                    }
+                    percentConsumptionProductionTable.update();
+                    ttscommit;
+                }
+                cont = conDel(cont, 1, 1);
+            }
+        }
+    }
+
+    public Qty KPMGCommon_OnHand(ItemId _itemId, InventLocationId _inventLocationId, WMSLocationId _wmsLocationId)
+    {
+        InventDim               inventDimCriteria;
+        InventDimParm           inventDimParmCriteria;
+        InventQty               inventQty;
+        InventDimOnHand         inventDimOnHand;
+        InventDimOnHandIterator inventDimOnHandIterator;
+        InventDimOnHandMember   inventDimOnHandMember;
+ 
+        // Inventory dimensions range
+        inventDimCriteria.InventLocationId    = _inventLocationId;
+        inventDimCriteria.wMSLocationId       = _wmsLocationId;
+        inventDimCriteria = InventDim::findOrCreate(inventDimCriteria);
+ 
+        inventDimParmCriteria.InventLocationIdFlag     = NoYes::Yes;
+        inventDimParmCriteria.wmsLocationIdFlag        = NoYes::Yes;
+ 
+        //inventDimOnHand            = InventDimOnHand_Physical::newPhysical(_itemId, inventDimCriteria, inventDimParmCriteria, inventDimOnHandLevel::Item, null);
+        inventDimOnHand = InventDimOnHand::newAvailPhysical(_itemId, inventDimCriteria, inventDimParmCriteria, inventDimOnHandLevel::Item, null);
+ 
+        inventDimOnHandIterator    = inventDimOnHand.onHandIterator();
+ 
+        while (inventDimOnHandIterator.more())
+        {
+            // A location can contain multiple items in it.
+            // Class <c>InventDimOnHand</c> consists of InventDimOnHandMember classes.
+            // Each class <c>InventDimOnHandMember</c> instance contains information about item, inventory dimensions and quantity.
+            inventDimOnHandMember    = inventDimOnHandIterator.value();
+ 
+            inventQty += inventDimOnHandMember.parmInventQty();
+ 
+            inventDimOnHandIterator.next();
+        }
+        return inventQty;
+    }
+
+}

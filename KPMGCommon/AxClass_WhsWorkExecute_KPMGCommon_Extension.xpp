@@ -1,0 +1,280 @@
+﻿[ExtensionOf(classStr(WhsWorkExecute))]
+final class WhsWorkExecute_KPMGCommon_Extension
+{
+    private boolean errorStockExcess;
+
+        [Hookable(false)]
+    internal boolean KPMGCommon_parmErrorStockExcess(boolean _errorStockExcess = errorStockExcess)
+    {
+        errorStockExcess = _errorStockExcess;
+        return errorStockExcess;
+    }
+
+    [Wrappable(true)]
+    protected boolean validateShippingOverpickQuantities(
+        InventHandlingQty   _handlingQty,
+        WHSWorkLine         _workLine,
+        WHSWorkTable        _workTable)
+    {
+        boolean ret;
+        boolean reserve = false;
+        WMSLocationId locationId = _workLine.WMSLocationId;
+
+        this.KPMGCommon_parmErrorStockExcess(false);
+
+        if (WMHEParameters::find().KPMGCommon_EnableAvailableStockExcessSelections && 
+            !InventTable::find(_workLine.ItemId).pdsCWItem())
+        {
+            // Check that overpick quantity is within allowed limit.
+            ret = WHSWorkExecute::validateShippingOverpickWorkTrans(_workTable.WorkTransType, _workLine, _handlingQty);
+
+            // Check that there is sufficient quantity available to overpick on the location and above hierarchy levels.
+            if (ret)
+            {
+                InventDim inventDimCriteria = _workLine.inventDimWithLocation();
+            
+                ret = (WHSInventOnHand::getPhysicalAvailQty(_workLine.ItemId,
+                                                            inventDimCriteria,
+                                                            true,
+                                                            false) >= _handlingQty);
+            
+                if (!ret)
+                {
+                    this.KPMGCommon_parmErrorStockExcess(true);
+                    this.KPMGCommon_DeduceExcessLastWork(_workLine, _handlingQty);
+
+                    this.KPMGCommon_ReserveOrUnReserve(_workLine, _handlingQty);
+                    reserve = true;
+
+                    ttsbegin;
+                   _workLine.selectForUpdate(true);
+                    _workLine.WMSLocationId = '';
+                    _workLine.doUpdate();
+                    ttscommit;
+                }
+            }
+        }
+        ret = next validateShippingOverpickQuantities(_handlingQty, _workLine, _workTable);
+        
+        if (ret && reserve)
+        {
+            InventTrans inventTransReserve, inventTransSales;
+            SalesLine   salesLine = WHSLoadLine::findbyRecId(_workLine.LoadLineRefRecId).salesLine();
+            // Inventory dimensions for 'On order' transactions
+            //InventDim inventDim = InventDim::find(salesLine.InventDimId);
+            InventDim inventDim = salesLine.InventDim();
+            InventTransOrigin     inventTransOrigin = InventTransOrigin::findByInventTransId(salesLine.InventTransId);
+
+            ttsbegin;
+            _workLine.selectForUpdate(true);
+            _workLine.WMSLocationId = locationId;
+            _workLine.doUpdate();
+            ttscommit;
+
+            if (reserve)
+            {
+                this.KPMGCommon_ReserveOrUnReserve(_workLine, _handlingQty, true);
+                this.KPMGCommon_ReserveAdjust(_workLine, _handlingQty);
+            }
+
+        }
+        
+        return ret;
+    }
+
+    private void KPMGCommon_ReserveOrUnReserve(WHSWorkLine         _workLine,
+                                               InventHandlingQty   _unReserveQty,
+                                               boolean             _reserve = false)
+    {
+        SalesLine   salesLine = WHSLoadLine::findbyRecId(_workLine.LoadLineRefRecId).salesLine();
+        // Inventory dimensions for 'On order' transactions
+        InventDim inventDim = InventDim::find(_workLine.InventDimId);
+        if (_reserve)
+            inventDim = salesLine.InventDim();
+        
+        InventTransOrigin     inventTransOrigin = InventTransOrigin::findByInventTransId(salesLine.InventTransId);
+        InventTrans inventTransReserve, inventTransOnOrder;
+
+       if (!_reserve)
+        {
+            ttsbegin;
+            select forupdate inventTransReserve
+                where inventTransReserve.InventTransOrigin == inventTransOrigin.RecId
+                    && inventTransReserve.inventDimId == inventDim.InventDimId
+                    && inventTransReserve.StatusIssue == StatusIssue::ReservPhysical;
+            if (inventTransReserve)
+            {
+                inventTransReserve.Qty = inventTransReserve.Qty - _unReserveQty;
+                inventTransReserve.doUpdate();
+            }
+            else
+            {
+                throw error("No transacción ReservPhysical mas");
+            }
+            ttscommit;
+        }
+
+        // Create movement for the reservation
+        InventMovement movement = InventMovement::construct(salesLine);
+        // Match on all fields
+        InventDimParm inventDimParm;
+        inventDimParm.initFromInventDim(movement.inventdim());
+
+        // Create reservation class
+        InventUpd_Reservation reservation = InventUpd_Reservation::newParameters(movement,
+                                               inventDim,
+                                               inventDimParm,
+                                               InventDimFixedClass::inventDimParm2InventDimFixed(inventDimParm),
+                                               (_reserve ? -_unReserveQty : _unReserveQty),
+                                               false);
+
+        // Set inventory dimension criteria to reserve against at the input location
+        //reservation.parmInventDimOnHandSelectionCriteria(inventDim);
+        reservation.updateNow();
+
+        if (!_reserve)
+        {
+            ttsbegin;
+            select forupdate inventTransReserve
+                where inventTransReserve.InventTransOrigin == inventTransOrigin.RecId
+                    && inventTransReserve.inventDimId == inventDim.inventDimId
+                    && inventTransReserve.StatusIssue == StatusIssue::ReservPhysical;
+            if (inventTransReserve)
+            {
+                inventTransReserve.Qty = inventTransReserve.Qty + _unReserveQty;
+                inventTransReserve.doUpdate();
+            }
+            else
+            {
+                throw error("No transacción ReservPhysical menos");
+            }
+            ttscommit;
+
+        }
+        
+
+    }
+
+    public void KPMGCommon_DeduceExcessLastWork(WHSWorkLine         _workLine,
+                                                InventHandlingQty   _excessQty)
+    {
+        WhsWorkLine         lastWorkLine, lastWorkLineUpdate;
+        WHSWorkInventTrans  LastWorkInventTrans;
+        WHSLoadLine         loadLine;
+        boolean             deduce = false;
+
+        select lastWorkLine
+            order by WorkId desc
+            where lastWorkLine.LoadLineRefRecId == _workLine.LoadLineRefRecId
+               && lastWorkLine.WorkStatus == whsWorkStatus::Open
+               && lastWorkLine.WorkType == _workLine.WorkType
+               && lastWorkLine.RecId != _workLine.RecId;
+        if (lastWorkLine)
+        {
+            ttsbegin;
+            while select forupdate lastWorkLineUpdate
+                where lastWorkLineUpdate.WorkId == lastWorkLine.WorkId
+            {
+                lastWorkLineUpdate.QtyWork = lastWorkLineUpdate.QtyWork - _excessQty;
+                lastWorkLineUpdate.QtyRemain = lastWorkLineUpdate.QtyWork;
+                lastWorkLineUpdate.InventQtyWork = lastWorkLineUpdate.QtyWork;
+                lastWorkLineUpdate.InventQtyRemain = lastWorkLineUpdate.QtyWork;
+                lastWorkLineUpdate.Update();
+                deduce = true;
+            }
+
+            if (deduce)
+            {
+                select forupdate lastWorkInventTrans
+                where lastWorkInventTrans.WorkId == lastWorkLine.WorkId;
+                if (lastWorkInventTrans)
+                {
+                    lastWorkInventTrans.Qty = lastWorkInventTrans.Qty - _excessQty;
+                    lastWorkInventTrans.update();
+                }
+
+                loadLine = WHSLoadLine::findbyRecId(_workLine.LoadLineRefRecId,true);
+                if (loadLine)
+                {
+                    loadLine.WorkCreatedQty = loadLine.WorkCreatedQty - _excessQty;
+                    loadLine.update();
+                }
+            }
+            ttscommit;
+        }
+
+    }
+
+    private void KPMGCommon_ReserveAdjust(WHSWorkLine         _workLine,
+                                          InventHandlingQty   _unReserveQty,
+                                          boolean             _reserve = false)
+    {
+        SalesLine   salesLine = WHSLoadLine::findbyRecId(_workLine.LoadLineRefRecId).salesLine();
+        // Inventory dimensions for 'On order' transactions
+        InventDim inventDim = InventDim::find(_workLine.InventDimId);
+        if (_reserve)
+            inventDim = salesLine.InventDim();
+        
+        InventTransOrigin     inventTransOrigin = InventTransOrigin::findByInventTransId(salesLine.InventTransId);
+        InventTrans inventTransReserve;
+
+        if (!_reserve)
+        {
+            ttsbegin;
+            select forupdate inventTransReserve
+                where inventTransReserve.InventTransOrigin == inventTransOrigin.RecId
+                    && inventTransReserve.inventDimId == inventDim.InventDimId
+                    && inventTransReserve.StatusIssue == StatusIssue::ReservPhysical;
+            if (inventTransReserve)
+            {
+                inventTransReserve.Qty = inventTransReserve.Qty - _unReserveQty;
+                inventTransReserve.Update();
+            }
+            else
+            {
+                throw error("No transacción");
+            }
+            ttscommit;
+        }
+
+        // Create movement for the reservation
+        InventMovement movement = InventMovement::construct(salesLine);
+
+        // Match on all fields
+        InventDimParm inventDimParm;
+        inventDimParm.initFromInventDim(movement.inventdim());
+
+        // Create reservation class
+        InventUpd_Reservation reservation = InventUpd_Reservation::newParameters(movement,
+                                               inventDim,
+                                               inventDimParm,
+                                               InventDimFixedClass::inventDimParm2InventDimFixed(inventDimParm),
+                                               (_reserve ? -_unReserveQty : _unReserveQty),
+                                               false);
+
+        // Set inventory dimension criteria to reserve against at the input location
+        //reservation.parmInventDimOnHandSelectionCriteria(inventDim);
+        reservation.updateNow();
+
+        if (!_reserve)
+        {
+            ttsbegin;
+            select forupdate inventTransReserve
+                where inventTransReserve.InventTransOrigin == inventTransOrigin.RecId
+                    && inventTransReserve.inventDimId == inventDim.inventDimId
+                    && inventTransReserve.StatusIssue == StatusIssue::ReservPhysical;
+            if (inventTransReserve)
+            {
+                inventTransReserve.Qty = inventTransReserve.Qty + _unReserveQty;
+                inventTransReserve.Update();
+            }
+            else
+            {
+                throw error("No transacción");
+            }
+            ttscommit;
+        }
+
+    }
+
+}

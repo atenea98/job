@@ -1,0 +1,62 @@
+﻿class KPMGCommon_PrinterWHSLicensePlateLabels
+{
+        public static void main(Args _args)
+    {
+        KPMGCommon_PrinterWHSLicensePlateLabels action = new KPMGCommon_PrinterWHSLicensePlateLabels();
+        FormRun callerForm = _args.caller();
+        FormDataSource WHSLicensePlateLabel_ds;
+        int regLabel;
+
+        WHSLicensePlateLabel_ds = callerForm.dataSource(formDataSourceStr(WHSLicensePlateLabel, WHSLicensePlateLabel));
+        regLabel = action.TotallabelsPrinter(WHSLicensePlateLabel_ds);
+        if (Box::yesNo(strFmt("@KPMGCommon:LabelsPrint",regLabel) , DialogButton::No)) //Etiquetas a imprimir: %1. Desea continuar?
+        {
+            action.printlabels(WHSLicensePlateLabel_ds);
+        }
+    }
+
+    public int TotallabelsPrinter(FormDataSource WHSLicensePlateLabel_ds)
+    {
+        WHSLicensePlateLabel wHSLicensePlateLabel;
+        int                  regLabel = 0;
+
+        for (wHSLicensePlateLabel = WHSLicensePlateLabel_ds.getFirst() ? WHSLicensePlateLabel_ds.getFirst() : WHSLicensePlateLabel_ds.cursor();
+
+        wHSLicensePlateLabel;
+
+        wHSLicensePlateLabel = WHSLicensePlateLabel_ds.getNext())
+        {
+            ++regLabel;
+        }
+        return regLabel;
+    }
+
+    public void PrintLabels(FormDataSource WHSLicensePlateLabel_ds)
+    {
+        WHSLicensePlateLabel wHSLicensePlateLabel;
+
+        for (wHSLicensePlateLabel = WHSLicensePlateLabel_ds.getFirst() ? WHSLicensePlateLabel_ds.getFirst() : WHSLicensePlateLabel_ds.cursor();
+
+        wHSLicensePlateLabel;
+
+        wHSLicensePlateLabel = WHSLicensePlateLabel_ds.getNext())
+        {
+            this.printLabel(wHSLicensePlateLabel.LicensePlateId);
+
+        }
+    }
+
+    void printLabel(WHSLastPrintedLicensePlate _enteredLP)
+    {
+        WHSDocumentRouting          documentRouting = WHSDocumentRouting::construct();
+        WHSLicensePlateLabel        licensePlateLabel;
+
+        select firstonly licensePlateLabel
+            order by licensePlateLabel.PrintedDate desc
+            where licensePlateLabel.LicensePlateId == _enteredLP;
+
+        documentRouting.parmUserId(WHSParameters::find().GenericWorkUserId);
+        documentRouting.printDocument(licensePlateLabel.WorkTransType, licensePlateLabel);
+    }
+
+}

@@ -1,0 +1,223 @@
+﻿/// <summary>
+/// Class for processing the generate packingslip for Load services
+/// </summary>
+abstract class KPMGCommon_GeneratePackingSlipForLoadProcess
+{
+    const str constStatusSuccessTxt = '';
+     
+    KPMGCommon_GeneratePackingSlipForLoadProcessType processType;
+
+        /// <summary>
+    /// Construct the specific instance of the process class
+    /// </summary>
+    /// <param name = "_processType">Enum value process type</param>
+    /// <param name = "_request">Request details</param>
+    /// <returns>Response details</returns>
+    public static KPMGCommon_GeneratePackingSlipForLoadProcess construct(
+        KPMGCommon_GeneratePackingSlipForLoadProcessType _processType,
+        KPMGCommon_RequestBase _request)
+    {
+        KPMGCommon_GeneratePackingSlipForLoadProcess process = SysExtensionAppClassFactory::getClassFromSysAttribute(classStr(KPMGCommon_GeneratePackingSlipForLoadProcess),
+                                        new KPMGCommon_GeneratePackingSlipForLoadProcessTypeAttribute(_processType));
+
+        if (!process || !_request)
+        {
+            throw error(Error::wrongUseOfFunction(funcName()));
+        }
+
+        process.setProcessType(_processType);
+        process.parmRequest(_request);
+
+        return process;
+    }
+
+    /// <summary>
+    /// Main logic
+    /// </summary>
+    /// <returns>Response message object</returns>
+    public KPMGCommon_ResponseBase run()
+    {
+        try
+        {
+            this.init();
+
+            changeCompany(this.companyId())
+            {
+               
+                ttsbegin;
+                this.doProcess();
+                ttscommit;
+
+                this.postProcess();
+
+                this.endSuccess();
+            }
+        }
+        catch(Exception::CLRError)
+        {
+            this.endCLRError();
+        }
+        catch(Exception::Error)
+        {
+            this.endError();
+        }
+    
+        return this.parmResponse();
+    }
+
+    /// <summary>
+    /// Sets type of the processing
+    /// </summary>
+    /// <param name = "_processType">KPMGCommon_GeneratePackingSlipForLoadProcessType enum value</param>
+    private void setProcessType(KPMGCommon_GeneratePackingSlipForLoadProcessType _processType)
+    {
+        processType = _processType;
+    }
+
+    /// <summary>
+    /// Parm-method for Request object. Should be implemented in descendant class with exact type of the request.
+    /// </summary>
+    /// <param name = "_request">Input value</param>
+    /// <returns>Output value</returns>
+    abstract protected KPMGCommon_RequestBase parmRequest(KPMGCommon_RequestBase _request = null)
+    {
+    }
+
+    /// <summary>
+    /// Parm method for the response object
+    /// </summary>
+    /// <param name = "_response">Input value</param>
+    /// <returns>Qoutput value</returns>
+    protected KPMGCommon_ResponseBase parmResponse(KPMGCommon_ResponseBase _response = null)
+    {
+        return _response;
+    }
+
+    /// <summary>
+    /// Returns current Company ID
+    /// </summary>
+    /// <returns>Company ID</returns>
+    protected CompanyId companyId()
+    {
+        return this.parmRequest().parmDataAreaId();
+    }
+
+    /// <summary>
+    /// Initialize method
+    /// </summary>
+    protected void init()
+    {
+        this.initResponse();
+
+        CompanyInfo company;
+        
+        if (this.parmRequest().parmDataAreaId())
+        {
+            if (!company.RecId)
+            {
+                company = CompanyInfo::findDataArea(this.parmRequest().parmDataAreaId());
+            }
+        }
+
+        if (!company.RecId)
+        {
+            throw error(strFmt("@KPMGCommon_GeneratePackingSlipForLoad:ValidateCompanyError", this.parmRequest().parmDataAreaId()));
+        }
+        this.parmRequest().parmDataAreaId(company.DataArea);
+        this.parmResponse().parmDataAreaId(company.DataArea);
+        this.parmResponse().parmMessageType(this.messageType());
+    }
+
+    /// <summary>
+    /// Initializes response instance
+    /// </summary>
+    abstract protected void initResponse()
+    {
+        
+    }
+
+    /// <summary>
+    /// Type of the response message
+    /// </summary>
+    /// <returns>String value of the type</returns>
+    abstract protected KPMGCommon_MessageType messageType()
+    {
+    }
+
+    /// <summary>
+    /// Message specific processing logic
+    /// </summary>
+    abstract protected void doProcess()
+    {
+    }
+
+    /// <summary>
+    /// Additional logic after processing
+    /// </summary>
+    protected void postProcess()
+    {
+    }
+
+    /// <summary>
+    /// Processing unsuccessful because of CLR error
+    /// </summary>
+    protected void endCLRError()
+    {
+        this.initResponse();
+        this.parmResponse().parmErrorTxt(KPMGCommon_Util::clrErrorTxt());
+        this.parmResponse().parmStatusCode(KPMGCommon_ResponseStatusCode::Error);
+    }
+
+    /// <summary>
+    /// Processing unsuccessful because of error
+    /// </summary>
+    protected void endError()
+    {
+        this.initResponse();
+        this.parmResponse().parmErrorTxt(KPMGCommon_Util::getInfologData());
+        this.parmResponse().parmStatusCode(KPMGCommon_ResponseStatusCode::Error);
+    }
+
+    /// <summary>
+    /// Processing successful
+    /// </summary>
+    protected void endSuccess()
+    {
+        this.parmResponse().parmErrorTxt(constStatusSuccessTxt);
+        this.parmResponse().parmStatusCode(KPMGCommon_ResponseStatusCode::OK);
+    }
+
+    /// <summary>
+    /// Base method to set fields only when sent by the interface including calling the modified.
+    /// </summary>
+    /// <param name = "_targetRecord">An record instance of the target table</param>
+    /// <param name = "_targetFieldNum">The fieldnumber of the field which needs to be set</param>
+    /// <param name = "_value">The value from the interface</param>
+    /// <param name = "_setIfEmpty">Optional parameter if the field is to be set when the sent value is empty</param>
+    /// <param name = "_callModified">Optional parameter to call the modifiedfield logic</param>
+    /// <returns>True if the field is set, otherwise false</returns>
+    protected boolean setField(Common _targetRecord, FieldId _targetFieldNum, AnyType _value, boolean _setIfEmpty = false, boolean _callModified = false)
+    {
+        boolean isSet = false;
+
+        if ((_setIfEmpty == true || _value) && _value != _targetRecord.(_targetFieldNum))
+        {
+            _targetRecord.(_targetFieldNum) = _value;
+
+            if (_callModified)
+            {
+                if (_targetRecord.validateField(_targetFieldNum))
+                {
+                    _targetRecord.modifiedField(_targetFieldNum);
+                }
+                else
+                {
+                    throw Exception::Error;
+                }
+            }
+            isSet = true;
+        }
+        return isSet;
+    }
+
+}

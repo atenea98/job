@@ -1,0 +1,4 @@
+﻿[ExtensionOf(dataEntityStr(InventWarehouseOnHandV2Entity))]
+internal final class KPMGCommon_InventWarehouseOnHandV2Entity_Extension
+{
+}

@@ -1,0 +1,36 @@
+﻿public class KPMGCommon_KaytekIntegrationMessageService
+{
+    public void insertMessage(KPMGCommon_KaytekIntegrationMessageContract _contract)
+    {
+        KPMGCommon_KaytekIntegrationTable msg;
+
+        msg.OperationType    = _contract.parmOperationType();
+        msg.DateTime         = _contract.parmDateTime();
+        msg.JournalId        = _contract.parmJournalId();
+        msg.Status           = KPMGCommon_OperationStatus::Pending;
+        msg.ErrorMessage     = "";
+        msg.User             = _contract.parmUserId();
+        msg.DateTimeLastTry  = _contract.parmDateTimeLastTry();
+
+        msg.insert();
+    }
+
+    public void updateMessage(KPMGCommon_KaytekIntegrationMessageContract _contract)
+    {
+        KPMGCommon_KaytekIntegrationTable msg;
+        select firstOnly forUpdate msg
+            where msg.JournalId == _contract.parmJournalId();
+        
+        if (msg.RecId)
+        {
+            ttsbegin;
+            msg.Status               = KPMGCommon_OperationStatus::Success; //Aplicar lógica
+            msg.ErrorMessage         = _contract.parmErrorMessage();
+            msg.DateTimeLastTry      = DateTimeUtil::utcNow();
+
+            msg.update();
+            ttscommit;
+        }
+    }
+
+}

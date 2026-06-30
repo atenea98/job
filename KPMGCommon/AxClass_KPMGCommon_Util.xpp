@@ -1,0 +1,88 @@
+﻿// <summary>
+/// Class KPMGCommon_Util contains generic methods used for the D365FO-KPMG integration
+/// </summary>
+class KPMGCommon_Util
+{
+    /// <summary>
+    /// Collect content (errors, warnings) from the infolog
+    /// </summary>
+    /// <param name = "_infologStartLineNum">Start position of the infolog lines to be captured</param>
+    /// <returns>Errors and warnings as text</returns>
+    public static SysInfoLogStr getInfologData(Counter _infologStartLineNum = 0)
+    {
+        SysInfologEnumerator    sysInfologEnumerator;
+        SysInfoLogStr           ret;
+    
+        if (_infologStartLineNum)
+        {
+            sysInfologEnumerator = SysInfologEnumerator::newData(infolog.copy(_infologStartLineNum < Global::infologLine() ? (_infologStartLineNum + 1) : _infologStartLineNum, Global::infologLine()));
+        }
+        else
+        {
+            sysInfologEnumerator = SysInfologEnumerator::newData(infolog.infologData());
+        }
+ 
+        while (sysInfologEnumerator.moveNext() )
+        {
+            ret += ((ret ? ' ' : '') + sysInfologEnumerator.currentMessage());
+        }
+
+        return ret;
+    }
+
+    /// <summary>
+    /// Method to return details of the CLR error
+    /// </summary>
+    /// <returns>CLR error details</returns>
+    public static LogText clrErrorTxt()
+    {
+        System.Exception ex = CLRInterop::getLastException();
+        if (ex != null)
+        {
+            ex = ex.get_InnerException();
+            if (ex != null)
+            {
+                return strFmt('%1, %2 [%3]', enum2Str(Exception::CLRError), ex.tostring(), ex.StackTrace);
+            }
+        }
+        return strFmt('%1, %2 [%3]', enum2Str(Exception::CLRError), ex.Message, ex.StackTrace);
+    }
+
+    /// <summary>
+    /// Generic method to transfer date values to str
+    /// </summary>
+    /// <param name = "_date">Date to transfer</param>
+    /// <returns>String value of date</returns>
+    public static str date2str(TransDate _date)
+    {
+        return date2Str(_date,321,DateDay::Digits1or2,DateSeparator::Hyphen,DateMonth::Digits1or2,DateSeparator::Hyphen,DateYear::Digits4);
+    }
+
+    /// <summary>
+    /// Generic method to get the external notes for a specific line
+    /// </summary>
+    /// <param name = "_refDataareaId">Reference data area id</param>
+    /// <param name = "_refTableId">Reference table id</param>
+    /// <param name = "_refRecId">Reference record id</param>
+    /// <param name = "_typeId">Docu type id</param>
+    /// <returns>Combined Notes</returns>
+    public static Notes getExternalDocuRefNotes(DataAreaId _refDataareaId, TableId _refTableId, RecId _refRecId, DocuTypeId _typeId = '')
+    {
+        Notes notes;
+        DocuRef docuRef;
+
+        while select Notes from DocuRef
+            where DocuRef.RefCompanyId == _refDataareaId
+            && docuRef.RefTableId == _refTableId
+            && docuRef.RefRecId == _refRecId
+            && docuRef.Restriction == DocuRestriction::External
+            && (_typeId == '' || docuRef.TypeId == _typeId)
+        {
+            notes += strLen(Notes)>0?'\n':'';
+            notes += docuRef.Notes;
+        }
+
+        return notes;
+    }
+
+}

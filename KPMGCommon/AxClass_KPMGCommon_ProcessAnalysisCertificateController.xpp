@@ -1,0 +1,36 @@
+﻿final class KPMGCommon_ProcessAnalysisCertificateController extends SysOperationServiceController
+{
+    protected void new()
+    {
+        super(classStr(KPMGCommon_ProcessAnalysisCertificateService), methodStr(KPMGCommon_ProcessAnalysisCertificateService, process), SysOperationExecutionMode::Synchronous); //¿Qué modo de ejecución queremos?
+    }
+
+    public ClassDescription defaultCaption()
+    {
+        return "@SYS113621"; //Certificado de análisis
+    }
+
+    public static KPMGCommon_ProcessAnalysisCertificateController construct(SysOperationExecutionMode _executionMode = SysOperationExecutionMode::Synchronous)
+    {
+        KPMGCommon_ProcessAnalysisCertificateController controller;
+        controller = new KPMGCommon_ProcessAnalysisCertificateController();
+        controller.parmExecutionMode(_executionMode);
+        controller.parmShowDialog(false);
+        return controller;
+    }
+
+    public static void main (Args _args)
+    {
+        KPMGCommon_ProcessAnalysisCertificateContract   contract;
+        KPMGCommon_ProcessAnalysisCertificateController controller;
+        CustPackingSlipJour                             custPackingSlipJour;
+
+        controller = KPMGCommon_ProcessAnalysisCertificateController::construct();
+        controller.parmArgs(_args);
+        custPackingSlipJour = _args.record();
+        contract = controller.getDataContractObject();
+        contract.parmCustPackingSlipJour(custPackingSlipJour);
+        controller.startOperation();
+    }
+
+}

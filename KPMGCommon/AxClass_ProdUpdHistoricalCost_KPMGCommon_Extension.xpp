@@ -1,0 +1,109 @@
+﻿[ExtensionOf(classStr(ProdUpdHistoricalCost))]
+final class ProdUpdHistoricalCost_KPMGCommon_Extension
+{
+    void run()
+    {
+        next run();
+        this.findRecords(this.prodTable().ProdId);
+    }
+
+    public void findRecords(ProdId _prodId)
+    {
+        ProdJournalTable prodJournalTable;
+        ProdJournalProd prodJournalProd;
+        ProdRouteTransExpanded prodRouteTransExpanded;
+
+        while select prodJournalProd
+        order by JournalId desc
+            join prodJournalTable
+            where prodJournalTable.ProdId == prodJournalProd.ProdId
+            && prodJournalTable.JournalType == ProdJournalType::ReportFinished
+            && prodJournalProd.ProdId == _prodId
+            && prodJournalProd.QtyGood
+        {
+            select firstonly prodRouteTransExpanded
+                where prodRouteTransExpanded.ProdId == _prodId
+                && prodRouteTransExpanded.OprPriority == RouteOprPriority::Primary;
+
+            this.insertData(
+                KPMGCommon_TrazabilityJournalType::ReportFinished,
+                0,
+                prodJournalProd.inventDim().LicensePlateId,
+                prodRouteTransExpanded.WrkCtrId,
+                prodJournalProd.inventDim().inventBatchId,
+                prodJournalTable.PostedDateTime,
+                prodJournalProd.ItemId,
+                prodJournalProd.QtyGood,
+                "", //Unidad
+                "", //Sitio
+                "", //Almacen
+                "", //Lote
+                "", //Proveedor
+                "", //Ubicacion
+                "", //Estado de inventario
+                "", //Matricula
+                "", //Pedido de venta
+                "", //Albaran
+                "", //Cliente
+                prodJournalProd.JournalId,
+                prodJournalProd.ProdId
+                );
+        }
+    }
+
+    public void insertData (
+        KPMGCommon_TrazabilityJournalType _trazabilityJournalType,
+        int _level,
+        WHSLicensePlateId _producedLicensePlateId,
+        WrkCtrIdBase _productionMachine,
+        InventBatchId _producedInventBatchId,
+        DateTimeExecuted _dateTime,
+        ItemId _itemId,
+        Qty _qty,
+        UnitOfMeasureSymbol _unitId,
+        InventSiteId _inventSiteId,
+        InventLocationId _inventLocationId,
+        InventBatchId _inventBatchId,
+        VendAccount _vendAccount,
+        WMSLocationId _wmsLocationId,
+        WHSInventStatusId _whsInventStatusId,
+        WHSLicensePlateId _licensePlateId,
+        SalesId _salesId,
+        PackingSlipId _packingSlipdId,
+        CustAccount _custAccount,
+        JournalId _journalId,
+        ProdId _prodId
+        )
+    {
+        KPMGCommon_Trazability trazabilityTable;
+
+        trazabilityTable.clear();
+
+        trazabilityTable.TrazabilityJournalType = _trazabilityJournalType;
+        trazabilityTable.Level = _level;
+        trazabilityTable.ProducedLicensePlateId = _producedLicensePlateId;
+        trazabilityTable.ProductionMachine = _productionMachine;
+        trazabilityTable.ProducedInventBatchId = _producedInventBatchId;
+        trazabilityTable.DateTime = _dateTime;
+        trazabilityTable.ItemId = _itemId;
+        trazabilityTable.ItemName = InventTable::find(_itemId).itemName();
+        trazabilityTable.Qty = _qty;
+        trazabilityTable.UnitId = _unitId;
+        trazabilityTable.InventSiteId = _inventSiteId;
+        trazabilityTable.InventLocationId = _inventLocationId;
+        trazabilityTable.InventBatchId = _inventBatchId;
+        trazabilityTable.VendAccount = _vendAccount;
+        trazabilityTable.VendName = VendTable::find(_vendAccount).name();
+        trazabilityTable.WMSLocationId = _wmsLocationId;
+        trazabilityTable.WHSInventStatusId = _whsInventStatusId;
+        trazabilityTable.LicensePlateId = _licensePlateId;
+        trazabilityTable.SalesId = _salesId;
+        trazabilityTable.PackingSlipId = _packingSlipdId;
+        trazabilityTable.CustAccount = _custAccount;
+        trazabilityTable.JournalId = _journalId;
+        trazabilityTable.ProdId = _prodId;
+
+        trazabilityTable.insert();
+    }
+
+}

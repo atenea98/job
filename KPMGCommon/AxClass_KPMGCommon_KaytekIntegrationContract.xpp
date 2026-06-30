@@ -1,0 +1,4 @@
+﻿[DataContractAttribute]
+public class KPMGCommon_KaytekIntegrationContract
+{
+}

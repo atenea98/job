@@ -1,0 +1,47 @@
+﻿[ExtensionOf(tableStr(CustPackingSlipTrans))]
+final class CustPackingSlipTrans_KPMGCommon_Extension
+{
+    public void insert()
+    {
+        next insert();
+        this.updateTrazability();
+    }
+
+    public void updateTrazability()
+    {
+        KPMGCommon_Trazability trazabilityTable;
+        InventTrans inventTrans;
+        InventTransOrigin inventTransOrigin;        
+
+        inventTransOrigin = InventTransOrigin::findByInventTransId(this.InventTransId);
+
+        if(this.Qty > 0)
+        {
+            while select inventTrans
+                where inventTrans.InventTransOrigin == inventTransOrigin.RecId
+                && !inventTrans.PackingSlipId
+                && inventTrans.ItemId == this.ItemId
+            {
+                    if(inventTrans.inventDim().LicensePlateId)
+                    {
+                        select firstonly trazabilityTable
+                            where trazabilityTable.ItemId == this.ItemId
+                            && trazabilityTable.ProducedLicensePlateId == inventTrans.inventDim().LicensePlateId;
+            
+                        if(trazabilityTable.RecId)
+                        {
+                            ttsbegin;
+                            trazabilityTable.selectForUpdate(true);
+                            trazabilityTable.CustAccount = this.custPackingslipJour().OrderAccount;
+                            trazabilityTable.PackingSlipId = this.PackingSlipId;
+                            trazabilityTable.SalesId = this.SalesId;
+                            trazabilityTable.update();
+                           ttscommit;
+                        }
+                    }
+            }
+            
+        }        
+    }
+
+}

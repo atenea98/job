@@ -1,0 +1,21 @@
+﻿internal final class KPMGCommon_DeclarationOfConformityERRunner
+{
+    static void main (Args _args)
+    {
+       
+
+        CustPackingSlipJour custPackingSlipJour;
+
+        //Get record from where we are calling the ER
+        select firstonly * from custPackingSlipJour where custPackingSlipJour.RecId == _args.record().RecId;
+
+        ERModelDefinitionInputParametersAction obj = new ERModelDefinitionInputParametersAction();
+
+        obj.addParameter('model/$PackingSlipId', custPackingSlipJour.PackingSlipId);
+        
+        ERObjectsFactory::createFormatMappingRunByFormatMappingId(
+            smmParametersTable::find().KPMGCommon_ERFormatMappingIdForDeclarationOfConformityCert,"",false)
+            .withParameter(obj).run();
+    }
+
+}

@@ -1,0 +1,30 @@
+﻿public class KPMGCommon_KaytekIntegrationProcessController extends SysOperationServiceController
+{
+    protected void new()
+    {
+        super(
+            classStr(KPMGCommon_KaytekIntegrationProcessService),
+            methodStr(KPMGCommon_KaytekIntegrationProcessService, process),
+            SysOperationExecutionMode::Synchronous
+        );
+    }
+
+    public static KPMGCommon_KaytekIntegrationProcessController construct(
+        SysOperationExecutionMode _mode = SysOperationExecutionMode::ScheduledBatch
+    )
+    {
+        KPMGCommon_KaytekIntegrationProcessController controller;
+        controller = new KPMGCommon_KaytekIntegrationProcessController();
+        controller.parmExecutionMode(_mode);
+        return controller;
+    }
+
+    public static void main(Args _args)
+    {
+        KPMGCommon_KaytekIntegrationProcessController controller;
+        controller = KPMGCommon_KaytekIntegrationProcessController::construct();
+        controller.parmArgs(_args);
+        controller.startOperation();
+    }
+
+}

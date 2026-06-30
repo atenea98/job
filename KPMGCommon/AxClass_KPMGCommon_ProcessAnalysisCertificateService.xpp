@@ -1,0 +1,262 @@
+﻿class KPMGCommon_ProcessAnalysisCertificateService
+{
+    KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip    inventTestCertOfAnalysisTable_PackingSlip, inventTestCertOfAnalysisTable_PackingSlipExist;
+    KPMGCommon_InventTestCertOfAnalysisLine_PackingSlip     inventTestCertOfAnalysisLine_PackingSlip;
+    CustPackingSlipJour                                     custPackingSlipJour;
+    boolean                                                 printReport = false;
+    public void process(KPMGCommon_ProcessAnalysisCertificateContract  _contract)
+    {
+
+        custPackingSlipJour = _contract.parmCustPackingSlipJour();
+        select firstonly inventTestCertOfAnalysisTable_PackingSlipExist
+            where inventTestCertOfAnalysisTable_PackingSlipExist.PackingSlipId == custPackingSlipJour.PackingSlipId
+            && inventTestCertOfAnalysisTable_PackingSlipExist.DeliveryDate  == custPackingSlipJour.DeliveryDate;
+        if (!inventTestCertOfAnalysisTable_PackingSlipExist)
+        {
+            this.generateAnalysisCertificate();
+        }
+        else
+        {
+            this.ReportAnalysisCertificate();
+        }
+
+    }
+
+    public void generateAnalysisCertificate()
+    {
+        InventTrans             inventTrans;
+        InventTransOrigin       inventTransOrigin;
+        InventDim               inventDimTrans, inventDimQualityOtder;
+        InventQualityOrderTable inventQualityOrderTable;
+        InventQualityOrderLine  inventQualityOrderLine;
+
+        select firstonly inventTrans
+            where inventTrans.PackingSlipId == custPackingSlipJour.PackingSlipId
+               && inventTrans.StatusReceipt == StatusReceipt::None
+               && (inventTrans.StatusIssue == StatusIssue::Sold || inventTrans.StatusIssue == StatusIssue::Deducted)
+               && inventTrans.DatePhysical == custPackingSlipJour.DeliveryDate
+            join inventDimTrans
+            where inventDimTrans.inventDimId == inventTrans.inventDimId
+            join inventTransOrigin
+            where inventTransOrigin.RecId == inventTrans.inventTransOrigin
+               && inventTransOrigin.ReferenceCategory == InventTransType::Sales
+            join  inventQualityOrderTable
+            where inventQualityOrderTable.ItemId == inventTrans.itemId
+               && (inventQualityOrderTable.ReferenceType == InventTestReferenceType::Production
+                || inventQualityOrderTable.ReferenceType == InventTestReferenceType::PmfProdCoBy)
+            && inventQualityOrderTable.OrderStatus == InventTestOrderStatus::Pass
+            join  inventDimQualityOtder
+            where inventDimQualityOtder.inventDimId == inventQualityOrderTable.InventDimId
+               && inventDimQualityOtder.InventSiteId == inventDimTrans.InventSiteId
+               && inventDimQualityOtder.InventLocationId == inventDimTrans.InventLocationId
+               && inventDimQualityOtder.LicensePlateId == inventDimTrans.LicensePlateId
+               && inventDimQualityOtder.inventBatchId == inventDimTrans.inventBatchId
+            exists join inventQualityOrderLine
+            where inventQualityOrderLine.QualityOrderId == inventQualityOrderTable.QualityOrderId
+               && inventQualityOrderLine.CertificateOfAnalysisReport;
+        if (inventTrans)
+        {
+            this.createAnalysisCertificate();
+
+            if (printReport)
+            this.ReportAnalysisCertificate();
+        }
+    }
+
+    public void createAnalysisCertificate()
+    {
+        CustPackingSlipTrans    custPackingSlipTrans, custPackingSlipTransGroupItem;
+
+        while select custPackingSlipTransGroupItem
+            group by PackingSlipId, DeliveryDate, ItemId
+            where custPackingSlipTransGroupItem.PackingSlipId == custPackingSlipJour.PackingSlipId
+               && custPackingSlipTransGroupItem.DeliveryDate == custPackingSlipJour.DeliveryDate
+        {
+            this.createAnalysisCertificateHeader(custPackingSlipTransGroupItem);
+            this.createAnalysisCertificateLines(custPackingSlipTransGroupItem);
+            printReport = true;
+        }
+        
+    }
+
+    public void createAnalysisCertificateHeader(CustPackingSlipTrans    _custPackingSlipTrans)
+    {
+        inventTestCertOfAnalysisTable_PackingSlip.clear();
+        inventTestCertOfAnalysisTable_PackingSlip.initValue();
+        inventTestCertOfAnalysisTable_PackingSlip.initFromCustPckSlpJour(custPackingSlipJour);
+        inventTestCertOfAnalysisTable_PackingSlip.ItemId    = _custPackingSlipTrans.ItemId;
+        inventTestCertOfAnalysisTable_PackingSlip.insert();
+    }
+
+    public void createAnalysisCertificateLines(CustPackingSlipTrans    _custPackingSlipTrans)
+    {
+        InventTrans                     inventTrans;
+        InventTransOrigin               inventTransOrigin;
+        InventDim                       inventDimTrans, inventDimQualityOtder;
+        InventQualityOrderTable         inventQualityOrderTable;
+        InventQualityOrderLine          inventQualityOrderLine;
+        InventQualityOrderLineResults   inventQualityOrderLineResultsReal, inventQualityOrderLineResultsOK, inventQualityOrderLineResultsNOOK;
+        InventTestVariableOutcome       inventTestVariableOutcomePass, inventTestVariableOutcomeFail;
+        KPMGCommon_InventTestCertOfAnalysisLine_PackingSlip inventTestCertOfAnalysisLine_PackingSlipExists;
+
+        
+        ttsbegin;
+        while select inventTrans
+            where inventTrans.PackingSlipId == _custPackingSlipTrans.PackingSlipId
+               && inventTrans.StatusReceipt == StatusReceipt::None
+               && (inventTrans.StatusIssue == StatusIssue::Sold || inventTrans.StatusIssue == StatusIssue::Deducted)
+               && inventTrans.DatePhysical == _custPackingSlipTrans.DeliveryDate
+               && inventTrans.ItemId == _custPackingSlipTrans.ItemId
+            join inventDimTrans
+            where inventDimTrans.inventDimId == inventTrans.inventDimId
+            join inventTransOrigin
+            where inventTransOrigin.RecId == inventTrans.inventTransOrigin
+               && inventTransOrigin.ReferenceCategory == InventTransType::Sales
+            join inventQualityOrderTable
+            where inventQualityOrderTable.ItemId == inventTrans.itemId
+               && (inventQualityOrderTable.ReferenceType == InventTestReferenceType::Production
+                || inventQualityOrderTable.ReferenceType == InventTestReferenceType::PmfProdCoBy)
+               && inventQualityOrderTable.OrderStatus == InventTestOrderStatus::Pass
+            join inventDimQualityOtder
+            where inventDimQualityOtder.inventDimId == inventQualityOrderTable.InventDimId
+               && inventDimQualityOtder.InventSiteId == inventDimTrans.InventSiteId
+               && inventDimQualityOtder.InventLocationId == inventDimTrans.InventLocationId
+               && inventDimQualityOtder.LicensePlateId == inventDimTrans.LicensePlateId
+               && inventDimQualityOtder.inventBatchId == inventDimTrans.inventBatchId
+            join inventQualityOrderLine
+            where inventQualityOrderLine.QualityOrderId == inventQualityOrderTable.QualityOrderId
+               && inventQualityOrderLine.CertificateOfAnalysisReport
+        {
+            inventTestCertOfAnalysisLine_PackingSlipExists = KPMGCommon_InventTestCertOfAnalysisLine_PackingSlip::find(inventTestCertOfAnalysisTable_PackingSlip.InventCertificateOfAnalysisId,
+                                                                                                                        inventQualityOrderTable.InventRefId,
+                                                                                                                        inventQualityOrderLine.TestSequence,
+                                                                                                                        inventQualityOrderLine.TestId, true);
+            if (!inventTestCertOfAnalysisLine_PackingSlipExists)
+            {
+                inventTestCertOfAnalysisLine_PackingSlip.clear();
+                inventTestCertOfAnalysisLine_PackingSlip.initValue();
+                inventTestCertOfAnalysisLine_PackingSlip.InventCertificateOfAnalysisId = inventTestCertOfAnalysisTable_PackingSlip.InventCertificateOfAnalysisId;
+                inventTestCertOfAnalysisLine_PackingSlip.initFromInventQualityOrderLine(inventQualityOrderLine);
+                inventTestCertOfAnalysisLine_PackingSlip.ProdId = inventQualityOrderTable.InventRefId;
+                inventTestCertOfAnalysisLine_PackingSlip.ItemId = inventQualityOrderTable.ItemId;
+                if (InventTestTable::find(inventTestCertOfAnalysisLine_PackingSlip.TestId).TestType == InventTestType::Option)
+                {
+                    select firstonly inventTestVariableOutcomePass
+                        where inventTestVariableOutcomePass.VariableId == inventQualityOrderLine.VariableId
+                            && inventTestVariableOutcomePass.OutcomeStatus == InventTestOutcomeStatus::Pass;
+                    select  count(RecId) from inventQualityOrderLineResultsOK
+                        where inventQualityOrderLineResultsOK.QualityOrderId    == inventQualityOrderLine.QualityOrderId
+                            && inventQualityOrderLineResultsOK.TestId            == inventTestCertOfAnalysisLine_PackingSlipExists.TestId
+                            && inventQualityOrderLineResultsOK.TestSequence      == inventTestCertOfAnalysisLine_PackingSlipExists.TestSequence
+                            && inventQualityOrderLineResultsOK.TestResultValueOutcome    == inventTestVariableOutcomePass.VariableOutcomeId
+                            && inventQualityOrderLineResultsOK.IncludeResults    == NoYes::Yes;
+                    select firstonly inventTestVariableOutcomeFail
+                        where inventTestVariableOutcomeFail.VariableId == inventQualityOrderLine.VariableId
+                            && inventTestVariableOutcomeFail.OutcomeStatus == InventTestOutcomeStatus::Fail;
+                    select  count(RecId) from inventQualityOrderLineResultsNoOK
+                        where inventQualityOrderLineResultsNoOK.QualityOrderId    == inventQualityOrderLine.QualityOrderId
+                            && inventQualityOrderLineResultsNoOK.TestId            == inventTestCertOfAnalysisLine_PackingSlipExists.TestId
+                            && inventQualityOrderLineResultsNoOK.TestSequence      == inventTestCertOfAnalysisLine_PackingSlipExists.TestSequence
+                            && inventQualityOrderLineResultsNoOK.TestResultValueOutcome    == inventTestVariableOutcomeFail.VariableOutcomeId
+                            && inventQualityOrderLineResultsNoOK.IncludeResults    == NoYes::Yes;
+                    if (inventQualityOrderLineResultsOK.RecId >= inventQualityOrderLineResultsNoOK.RecId)
+                    {
+                        inventTestCertOfAnalysisLine_PackingSlip.TestResultValueOutcomeCountOK = 1;
+                        inventTestCertOfAnalysisLine_PackingSlip.TestResultValueOutcome = inventTestVariableOutcomePass.VariableOutcomeId;
+                    }
+                    else
+                    {
+                        inventTestCertOfAnalysisLine_PackingSlip.TestResultValueOutcomeCountNOOK = 1;
+                        inventTestCertOfAnalysisLine_PackingSlip.TestResultValueOutcome = inventTestVariableOutcomeFail.VariableOutcomeId;
+                    }
+                }
+                else
+                {
+                    select sum(TestResultValueReal) from inventQualityOrderLineResultsReal
+                        where inventQualityOrderLineResultsReal.QualityOrderId    == inventQualityOrderLine.QualityOrderId
+                            && inventQualityOrderLineResultsReal.TestId            == inventTestCertOfAnalysisLine_PackingSlip.TestId
+                            && inventQualityOrderLineResultsReal.TestSequence      == inventTestCertOfAnalysisLine_PackingSlip.TestSequence
+                            && inventQualityOrderLineResultsReal.IncludeResults    == NoYes::Yes;
+                    inventTestCertOfAnalysisLine_PackingSlip.TestResultValueRealCount = inventQualityOrderLineResultsReal.TestResultValueReal;
+                    inventTestCertOfAnalysisLine_PackingSlip.TestResultValueCount = 1;
+                    inventTestCertOfAnalysisLine_PackingSlip.TestResultValueReal = inventTestCertOfAnalysisLine_PackingSlip.TestResultValueRealCount / inventTestCertOfAnalysisLine_PackingSlip.TestResultValueCount;
+                }
+
+                inventTestCertOfAnalysisLine_PackingSlip.insert();
+            }
+            else
+            {
+                if (InventTestTable::find(inventTestCertOfAnalysisLine_PackingSlip.TestId).TestType == InventTestType::Option)
+                {
+                    select firstonly inventTestVariableOutcomePass
+                        where inventTestVariableOutcomePass.VariableId == inventQualityOrderLine.VariableId
+                            && inventTestVariableOutcomePass.OutcomeStatus == InventTestOutcomeStatus::Pass;
+                    select  count(RecId) from inventQualityOrderLineResultsOK
+                        where inventQualityOrderLineResultsOK.QualityOrderId    == inventQualityOrderLine.QualityOrderId
+                            && inventQualityOrderLineResultsOK.TestId            == inventTestCertOfAnalysisLine_PackingSlipExists.TestId
+                            && inventQualityOrderLineResultsOK.TestSequence      == inventTestCertOfAnalysisLine_PackingSlipExists.TestSequence
+                            && inventQualityOrderLineResultsOK.TestResultValueOutcome    == inventTestVariableOutcomePass.VariableOutcomeId
+                            && inventQualityOrderLineResultsOK.IncludeResults    == NoYes::Yes;
+                    select firstonly inventTestVariableOutcomeFail
+                        where inventTestVariableOutcomeFail.VariableId == inventQualityOrderLine.VariableId
+                            && inventTestVariableOutcomeFail.OutcomeStatus == InventTestOutcomeStatus::Fail;
+                    select  count(RecId) from inventQualityOrderLineResultsNoOK
+                        where inventQualityOrderLineResultsNoOK.QualityOrderId    == inventQualityOrderLine.QualityOrderId
+                            && inventQualityOrderLineResultsNoOK.TestId            == inventTestCertOfAnalysisLine_PackingSlipExists.TestId
+                            && inventQualityOrderLineResultsNoOK.TestSequence      == inventTestCertOfAnalysisLine_PackingSlipExists.TestSequence
+                            && inventQualityOrderLineResultsNoOK.TestResultValueOutcome    == inventTestVariableOutcomeFail.VariableOutcomeId
+                            && inventQualityOrderLineResultsNoOK.IncludeResults    == NoYes::Yes;
+                    if (inventQualityOrderLineResultsOK.RecId >= inventQualityOrderLineResultsNoOK.RecId)
+                    {
+                        inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueOutcomeCountOK = inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueOutcomeCountOK + 1;
+                    }
+                    else
+                    {
+                        inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueOutcomeCountNOOK = inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueOutcomeCountNOOK + 1;
+                    }
+
+                    if (inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueOutcomeCountOK >= inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueOutcomeCountNOOK)
+                    {
+                        inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueOutcome = inventTestVariableOutcomePass.VariableOutcomeId;
+                    }
+                    else
+                    {
+                        inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueOutcome = inventTestVariableOutcomeFail.VariableOutcomeId;
+                    }
+                }
+                else
+                {
+                    select sum(TestResultValueReal) from inventQualityOrderLineResultsReal
+                        where inventQualityOrderLineResultsReal.QualityOrderId    == inventQualityOrderLine.QualityOrderId
+                            && inventQualityOrderLineResultsReal.TestId            == inventTestCertOfAnalysisLine_PackingSlipExists.TestId
+                            && inventQualityOrderLineResultsReal.TestSequence      == inventTestCertOfAnalysisLine_PackingSlipExists.TestSequence
+                            && inventQualityOrderLineResultsReal.IncludeResults    == NoYes::Yes;
+                    inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueRealCount += inventQualityOrderLineResultsReal.TestResultValueReal;
+                    inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueCount = inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueCount + 1;
+                    inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueReal = inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueRealCount / inventTestCertOfAnalysisLine_PackingSlipExists.TestResultValueCount;
+                }
+
+                inventTestCertOfAnalysisLine_PackingSlipExists.update();
+            }
+        }
+        ttscommit;
+    }
+
+    public void ReportAnalysisCertificate()
+    {   
+        InventParameters    inventParameters = InventParameters::find();
+
+        if(!inventParameters.KPMGCommon_ERFormatAnalysisCertificateId)
+        {
+            warning("@KPMGCommon:ERFormatCertificateAnalysisNoExist");
+        }
+        else
+        {
+            ERModelDefinitionInputParametersAction  obj = new ERModelDefinitionInputParametersAction();
+            obj.addParameter('model/$PackingSlipId', custPackingSlipJour.PackingSlipId);
+            obj.addParameter('model/$DeliveryDate', custPackingSlipJour.DeliveryDate);
+            ERObjectsFactory::createFormatMappingRunByFormatMappingId(inventParameters.KPMGCommon_ERFormatAnalysisCertificateId,"").withParameter(obj).run();
+        }
+    }
+
+}

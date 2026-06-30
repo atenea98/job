@@ -1,0 +1,25 @@
+﻿class KPMGCommon_KaytekIntegrationTable
+{
+    void delete()
+    {
+        super();
+        this.deleteError();
+    }
+
+    private void deleteError()
+    {
+        KPMGCommon_KaytekIntegrationTable logMsg;
+
+        if (logMsg.Status == KPMGCommon_OperationStatus::Error)
+        {
+            ttsbegin;
+            logMsg.delete();
+            ttscommit;
+        }
+        else
+        {
+            throw error(strFmt("@KPMGCommon:KaytekIntegrationStatusError"));
+        }
+    }
+
+}

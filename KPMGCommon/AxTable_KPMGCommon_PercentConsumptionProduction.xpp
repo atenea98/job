@@ -1,0 +1,61 @@
+﻿public class KPMGCommon_PercentConsumptionProduction extends common
+{
+    /// <summary>
+    ///
+    /// </summary>
+    public void insert()
+    {
+        KPMGCommon_PercentConsumptionProductionHistory  percentConsumptionProductionHistory;
+        ProdBOM                                         prodBOM;
+        if (!this.InventTransIdProdBOM)
+        {
+            select firstonly prodBOM
+                where prodBOM.ProdId    == this.ProdId
+                   && prodBOM.LineNum   == this.LineNum
+                   && prodBOM.ItemId    == this.ItemId
+                   && prodBOM.OprNum    == this.OprNum;
+            this.InventTransIdProdBOM = prodBOM.InventTransId;
+        }
+        super();
+
+        percentConsumptionProductionHistory.CreateKPMGCommon_PercentConsumptionProductionHistory(this);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public void update()
+    {
+        KPMGCommon_PercentConsumptionProductionHistory  percentConsumptionProductionHistory;
+
+        super();
+
+        percentConsumptionProductionHistory.CreateKPMGCommon_PercentConsumptionProductionHistory(this);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public boolean validateWrite()
+    {
+        boolean ret;
+        ProdBOM     prodBOM;
+    
+        ret = super();
+    
+        if (ret)
+        {
+            select firstonly prodBOM
+                where prodBOM.ProdId    == this.ProdId
+                   && prodBOM.LineNum   == this.LineNum
+                   && prodBOM.ItemId    == this.ItemId
+                   && prodBOM.OprNum    == this.OprNum;
+            if (prodBOM && !prodBOM.KPMGCommon_PercentConsumption)
+                ret = checkFailed(strFmt("Línea %1 de la operación %2 no es de consumo porcentual-", this.LineNum, this.OprNum));
+        }
+
+        return ret;
+    }
+
+}

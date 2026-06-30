@@ -1,0 +1,13 @@
+﻿[DataContractAttribute]
+public class KPMGCommon_SalesPrintPackingListContract
+{
+    CustPackingSlipJour custPackingSlipJour;
+
+    [DataMemberAttribute]
+    public CustPackingSlipJour parmCustPackingSlipJour(CustPackingSlipJour _custPackingSlipJour = custPackingSlipJour)
+    {
+        custPackingSlipJour = _custPackingSlipJour;
+        return custPackingSlipJour;
+    }
+
+}

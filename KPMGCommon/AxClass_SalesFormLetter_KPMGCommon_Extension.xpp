@@ -1,0 +1,26 @@
+﻿[ExtensionOf(classStr(SalesFormLetter))]
+final class SalesFormLetter_KPMGCommon_Extension
+{
+
+    public void  KPMGCommon_initParameter_KPMGCommon_PrintFormLetterPackingList(
+        NoYes              _KPMGCommon_PrintFormLetterPackingList    = this.KPMGCommon_PrintFormLetterPackingList()
+        )
+    {
+        this.KPMGCommon_PrintFormLetterPackingList(_KPMGCommon_PrintFormLetterPackingList);
+    }
+
+    public void  KPMGCommon_initParameter_KPMGCommon_PrintFormLetterWayBill(
+        NoYes              _KPMGCommon_PrintFormLetterWayBill    = this.KPMGCommon_PrintFormLetterWayBill()
+        )
+    {
+        this.KPMGCommon_PrintFormLetterWayBill(_KPMGCommon_PrintFormLetterWayBill);
+    }
+
+    public void  KPMGCommon_initParameter_KPMGCommon_PrintDeclarationOfConformityCert(
+        NoYes              _KPMGCommon_PrintDeclarationOfConformityCert    = this.KPMGCommon_PrintDeclarationOfConformityCert()
+        )
+    {
+        this.KPMGCommon_PrintDeclarationOfConformityCert(_KPMGCommon_PrintDeclarationOfConformityCert);
+    }
+
+}

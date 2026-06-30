@@ -1,0 +1,19 @@
+﻿internal final class KPMGCommon_WMSJournalTable_EventHandlers
+{
+    
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    [FormControlEventHandler(formControlStr(WMSJournalTable, KPMGCommon_ImportSacks), FormControlEventType::Clicked)]
+    public static void KPMGCommon_ImportSacks_OnClicked(FormControl sender, FormControlEventArgs e)
+    {
+        FormRun formRun = sender.formRun();
+        FormDataSource ds = formRun.dataSource("WMSJournalTrans");
+
+        ds.refresh();
+        ds.research(true);
+    }
+
+}

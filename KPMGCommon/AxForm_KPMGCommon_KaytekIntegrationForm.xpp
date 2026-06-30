@@ -1,0 +1,38 @@
+﻿[Form]
+public class KPMGCommon_KaytekIntegrationForm extends FormRun
+{
+    [Control("String")]
+    class KPMGCommon_KaytekIntegrationTable_JournalId
+    {
+        public void jumpRef()
+        {
+            FormDataSource                       ds   = this.formRun().dataSource("KPMGCommon_KaytekIntegrationTable");
+            KPMGCommon_KaytekIntegrationTable   rec   = ds ? ds.cursor() : null;
+            Args                                 args = new Args();
+            JournalFormParameters                parm;
+
+            if (!rec)
+            {
+                super();
+                return;
+            }
+
+            parm = JournalFormParameters::construct();
+            parm.parmJournalIdRangeValue(queryValue(rec.JournalId));
+            parm.parmUseAllOpenPosted(true);
+            parm.parmAllOpenPosted(AllOpenPosted::All);
+            args.parmObject(parm);
+
+            if (rec.OperationType == KPMGCommon_OperationType::DailyReceiptItemJournal)
+            {
+                new MenuFunction(menuItemDisplayStr(WMSJournalTable), MenuItemType::Display).run(args);
+            }
+            else
+            {
+                super();
+            }
+        }
+
+    }
+
+}

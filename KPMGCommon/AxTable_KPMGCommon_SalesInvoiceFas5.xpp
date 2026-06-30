@@ -1,0 +1,32 @@
+﻿public class KPMGCommon_SalesInvoiceFas5 extends common
+{
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name = "_fieldIdToCheck"></param>
+    /// <returns></returns>
+    public boolean validateField(FieldId _fieldIdToCheck)
+    {
+        boolean ret;
+        CustTable custTable;
+    
+        ret = super(_fieldIdToCheck);
+
+        switch(_fieldIdToCheck)
+        {
+            case fieldNum(KPMGCommon_SalesInvoiceFas5, CustomerId):
+                custTable = CustTable::find(this.CustomerId);
+                if(custTable)
+                {
+                    ttsbegin;
+                    this.PaymentMode = custTable.PaymMode;
+                    ttscommit;
+                }
+                break;
+        }
+    
+        return ret;
+    }
+
+}

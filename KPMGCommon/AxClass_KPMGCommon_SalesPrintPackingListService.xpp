@@ -1,0 +1,28 @@
+﻿class KPMGCommon_SalesPrintPackingListService
+{
+    CustPackingSlipJour                                     custPackingSlipJour;
+    public void process(KPMGCommon_SalesPrintPackingListContract  _contract)
+    {
+
+        custPackingSlipJour = _contract.parmCustPackingSlipJour();
+        this.ReportSalesPackingList();
+    }
+
+    public void ReportSalesPackingList()
+    {   
+        SalesParameters    salesParameters = SalesParameters::find();
+
+        if(!salesParameters.KPMGCommon_ERFormatPackingListId)
+        {
+            warning("@KPMGCommon:ERFormatPackingListNoExist");
+        }
+        else
+        {
+            ERModelDefinitionInputParametersAction  obj = new ERModelDefinitionInputParametersAction();
+            obj.addParameter('model/$PackingSlipId', custPackingSlipJour.PackingSlipId);
+            obj.addParameter('model/$DeliveryDate', custPackingSlipJour.DeliveryDate);
+            ERObjectsFactory::createFormatMappingRunByFormatMappingId(salesParameters.KPMGCommon_ERFormatPackingListId,"").withParameter(obj).run();
+        }
+    }
+
+}

@@ -1,0 +1,15 @@
+﻿[ExtensionOf(formDataSourceStr(JmgProductionFloorExecutionReportProgress, JmgTmpJobBundleProdFeedback))]
+final class JmgProductionFloorExecutionReportProgress_JmgTmpJobBundleProdFeedbacDS_Extension
+{
+    public void selectionChanged()
+    {
+        JmgTmpJobBundleProdFeedback jmgTmpJobBundleProdFeedback = this.cursor();
+
+        element.KPMGCommon_initializeControlsProperties();
+        element.setWMSLocationId(jmgTmpJobBundleProdFeedback.KPMGCommon_WMSlocation);
+        element.KPMGCommon_setWhsLicensePlateId_AssignmentIntelligentLicensePlateCode();
+
+        next selectionChanged();
+    }
+
+}

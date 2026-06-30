@@ -1,0 +1,36 @@
+﻿[ExtensionOf(formStr(SalesEditLines))]
+final class SalesEditLines_KPMGCommon_Extension
+{
+
+    void closeOk()
+    {
+        CompanyInfo         companyInfo;
+
+        next closeOk();
+
+        companyInfo = CompanyInfo::find();
+
+        if(KPMGCommon_PrintDeclarationOfConformityCert.Value() && companyInfo.DataArea == "omt")
+        {
+            FormDataSource      fds = SalesParmTable_ds;
+            SalesParmTable      salesParmtable = fds.cursor() as SalesParmTable;
+            CustPackingSlipJour custPackingSlipJour;
+
+            /*select firstonly custPackingSlipJour
+                order by CreatedDateTime desc
+                where custPackingSlipJour.CreatedBy == curUserId();*/
+
+            custPackingSlipJour = CustPackingSlipJour::findRecId(salesParmtable.CustPackingSlipJour);
+
+            if (custPackingSlipJour.RecId)
+            {
+                Args args = new Args();
+                args.record(custPackingSlipJour);
+
+                KPMGCommon_DeclarationOfConformityERRunner::main(args);
+            }
+        }
+
+    }
+
+}

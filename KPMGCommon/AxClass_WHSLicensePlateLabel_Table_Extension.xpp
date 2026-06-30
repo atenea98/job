@@ -1,0 +1,97 @@
+﻿[ExtensionOf(tableStr(WHSLicensePlateLabel))]
+final class WHSLicensePlateLabel_Table_Extension
+{
+    public void insert()
+    {
+        InventItemGTIN              inventItemGTIN;
+        WHSWorkTemplateTable        wHSWorkTemplateTable = WHSWorkTemplateTable::find(this.WorkTemplateCode, WHSWorkTransType::Invent);
+        WHSLicensePlateLabel        wHSLicensePlateLabelexist;
+        InventQualityOrderTable     inventQualityOrderTable;
+        InventDim                   inventDim;
+
+        select Firstonly inventItemGTIN
+            where inventItemGTIN.itemId == this.ItemId
+               && inventItemGTIN.UnitId == this.UnitID
+               && inventItemGTIN.GTINSetup == WHSParameters::find().KPMGCommon_GTINSetup;
+        if (inventItemGTIN)
+            this.KPMGCommon_GTIN = inventItemGTIN.GlobalTradeItemNumber;
+        
+        if (wHSWorkTemplateTable.WorkTransType == WHSWorkTransType::Invent && wHSWorkTemplateTable.KPMGCommon_RearrangeProductionOrderLabel)
+        {
+            select wHSLicensePlateLabelexist
+                where wHSLicensePlateLabelexist.LicensePlateId == this.LicensePlateId
+                   //&& wHSLicensePlateLabelexist.ItemId         != this.ItemId
+                   && wHSLicensePlateLabelexist.RecId          != this.RecId
+                   && (wHSLicensePlateLabelexist.WorkTransType  == WHSWorkTransType::ProdPut ||
+                       wHSLicensePlateLabelexist.WorkTransType  == WHSWorkTransType::ProdProcessPut)
+                   && wHSLicensePlateLabelexist.OrderNum;
+            if (wHSLicensePlateLabelexist && ProdTable::exist(wHSLicensePlateLabelexist.OrderNum))
+            {
+                this.OrderNum = wHSLicensePlateLabelexist.OrderNum;
+                this.Qty = wHSLicensePlateLabelexist.Qty;
+
+                ttsbegin;
+                select forupdate inventQualityOrderTable
+                    where inventQualityOrderTable.ItemId == wHSLicensePlateLabelexist.ItemId
+                       && inventQualityOrderTable.InventRefId == this.OrderNum
+                       && (inventQualityOrderTable.ReferenceType == InventTestReferenceType::Production
+                        || inventQualityOrderTable.ReferenceType == InventTestReferenceType::PmfProdCoBy)
+                    join inventDim
+                    where inventDim.inventDimId == inventQualityOrderTable.InventDimId
+                       && inventDim.LicensePlateId == this.LicensePlateId;
+                if (inventQualityOrderTable && inventQualityOrderTable.ItemId != this.ItemId)
+                {
+                    inventQualityOrderTable.ItemId = this.ItemId;
+                    inventQualityOrderTable.update();
+                }
+                ttscommit;
+            }
+        }
+
+        next insert();
+    }
+
+    [Hookable(false)]
+    public void KPMGCommon_initLabelFromInventDimParm(
+        InventDim            _inventDim,
+        InventDimParm        _inventDimParm)
+    {
+        ListEnumerator  enumerator            = InventDim::dimFieldListEnumerator();
+        FieldId         inventDimParmFieldId;
+        FieldId         inventDimFieldId;
+        str             inventDimFieldValue;
+        str             fieldName;
+
+        while (enumerator.moveNext())
+        {
+            inventDimFieldId     = enumerator.current();
+            inventDimParmFieldId = InventDim::dim2dimParm(inventDimFieldId);
+            inventDimFieldValue  = _inventDim.(inventDimFieldId);
+
+            if (_inventDimParm.(inventDimParmFieldId) && inventDimFieldValue)
+            {
+                fieldName = fieldId2name(tableNum(InventDim), inventDimFieldId);
+                if (fieldName2id(this.TableId, fieldName) != 0)
+                {
+                    this.setFieldValue(fieldName, inventDimFieldValue);
+                }
+            }
+        }
+    }
+
+    [Hookable(false)]
+    public void KPMGCoomon_initFromAddressFromInventSite(InventSiteId _inventSiteId)
+    {
+        InventSite inventSite = InventSite::find(_inventSiteId);
+        LogisticsPostalAddress  address = LogisticsPostalAddress::findByLocation(LogisticsLocation::find(InventSite::getLocationFromRole(inventSite.RecId, LogisticsLocationRoleType::Delivery)).RecId);
+
+        if (address)
+        {
+            this.AddressCityFrom         = address.City;
+            this.AddressStateIdFrom      = address.State;
+            this.AddressStreetFrom       = address.Street;
+            this.AddressZipCodeIdFrom    = address.ZipCode;
+        }
+    }
+
+}

@@ -1,0 +1,106 @@
+﻿/// <summary>
+/// Processing class for the generate packingSlip process
+/// </summary>
+[KPMGCommon_GeneratePackingSlipForLoadProcessTypeAttribute(KPMGCommon_GeneratePackingSlipForLoadProcessType::GeneratePackingSlip)]
+class KPMGCommon_GeneratePackingSlipForLoadProcess_GeneratePackingSlip extends KPMGCommon_GeneratePackingSlipForLoadProcess
+{
+    private const KPMGCommon_GeneratePackingSlipForLoadMessageType messageType = 'GeneratePackingSlip';
+    KPMGCommon_GeneratePackingSlipForLoadRequest_GeneratePackingSlip request;
+    KPMGCommon_GeneratePackingSlipForLoadResponse_GeneratePackingSlip response;
+    TransDate       transdate;
+    WHSLoadId       loadId;
+    PackingSlipId   packingSlipId;
+    WHSLoadTable    loadTable;
+
+        /// <summary>
+    /// Parm method for Request object
+    /// </summary>
+    /// <param name = "_request">Value to set</param>
+    /// <returns>Current value</returns>
+    protected KPMGCommon_RequestBase parmRequest(KPMGCommon_RequestBase _request = request)
+    {
+        request = _request as KPMGCommon_GeneratePackingSlipForLoadRequest_GeneratePackingSlip;
+        return request;
+    }
+
+    protected KPMGCommon_ResponseBase parmResponse(KPMGCommon_ResponseBase _response = response)
+    {
+        response = _response as KPMGCommon_GeneratePackingSlipForLoadResponse_GeneratePackingSlip;
+        return response;
+    }
+
+    protected void initResponse()
+    {
+        response = new KPMGCommon_GeneratePackingSlipForLoadResponse_GeneratePackingSlip();
+        response.ParmMessageType(this.messageType());
+        response.parmDataAreaId(request.parmDataAreaId());
+        response.parmLoadId(loadId);
+    }
+
+    protected KPMGCommon_GeneratePackingSlipForLoadMessageType messageType()
+    {
+        return KPMGCommon_GeneratePackingSlipForLoadProcess_GeneratePackingSlip::messageType;
+    }
+
+    protected void init()
+    {
+        super();
+        transdate = DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone());
+        loadId = request.parmLoadId();
+    }
+
+    protected void doProcess()
+    {
+        this.validateLoad();
+        this.GeneratePackingslip();
+        response.parmDataAreaId(curExt());
+        response.parmLoadId(loadId);
+        response.parmPackingSlipId(packingSlipId);
+        
+    }
+
+    private void validateLoad()
+    {
+        loadTable = WHSLoadTable::find(loadId);
+        if (!loadTable)
+        {
+            throw Error(strFmt("@KPMGCommon_GeneratePackingSlipForLoad:LoadError", loadId));
+        } else if (loadTable.LoadStatus != WHSLoadStatus::Loaded)
+        {
+            throw Error(strFmt("@KPMGCommon_GeneratePackingSlipForLoad:LoadLoadedStatusError", loadId));
+        }
+    }
+
+    private void GeneratePackingslip()
+    {
+        //Ship confirm Load
+        WHSShipConfirm shipConfirm = WHSShipConfirm::construct();
+        shipConfirm.shipConfirm(loadTable.LoadId);
+
+        // post packing slip from Load
+        ttsbegin;
+        SalesFormLetter salesFormLetter = SalesFormLetter::construct(DocumentStatus::PackingSlip);
+        salesFormLetter.parmWHSLoadId(loadTable.LoadId);
+        salesFormLetter.parmVersioningUpdateType(VersioningUpdateType::Initial);
+       
+        salesFormLetter.update(loadTable, DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone()), SalesUpdate::DeliverNow, AccountOrder::None,NoYes::No,NoYes::No);
+        CustPackingSlipJour custPackingSlipJour = salesFormLetter.parmJournalRecord();
+        if (!custPackingSlipJour)
+            throw Error("@KPMGCommon_GeneratePackingSlipForLoad:ErrorPostPackingSlip");
+
+        packingSlipId = custPackingSlipJour.PackingSlipId;
+        ttscommit;    
+    }
+
+    protected void postProcess()
+    {
+        super();
+    }
+
+    protected void endSuccess()
+    {
+        response.parmPackingSlipId(packingSlipId);
+        super();
+    }
+
+}

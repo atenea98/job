@@ -1,0 +1,44 @@
+﻿internal final class KPMGCommon_PurchaseOrderChangeApprovalStatus
+{
+    /// <summary>
+    /// Class entry point. The system will call this method when a designated menu 
+    /// is selected or when execution starts and this class is set as the startup class.
+    /// </summary>
+    /// <param name = "_args">The specified arguments.</param>
+    public static void main(Args _args)
+    {
+        Dialog        dialog;
+        DialogField   fieldPurchId, fieldDocumentState;
+        PurchId       purchId;
+        VersioningDocumentState documentState;
+        PurchTable    purchTable;
+        dialog = new Dialog("Purchase Order Change Approval status");
+        dialog.addTabPage('General');
+        dialog.addText("Select Purchase Order Change Approval status:");
+        fieldPurchId = dialog.addField(extendedTypeStr(PurchId));
+        fieldDocumentState = dialog.addField(enumStr(VersioningDocumentState));
+        dialog.run();
+        if (dialog.closedOk())
+        {
+            purchId = fieldPurchId.value();
+            documentState = fieldDocumentState.value();
+            purchTable = PurchTable::find(purchId, true);
+            if(!purchTable)
+            {
+                throw error("Purchase Order entered does not exist.");
+            }
+            else
+            {
+                if (purchTable.PurchStatus == PurchStatus::Invoiced)
+                    throw error("Purchase order is status Invoiced.");
+            }
+
+            ttsbegin;
+            purchTable.DocumentState = documentState;
+            purchTable.doUpdate();
+            ttscommit;
+
+        }
+    }
+
+}

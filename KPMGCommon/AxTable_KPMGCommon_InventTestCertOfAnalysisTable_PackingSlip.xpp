@@ -1,0 +1,253 @@
+﻿public class KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip extends common
+{
+    /// <summary>
+    ///    Checks that the value in the <c>AccountRelation</c> field is valid.
+    /// </summary>
+    /// <returns>
+    ///    true if the value is valid; otherwise, false.
+    /// </returns>
+    boolean checkAccountRelation()
+    {
+        if (!this.AccountRelation)
+        {
+            return true;
+        }
+
+        if (!CustTable::exist(this.AccountRelation))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Gets the email address for the specified customer or vendor.
+    /// </summary>
+    /// <returns>
+    /// The email address; otherwise, an empty string.
+    /// </returns>
+
+    display Email custVendEmail()
+    {
+        CustVendTable   custVendTable   = this.custVendTable();
+
+        if (!custVendTable.RecId)
+        {
+            return '';
+        }
+
+        return custVendTable.CustVendTable::email();
+    }
+
+    /// <summary>
+    ///    Gets the name of the specified customer or vendor.
+    /// </summary>
+    /// <returns>
+    ///    The costumer or vendor name; otherwise, an empty string.
+    /// </returns>
+
+    display CustVendName custVendName()
+    {
+        CustVendTable   custVendTable   = this.custVendTable();
+
+        if (!custVendTable.RecId)
+        {
+            return '';
+        }
+
+        return custVendTable.CustVendTable::name();
+    }
+
+    /// <summary>
+    /// Gets the phone number for the specified customer or vendor.
+    /// </summary>
+    /// <returns>
+    /// The costumer or vendor phone number; otherwise, an empty string.
+    /// </returns>
+
+    display Phone custVendPhone()
+    {
+        CustVendTable   custVendTable   = this.custVendTable();
+
+        if (!custVendTable.RecId)
+        {
+            return '';
+        }
+
+        return custVendTable.CustVendTable::phone();
+    }
+
+    /// <summary>
+    ///    Gets the <c>CustVendTable</c> map that matches this record.
+    /// </summary>
+    /// <returns>
+    ///    The <c>CustVendTable</c> map; otherwise an empty map.
+    /// </returns>
+    CustVendTable custVendTable()
+    {
+        CustTable   custTableNull;
+
+        if (!this.AccountRelation)
+        {
+            return custTableNull;
+        }
+
+        if (hasFieldAccess( tableNum(KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip),
+                            fieldNum(KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip, AccountRelation),
+                            AccessType::View))
+        {
+            return CustTable::find(this.AccountRelation);
+        }
+        return custTableNull;
+    }
+
+    /// <summary>
+    /// Gets the fax number for the specified customer or vendor.
+    /// </summary>
+    /// <returns>
+    /// The costumer or vendor fax number; otherwise, an empty string.
+    /// </returns>
+
+    display TeleFax custVendTeleFax()
+    {
+        CustVendTable   custVendTable   = this.custVendTable();
+
+        if (!custVendTable.RecId)
+        {
+            return '';
+        }
+
+        return custVendTable.CustVendTable::telefax();
+    }
+
+    /// <summary>
+    ///    Overrides of standard delete method and ensures that lines and results are deleted too.
+    /// </summary>
+    public void delete()
+    {
+        KPMGCommon_InventTestCertOfAnalysisLine_PackingSlip        inventTestCertOfAnalysisLine_PackingSlip;
+
+        ttsbegin;
+
+        delete_from inventTestCertOfAnalysisLine_PackingSlip
+            where inventTestCertOfAnalysisLine_PackingSlip.InventCertificateOfAnalysisId        == this.InventCertificateOfAnalysisId;
+
+        super();
+
+        ttscommit;
+    }
+
+    /// <summary>
+    ///    Overrides the standard insert method.
+    /// </summary>
+    /// <exception cref="M:Exception::Error">
+    ///    The certificate of analysis ID is missing.
+    /// </exception>
+    public void insert()
+    {
+        if (!this.InventCertificateOfAnalysisId)
+        {
+            this.InventCertificateOfAnalysisId = this.initInventCertificateOfAnalysisId(false);
+        }
+
+        super();
+
+    }
+
+    /// <summary>
+    ///    Gets the <c>InventTable</c> record that is related to this record.
+    /// </summary>
+    /// <returns>
+    ///    An <c>InventTable</c> record; otherwise, an empty record.
+    /// </returns>
+    InventTable inventTable()
+    {
+        return InventTable::find(this.ItemId);
+    }
+
+    /// <summary>
+    ///    Gets the item name for the item that is associated with this record.
+    /// </summary>
+    /// <returns>
+    ///    An item name; otherwise, an empty string.
+    /// </returns>
+
+    display ItemName itemName()
+    {
+        if (hasFieldAccess( tableNum(KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip),
+                            fieldNum(KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip, ItemId),
+                            AccessType::View))
+        {
+            return this.inventTable().itemName();
+        }
+        return '';
+    }
+
+    /// <summary>
+    ///    Determines whether the specified record in the <c>KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip</c> table exists.
+    /// </summary>
+    /// <param name="_inventCertificateOfAnalysisId">
+    ///    The certificate of analysis ID of the record to find.
+    /// </param>
+    /// <returns>
+    ///    true if the specified record exists; otherwise, false.
+    /// </returns>
+    static boolean exist(InventCertificateOfAnalysisId _inventCertificateOfAnalysisId)
+    {
+        return _inventCertificateOfAnalysisId &&
+            (select  firstonly   KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip
+             where  KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip.InventCertificateOfAnalysisId == _inventCertificateOfAnalysisId).RecId != 0;
+    }
+
+    /// <summary>
+    ///    Finds the specified record in the <c>KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip</c> table.
+    /// </summary>
+    /// <param name="_inventCertificateOfAnalysisId">
+    ///    The certificate of analysis ID of the record to find.
+    /// </param>
+    /// <param name="_forUpdate">
+    ///    A Boolean value that indicates whether to read the record for update; optional.
+    /// </param>
+    /// <returns>
+    ///    A record in the <c>InventTestArea</c> table; otherwise, an empty record.
+    /// </returns>
+    static KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip find(
+        InventCertificateOfAnalysisId   _inventCertificateOfAnalysisId,
+        boolean                         _forUpdate = false)
+    {
+        KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip   inventTestCertOfAnalysisTable_PackingSlip;
+
+        inventTestCertOfAnalysisTable_PackingSlip.selectForUpdate(_forUpdate);
+
+        if (_inventCertificateOfAnalysisId)
+        {
+            select firstonly    inventTestCertOfAnalysisTable_PackingSlip
+            where   inventTestCertOfAnalysisTable_PackingSlip.InventCertificateOfAnalysisId == _inventCertificateOfAnalysisId;
+        }
+
+        return inventTestCertOfAnalysisTable_PackingSlip;
+    }
+
+    public static NumberSeq numberSeqInventCertificateOfAnalysisId(boolean makeDecisionLater = true)
+    {
+        return NumberSeq::newGetNum(InventParameters::numRefCertificateOfAnalysisId(),makeDecisionLater);
+    }
+
+    InventCertificateOfAnalysisId initInventCertificateOfAnalysisId(boolean makeDecisionLater = true)
+    {
+        NumberSeq numberSeqInventCertificateOfAnalysisId = KPMGCommon_InventTestCertOfAnalysisTable_PackingSlip::numberSeqInventCertificateOfAnalysisId(makeDecisionLater);
+
+        InventCertificateOfAnalysisId inventCertificateOfAnalysisId = numberSeqInventCertificateOfAnalysisId.num();
+
+        return inventCertificateOfAnalysisId;
+    }
+
+    public void initFromCustPckSlpJour(CustPackingSlipJour _custPackingSlipJour)
+    {
+        this.PackingSlipId      = _custPackingSlipJour.PackingSlipId;
+        this.DeliveryDate       = _custPackingSlipJour.DeliveryDate;
+        this.AccountRelation    = _custPackingSlipJour.OrderAccount;
+    }
+
+}

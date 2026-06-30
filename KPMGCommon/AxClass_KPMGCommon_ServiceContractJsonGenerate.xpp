@@ -1,0 +1,392 @@
+﻿class KPMGCommon_ServiceContractJsonGenerate
+{
+    #File
+    #AOT
+    #Properties
+
+    private DialogField dlgFldServiceName;
+    private DialogField dlgFldOperationName;
+
+    private ServiceName serviceName;
+    private SysPropertyName operationName;
+    private IntegrationDirection direction;
+
+    private const int numOfElementsInCollectionSample = 2;
+    private const int jsonIndentSize = 4;
+    private const str jsonStartArrayBracket = '[';
+    private const str jsonEndArrayBracket = ']';
+    private const str jsonStartObjectBracket = '{';
+    private const str jsonEndObjectBracket = '}';
+
+    private int jsonLevel;
+    private Set levelsInProgress = new Set(Types::Integer); // a level is in the Set if it is not closed and contains 1 or more elements (to detect when comma delimiter is needed)
+
+        public static void main(Args _args)
+    {
+        KPMGCommon_ServiceContractJsonGenerate instance = KPMGCommon_ServiceContractJsonGenerate::construct();
+
+        if (instance.prompt())
+        {
+            instance.run();
+        }
+    }
+
+    public static KPMGCommon_ServiceContractJsonGenerate construct()
+    {
+        return new KPMGCommon_ServiceContractJsonGenerate();
+    }
+
+    public boolean prompt()
+    {
+        boolean ok;
+        
+        Dialog dialog = new Dialog('Generate service operation sample JSON file');
+        dlgFldServiceName   = dialog.addField(extendedTypeStr(ServiceName), 'Service'); // auto-lookup by table SysMetaServiceNameLookup
+        dlgFldOperationName = dialog.addField(extendedTypeStr(SysPropertyName), 'Operation');
+        DialogField dlgFldDirection = dialog.addField(enumStr(IntegrationDirection));
+
+        dialog.doInit();
+        dlgFldServiceName.control().registerOverrideMethod(methodStr(FormStringControl, modified), methodStr(KPMGCommon_ServiceContractJsonGenerate, modifiedServiceName), this);
+        dlgFldServiceName.mandatory_RU(true);
+        dlgFldOperationName.control().registerOverrideMethod(methodStr(FormStringControl, lookup), methodStr(KPMGCommon_ServiceContractJsonGenerate, lookupOperationName), this);
+        dlgFldOperationName.mandatory_RU(true);
+
+        if (dialog.run())
+        {
+            serviceName     = dlgFldServiceName.value();
+            operationName   = dlgFldOperationName.value();
+
+            if (serviceName && operationName)
+            {
+                direction = dlgFldDirection.value();
+                ok = true;
+            }
+            else
+            {
+                ok = checkFailed('Service and operation must be specified');
+            }
+        }
+
+        return ok;
+    }
+
+    private boolean modifiedServiceName(FormStringControl _control)
+    {
+        boolean ret = _control.modified();
+
+        if (ret)
+        {
+            dlgFldOperationName.value('');
+        }
+
+        return ret;
+    }
+
+    private void lookupOperationName(FormStringControl _control)
+    {
+        Query query = new Query();
+        QueryBuildDataSource qbds = query.addDataSource(tableNum(SysOperationMultiSelectTmp));
+        qbds.addSelectionField(fieldNum(SysOperationMultiSelectTmp, Values));
+        qbds.addOrderByField(fieldNum(SysOperationMultiSelectTmp, Values));
+
+        SysTableLookup sysTableLookup = SysTableLookup::newParameters(tablenum(SysOperationMultiSelectTmp), _control);
+        sysTableLookup.addLookupfield(fieldnum(SysOperationMultiSelectTmp, Values), true);
+        sysTableLookup.parmQuery(query);
+
+        sysTableLookup.parmTmpBuffer( this.populateOperationNamesTmpTable() );
+
+        sysTableLookup.performFormLookup();
+    }
+
+    private SysOperationMultiSelectTmp populateOperationNamesTmpTable()
+    {
+        SysOperationMultiSelectTmp  tmp;
+
+        if (dlgFldServiceName.value())
+        {
+            TreeNode serviceNode = TreeNode::findNode(strfmt(#ServicePath, dlgFldServiceName.value()));
+            if (serviceNode)
+            {
+                TreeNode operationsNode  = serviceNode.AOTfindChild(#ServiceOperations);
+                for (TreeNode operationNode = operationsNode.AOTfirstChild(); operationNode != null; operationNode = operationNode.AOTnextSibling())
+                {
+                    tmp.Values = operationNode.AOTgetProperty(#PropertyName);
+                    tmp.insert();
+                }
+            }
+        }
+
+        return tmp;
+    }
+
+    public void run()
+    {
+        TreeNode serviceNode = TreeNode::findNode(strfmt(#ServicePath, serviceName));
+        if (!serviceNode)
+        {
+            throw error(strFmt('Service node "%1" not found', strfmt(#ServicePath, serviceName)));
+        }
+
+        TreeNode operationNode   = TreeNode::findNode(strfmt(#ServiceOperationPath, serviceName, operationName));
+        if (!operationNode)
+        {
+            throw error(strFmt('Operation node "%1" not found', strfmt(#ServiceOperationPath, serviceName, operationName)));
+        }
+
+        ClassName       className   = serviceNode.AOTgetProperty(#PropertyServiceClass);
+        MethodName      methodName  = operationNode.AOTgetProperty(#PropertyOperationMethod);
+
+        if (!className || !methodName)
+        {
+            throw error('Unable to get name of X++ method');
+        }
+
+        str json = this.generateSampleJson(className, methodName);
+
+        if (json)
+        {
+            this.exportJsonFile(json);
+        }
+    }
+
+    private str generateSampleJson(ClassName _serviceClassName, MethodName _serviceOperationMethodName)
+    {
+        SysDictMethod       dictMethod = new SysDictMethod(UtilElementType::ClassInstanceMethod, className2Id(_serviceClassName), _serviceOperationMethodName);
+
+        Types               parameterType       = (direction == IntegrationDirection::Inbound) ? dictMethod.parameterType(1)     : dictMethod.returnType();
+        UtilElementName     parameterTypeName   = (direction == IntegrationDirection::Inbound) ? dictMethod.parameterTypeName(1) : dictMethod.returnTypeName();
+
+        str json;
+
+        if (direction == IntegrationDirection::Inbound)
+        {
+            json = this.startNewJsonObjectNode();
+            json = this.appendNewJsonNode(json, strFmt('"%1": ', dictMethod.parameterName(1)));
+        }
+
+        json += this.generateSampleJsonAttrValue(parameterType, parameterTypeName);
+        
+        if (direction == IntegrationDirection::Inbound)
+        {
+            json = this.endJsonObjectNode(json);
+        }
+
+        return json;
+    }
+
+    private str generateJsonByContractClass(ClassId _classId)
+    {
+        str nodeJson = this.startNewJsonObjectNode();
+
+        Set methods = new SysDictClass(_classId).methods(true, false, true);
+        SetEnumerator enumerator = methods.getEnumerator();
+        while (enumerator.moveNext())
+        {
+            SysDictMethod dictMethod = enumerator.current();
+            DataMemberAttribute dataMemberAttribute = dictMethod.getAttribute(classStr(DataMemberAttribute));
+            if (dataMemberAttribute)
+            {
+                str dataMemberName = dataMemberAttribute.name() ? dataMemberAttribute.name() : dictMethod.name();
+                anytype attrValue;
+
+                nodeJson = this.appendNewJsonNode(nodeJson, strFmt('"%1": ', dataMemberName));
+
+                try
+                {
+                    AifCollectionTypeAttribute collectionAttr = SysOperationHelper::getCollectionAttribute(dictMethod);
+                    if (collectionAttr
+                        && (   dictMethod.returnTypeName() == classStr(List)
+                            || dictMethod.returnTypeName() == classStr(Array)))
+                    {
+                        attrValue = this.startNewJsonCollectionNode();
+
+                        for (int idx = 1; idx <= numOfElementsInCollectionSample; idx ++)
+                        {
+                            attrValue = this.appendNewJsonNode(attrValue, this.generateSampleJsonAttrValue(collectionAttr.paramItemType(), collectionAttr.paramExtendedTypeName()));
+                        }
+                        
+                        attrValue = this.endJsonCollectionNode(attrValue);
+                    }
+                    else
+                    {
+                        attrValue = this.generateSampleJsonAttrValue(dictMethod.parameterType(1), dictMethod.parameterTypeName(1));
+                    }
+                }
+                catch
+                {
+                    attrValue = '""';
+                    error(strFmt('Cannot set value of the attribute %1', dataMemberName));
+                }
+
+                nodeJson += attrValue;
+            }
+        }
+
+        nodeJson = this.endJsonObjectNode(nodeJson);
+
+        return nodeJson;
+    }
+
+    private str generateSampleJsonAttrValue(Types _type, UtilElementName _typeName)
+    {
+        str ret;
+
+        switch (_type)
+        {
+            case Types::UserType:
+                Types type = Global::typeName2Type(_typeName);
+                if (type != Types::UserType)
+                {
+                    ret = this.generateSampleJsonAttrValue(type, _typeName);
+                }
+                else
+                {
+                    ret = strFmt('"%1"', Global::nullValueBaseType(_type));
+                }
+                break;
+                
+            case Types::Class:
+                ret = this.generateJsonByContractClass( Global::className2Id(_typeName) );
+                break;
+            
+            case Types::Enum:
+                EnumId enumId = Global::enumName2Id(_typeName);
+                if (!enumId)
+                {
+                    SysDictType dictType = new SysDictType(Global::extendedTypeName2Id(_typeName));
+                    if (dictType)
+                    {
+                        enumId = dictType.enumId();
+                    }
+                }
+
+                if (enumId == enumNum(NoYes) || _typeName == 'boolean')
+                {
+                    ret = 'true';
+                }
+                else if (enumId)
+                {
+                    SysDictEnum dictEnum = new SysDictEnum(enumId);
+                    if (dictEnum)
+                    {
+                        ret = dictEnum.index2Label(0);
+                        if (!ret && dictEnum.values() > 1)
+                        {
+                            ret = dictEnum.index2Label(1);
+                        }
+                    }
+                }
+
+                if (!ret)
+                {
+                    ret = strFmt('%1', Global::nullValueBaseType(_type));
+                }
+
+                ret = strFmt('"%1"', ret);
+
+                break;
+
+            case Types::Integer:
+            case Types::Int64:
+                ret = "0";
+                break;
+
+            case Types::Real:
+                ret = "0.0";
+                break;
+
+            case Types::Date:
+                ret = strFmt('"%1"', date2Str(systemDateGet(),321,DateDay::Digits1or2,DateSeparator::Hyphen,DateMonth::Digits1or2,DateSeparator::Hyphen,DateYear::Digits4));
+                break;
+
+            case Types::UtcDateTime:
+                ret = strFmt('"%1"', DateTimeUtil::getToday(DateTimeUtil::getUserPreferredTimeZone()));
+                break;
+
+            default:
+                ret = strFmt('"%1"', Global::nullValueBaseType(_type));
+                break;
+        }
+
+        return ret;
+    }
+
+    private str appendNewJsonLine(str _json, str _add)
+    {
+        str ret = _json;
+
+        if (_json)
+        {
+            ret += #delimiterCRLF;
+        }
+
+        ret += (strRep(#delimiterSpace, jsonLevel * jsonIndentSize) + _add);
+
+        return ret;
+    }
+
+    private str appendNewJsonNode(str _json, str _nodeStr)
+    {
+        str ret = _json;
+
+        if (_json && levelsInProgress.in(jsonLevel))
+        {
+            ret += ',';
+        }
+
+        ret = this.appendNewJsonLine(ret, _nodeStr);
+
+        levelsInProgress.add(jsonLevel);
+
+        return ret;
+    }
+
+    private str startNewJsonLevel(str _startBracket)
+    {
+        jsonLevel ++;
+        return _startBracket;
+    }
+
+    private str endJsonLevel(str _json, str _endBracket)
+    {
+        if (levelsInProgress.in(jsonLevel))
+        {
+            levelsInProgress.remove(jsonLevel);
+        }
+
+        jsonLevel --;
+
+        return this.appendNewJsonLine(_json, _endBracket);
+    }
+
+    private str startNewJsonObjectNode()
+    {
+        return this.startNewJsonLevel(jsonStartObjectBracket);
+    }
+
+    private str endJsonObjectNode(str _json)
+    {
+        return this.endJsonLevel(_json, jsonEndObjectBracket);
+    }
+
+    private str startNewJsonCollectionNode()
+    {
+        return this.startNewJsonLevel(jsonStartArrayBracket);
+    }
+
+    private str endJsonCollectionNode(str _json)
+    {
+        return this.endJsonLevel(_json, jsonEndArrayBracket);
+    }
+
+    private void exportJsonFile(str _json)
+    {
+        TextStreamIo    textIo = TextStreamIo::constructForWrite();
+        textIo.outFieldDelimiter(#delimiterTab);
+
+        textIo.writeRaw(_json);
+
+        File::SendFileToUser(textIo.getStream(), strFmt('%1_%2_%3_%4.json', serviceName, operationName, direction, Microsoft.Dynamics.ApplicationPlatform.Environment.EnvironmentFactory::GetApplicationEnvironment().Infrastructure.HostName));
+    }
+
+}

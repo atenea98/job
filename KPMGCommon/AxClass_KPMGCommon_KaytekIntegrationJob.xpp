@@ -1,0 +1,117 @@
+﻿public class KPMGCommon_KaytekIntegrationJob extends RunBaseBatch
+{
+    private JournalTransferErrors   transferErrors;
+    public void run()
+    {
+        KPMGCommon_KaytekIntegrationTable logMess;
+        InventJournalTable             journalInv;
+        WMSJournalTable                journalWms;
+        InventJournalName              invName;
+        WMSJournalName                 wmsName;
+        boolean                        processed;
+        str                            lastError;
+
+        while select forUpdate logMess
+            where logMess.Status == KPMGCommon_OperationStatus::Pending
+        {
+            processed = false;
+            lastError = "";
+
+            invName = InventJournalName::find(logMess.JournalId);
+            wmsName = WMSJournalName::find(logMess.JournalId);
+            if (!invName && !wmsName)
+            {
+                logMess.Status          = KPMGCommon_OperationStatus::Error;
+                logMess.ErrorMessage    = "Diario no encontrado"; //Mirar como obtener el error
+                logMess.DateTimeLastTry = DateTimeUtil::utcNow();
+                logMess.update();
+                continue;
+            }
+
+            journalInv = null;
+            select firstonly journalInv
+                where journalInv.JournalId == logMess.JournalId
+                   && journalInv.Posted           == NoYes::No;
+
+            if (journalInv)
+            {
+                try
+                {
+                    JournalCheckPost journalCheckPost;
+                    ttsBegin;
+                    journalCheckPost = InventJournalCheckPost::newPostJournal(journalInv);
+                    journalCheckPost.parmThrowCheckFailed(false);
+                    journalCheckPost.parmTransferErrors(NoYes::No);
+                    journalCheckPost.run();
+                    ttsCommit;
+                    processed = true;
+                }
+                catch (Exception::Error)
+                {
+                    ttsAbort;
+                    lastError = "";
+                    processed = false;
+                }
+            }
+            else
+            {
+                journalWms = null;
+                select firstonly journalWms
+                    where journalWms.JournalId == logMess.JournalId
+                      && journalWms.posted       == NoYes::No;
+
+                if (journalWms)
+                {
+                    try
+                    {
+                        JournalCheckPost _journalCheckPost;
+                        ttsBegin;
+                        _journalCheckPost = WMSJournalCheckPostReception::newTypeJournalTable(JournalCheckPostType::Post,journalWms);
+                        _journalCheckPost.parmAutoBlock(true);
+                        _journalCheckPost.run();
+                        ttsCommit;
+                        processed = true;
+                    }
+                    catch (Exception::Error)
+                    {
+                        ttsAbort;
+                        lastError = "";
+                        processed = false;
+                    }
+                }
+                else
+                {
+                    logMess.Status          = KPMGCommon_OperationStatus::Error;
+                    logMess.ErrorMessage    = "Diario no encontrado"; //Mirar como obtener el error
+                    logMess.DateTimeLastTry = DateTimeUtil::utcNow();
+                    logMess.update();
+                    continue;
+                }
+            }
+
+            if (processed)
+            {
+                logMess.Status       = KPMGCommon_OperationStatus::Success;
+                logMess.ErrorMessage = "";
+            }
+            else
+            {
+                logMess.Status       = KPMGCommon_OperationStatus::Error;
+                logMess.ErrorMessage = lastError;
+            }
+
+            logMess.DateTimeLastTry = DateTimeUtil::utcNow();
+            logMess.update();
+        }
+    }
+
+    public static void main(Args _args)
+    {
+        KPMGCommon_KaytekIntegrationJob job = new KPMGCommon_KaytekIntegrationJob();
+        if(job.prompt())
+        {
+            job.run();
+        }
+    }
+
+}

@@ -1,0 +1,21 @@
+﻿/// <summary>
+/// Class for the generate packingslip for load service request structure
+/// </summary>
+class KPMGCommon_GeneratePackingSlipForLoadProcessData
+{
+    WHSLoadId loadId;
+
+    /// <summary>
+    /// Load number
+    /// </summary>
+    /// <param name = "_LoadId">Load number as input</param>
+    /// <returns>Load number as output</returns>
+    [DataMemberAttribute('LoadId')]
+    //[DataMember('LoadId', RequiredValidation::Mandatory)]
+    public WHSLoadId parmLoadId(WHSLoadId _loadId = loadId)
+    {
+        loadId = _loadId;
+        return loadId;
+    }
+
+}
