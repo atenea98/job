@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTableExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>CredManCustGuaranteeInsurance.KPMGCommon</Name>
+	<FieldGroupExtensions>
+		<AxTableFieldGroupExtension>
+			<Name>Overview</Name>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>KPMGCommon_RequestedAmount</DataField>
+					<PositionType>AfterItem</PositionType>
+					<PreviousSibling>ValidTo</PreviousSibling>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>KPMGCommon_Note</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroupExtension>
+	</FieldGroupExtensions>
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>KPMGCommon_RequestedAmount</Name>
+			<ExtendedDataType>KPMGCommon_RequestedAmount</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>KPMGCommon_Note</Name>
+			<ExtendedDataType>KPMGCommon_Note</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes />
+	<Mappings />
+	<PropertyModifications />
+	<RelationExtensions />
+	<RelationModifications />
+	<Relations />
+</AxTableExtension>

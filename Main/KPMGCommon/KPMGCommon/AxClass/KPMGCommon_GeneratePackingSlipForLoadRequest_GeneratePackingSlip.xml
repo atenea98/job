@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_GeneratePackingSlipForLoadRequest_GeneratePackingSlip</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Class for the generate packingslip for load service request structure
+/// </summary>
+class KPMGCommon_GeneratePackingSlipForLoadRequest_GeneratePackingSlip extends KPMGCommon_RequestBase
+{
+    WHSLoadId   loadId;
+     
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>parmLoadId</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// LoadId for the request
+    /// </summary>
+    /// <param name = "parmKPMGCommon_LoadId"loadId data as input</param>
+    /// <returns>Header data as output</returns>
+    [DataMemberAttribute('LoadId'), AifCollectionTypeAttribute("return", Types::String, extendedTypeStr(WHSLoadId))]
+    public WHSLoadId parmLoadId(WHSLoadId _loadId = loadId)
+    {
+        loadId = _loadId;
+        return loadId;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

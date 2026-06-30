@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxDataEntityViewExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>WMSWarehouseLocationEntity.KPMGCommon</Name>
+	<DataSources />
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>KPMGCommon_PendienteActualizarKaytek</Name>
+			<AllowEdit>Yes</AllowEdit>
+			<Mandatory>No</Mandatory>
+			<DataField>KPMGCommon_PendienteActualizarKaytek</DataField>
+			<DataSource>WMSLocation</DataSource>
+		</AxDataEntityViewField>
+	</Fields>
+	<Mappings />
+	<PropertyModifications />
+	<Relations />
+</AxDataEntityViewExtension>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>WMSJournalTable.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControl20zjqk431</Name>
+			<FormControl xmlns=""
+				i:type="AxFormMenuFunctionButtonControl">
+				<Name>KPMGCommon_ImportSacks</Name>
+				<Type>MenuFunctionButton</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<MenuItemName>KPMGCommon_ImportSacks</MenuItemName>
+				<MenuItemType>Action</MenuItemType>
+			</FormControl>
+			<Parent>Functions</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

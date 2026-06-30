@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgProductionFloorExecutionReportProgress_Form_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(FormStr(JmgProductionFloorExecutionReportProgress))]
+final class JmgProductionFloorExecutionReportProgress_Form_Extension
+{
+    private JmgJobBundleProdFeedbackForm    _prodFeedbackForm;
+    private boolean     isWMSLocationNumberValidated  = true;
+    private boolean     WMSLocationNumberRequired;
+    private const int   WMSLocationNumberTabNumber    = 6;
+    private boolean     AssignmentIntelligentLicensePlateCodeRequired;
+    private FormRun     _parentForm;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>init</Name>
+				<Source><![CDATA[
+    public void init()
+    {
+        JmgJobBundle jobBundle = this.args().parmObject();
+        next init();
+        _prodFeedbackForm = new JmgJobBundleProdFeedbackForm(jobBundle, this.args().parmEnum());
+        _parentForm = this.args().caller();
+}
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>setLocationId</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    public void setLocationId(str setWMSLocationId)
+    {
+        JmgTmpJobBundleProdFeedback.KPMGCommon_WMSLocation = setWMSLocationId;
+        ClearButtonWMSLocation.enabled(setWMSLocationId? true : false);
+        this.validateWMSLocationNumber();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateWMSLocationNumber</Name>
+				<Source><![CDATA[
+    public boolean validateWMSLocationNumber()
+    {
+        boolean ret = true;
+        if (jmgTmpJobBundleProdFeedback.KPMGCommon_WMSlocation)
+        {
+            Query query = JmgJobBundleProdFeedbackForm::buildWMSLocationNumberLookupQuery(jmgTmpJobBundleProdFeedback.JobRef, jmgTmpJobBundleProdFeedback.ItemId, jmgTmpJobBundleProdFeedback.InventTransId, jmgTmpJobBundleProdFeedback.KPMGCommon_WMSLocation);
+            QueryRun qr = new QueryRun(query);
+            if (!qr.next())
+            {
+                ProdTable prodOrder = ProdTable::find(jmgTmpJobBundleProdFeedback.JobRef);
+                str typeOfOrder = prodOrder.ProdType == ProdType::Process? "@PDS1470" : "@SYS89639";
+
+                KPMGCommon_JmgProductionFloorExecutionInfoMessage infoMessage = new KPMGCommon_JmgProductionFloorExecutionInfoMessage(null, strFmt("@KPMGCommon:JmgRegistrationTouchReportProgressNoLocationError", jmgTmpJobBundleProdFeedback.KPMGCommon_WMSLocation, prodOrder.inventTable().KPMGCommon_LocProfileId), false); //Ubicación %1 no existe para Id. de perfil de ubicación %2.
+                infoMessage.parmCancelButtonVisible(true);
+                infoMessage.openWarningDialog();
+                
+                ret = false;
+            }
+        }
+
+        isWMSLocationNumberValidated = ret;
+        if (ret && jmgTmpJobBundleProdFeedback.KPMGCommon_WMSLocation)
+        {
+            WMSLocationNumberTab.caption("@KPMGCommon:JmgLocationOk"); //Ubicación (correcto)
+        }
+        else
+        {
+            WMSLocationNumberTab.caption("@SYS3794");
+        }
+
+        if (ret && FormTabs.tabValue() == WMSLocationNumberTabNumber && jmgTmpJobBundleProdFeedback.KPMGCommon_WMSLocation)
+        {
+            this.selectNextTabWMSLocation();
+        }
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>selectNextTabWMSLocation</Name>
+				<Source><![CDATA[
+    private void selectNextTabWMSLocation()
+    {
+        int nextTab = FormTabs.tabValue() + 1;
+        if (nextTab == wMSLocationNumberTabNumber && !wMSLocationNumberRequired)
+        {
+            nextTab ++;
+        }
+        FormTabs.tab(nextTab);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_initializeControlsProperties</Name>
+				<Source><![CDATA[
+    public void KPMGCommon_initializeControlsProperties()
+    {
+        boolean jobTypeIsProcess = JmgTmpJobBundleProdFeedback.JobType == RouteJobType::Process;
+        boolean jobTypeIsSetup   = JmgTmpJobBundleProdFeedback.JobType == RouteJobType::Setup;
+        boolean isPrimaryProcess = jobTypeIsProcess && (JmgTmpJobBundleProdFeedback.RouteOprPriority == RouteOprPriority::Primary);
+    
+        if (!isPrimaryProcess)
+        {
+            wMSLocationNumberRequired = false;
+            AssignmentIntelligentLicensePlateCodeRequired = false;
+       }
+        else
+        {
+            JmgTermJob_Prod prodJob = JmgTermJob::construct(JmgTmpJobBundleProdFeedback.JobId);
+            JmgProdParametersDim jmgProdParametersDim =  JmgProdParametersDim::find(prodJob.siteInventDimId());
+            boolean isReportQuantityNeeded = jmgProdParametersDim.ReportFinishStatus == JmgProdStatusUpdateReportFinished::Qty ||
+                                             jmgProdParametersDim.ReportFinishStatus == JmgProdStatusUpdateReportFinished::QtyOnly;
+
+            if (isReportQuantityNeeded)
+            {
+                if (JmgTmpJobBundleProdFeedback.KPMGCommon_isCoByProduct())
+                {
+                    AssignmentIntelligentLicensePlateCodeRequired = JmgTmpJobBundleProdFeedback.KPMGCommon_checkWhsLicensePlateEnabledForCoByProduct();
+                }
+                else
+                {
+                    AssignmentIntelligentLicensePlateCodeRequired = JmgTmpJobBundleProdFeedback.checkWhsLicensePlateEnabledForJob();
+                }
+
+                WMSLocationNumberRequired  = _prodFeedbackForm.wMSLocationRequired(JmgTmpJobBundleProdFeedback);
+            }
+            else
+            {
+                WMSLocationNumberRequired = false;
+                AssignmentIntelligentLicensePlateCodeRequired = false;
+            }
+        }
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>setWMSLocationId</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Sets the Location Number Id in case the auto generation feature is on. Also hides or shows the batch number field.
+    /// </summary>
+    public void setWMSLocationId(WMSLocationId _wMSLocationId)
+    {
+        WMSLocationId.allowEdit(WMSLocationNumberRequired);
+        WMSLocationNumberTab.visible(WMSLocationNumberRequired);
+        ClearButtonWMSLocation.enabled(false);
+
+        if (WMSLocationNumberRequired && _wMSLocationId)
+        {
+            WMSLocationNumberTab.caption("@KPMGCommon:JmgLocationOk"); //Ubicación (correcto)
+        }
+        else
+        {
+            if (WMSLocationNumberRequired && !_wMSLocationId)
+            {
+                WMSLocationNumberTab.caption("@SYS3794"); //Ubicación
+            }
+       }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getDefaultSelectedTab</Name>
+				<Source><![CDATA[
+    public int getDefaultSelectedTab()
+    {
+        int TabNumber = next getDefaultSelectedTab();
+
+        if (WMSLocationNumberRequired)
+        {
+            TabNumber = WMSLocationNumberTabNumber;
+        }
+        
+        return TabNumber;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_setWhsLicensePlateId_AssignmentIntelligentLicensePlateCode</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Sets the License Plate Id in case the auto generation feature is on. Also hides or shows the license plate field.
+    /// </summary>
+    public void KPMGCommon_setWhsLicensePlateId_AssignmentIntelligentLicensePlateCode()
+    {
+        JmgRegistrationSetup registrationSetup;
+        WHSLicensePlateId.allowEdit(AssignmentIntelligentLicensePlateCodeRequired);
+        LicensePlateTab.visible(AssignmentIntelligentLicensePlateCodeRequired);
+        
+        if (SysFormRun::hasMethod(_parentForm, identifierstr(getRegistrationSetup)))
+        {
+            registrationSetup = _parentForm.getRegistrationSetup();
+        }
+
+        if (AssignmentIntelligentLicensePlateCodeRequired &&
+            //!jmgTmpJobBundleProdFeedback.WHSLicensePlate &&
+            //registrationSetup.GenerateLP &&
+            JmgParameters::find().KPMGCommon_AssignmentIntelligentLicensePlateCode &&
+            InventTable::find(JmgTmpJobBundleProdFeedback.ItemId).KPMGCommon_AssignmentIntelligentLicensePlateCode)
+        {
+            ProdTable prodTable = ProdTable::find(JmgTmpJobBundleProdFeedback.JobRef);
+            WHSLicensePlateId   wHSLicensePlateId = this.KPMGCommon_GenerateLicensePlateId_AssignmentIntelligentLicensePlateCode(prodTable);
+            this.KPMGCommon_setLicensePlate_AssignmentIntelligentLicensePlateCode(wHSLicensePlateId);
+            LicensePlateTab.caption("@SCM:JmgLicensePlateOk");
+        }
+
+        ClearButtonLicensePlate.enabled(jmgTmpJobBundleProdFeedback.WHSLicensePlate? true : false);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_setLicensePlate_AssignmentIntelligentLicensePlateCode</Name>
+				<Source><![CDATA[
+    public void KPMGCommon_setLicensePlate_AssignmentIntelligentLicensePlateCode(WHSLicensePlateId _licensePlateId)
+    {
+        JmgTmpJobBundleProdFeedback.WHSLicensePlate = _licensePlateId;
+        WHSLicensePlateId.text(_licensePlateId);
+
+        ClearButtonLicensePlate.enabled(_licensePlateId? true : false);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_GenerateLicensePlateId_AssignmentIntelligentLicensePlateCode</Name>
+				<Source><![CDATA[
+    public WHSLicensePlateId KPMGCommon_GenerateLicensePlateId_AssignmentIntelligentLicensePlateCode(ProdTable _prodTable)
+    {
+        str year    = _prodTable.KPMGCommon_WHSLicensePlateIdYear > 9 ? strfmt("%1", _prodTable.KPMGCommon_WHSLicensePlateIdYear) : strfmt("0%1", _prodTable.KPMGCommon_WHSLicensePlateIdYear),
+            month   = _prodTable.KPMGCommon_WHSLicensePlateIdMonth > 9 ? strfmt("%1", _prodTable.KPMGCommon_WHSLicensePlateIdMonth ) : strfmt("0%1", _prodTable.KPMGCommon_WHSLicensePlateIdMonth),
+            day     = _prodTable.KPMGCommon_WHSLicensePlateIdDay > 9 ? strfmt("%1", _prodTable.KPMGCommon_WHSLicensePlateIdDay ) : strfmt("0%1", _prodTable.KPMGCommon_WHSLicensePlateIdDay),
+            numSack = _prodTable.KPMGCommon_WHSLicensePlateIdNumberSack > 9 ? strfmt("%1", _prodTable.KPMGCommon_WHSLicensePlateIdNumberSack ) : strfmt("0%1", _prodTable.KPMGCommon_WHSLicensePlateIdNumberSack);
+
+        return strFmt("%1%2%3%4-%5", year, month, day, numSack, _prodTable.KPMGCommon_WHSLicensePlateIdLine);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

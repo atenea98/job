@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTable xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_PercentConsumptionProduction</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class KPMGCommon_PercentConsumptionProduction extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>insert</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    public void insert()
+    {
+        KPMGCommon_PercentConsumptionProductionHistory  percentConsumptionProductionHistory;
+        ProdBOM                                         prodBOM;
+        if (!this.InventTransIdProdBOM)
+        {
+            select firstonly prodBOM
+                where prodBOM.ProdId    == this.ProdId
+                   && prodBOM.LineNum   == this.LineNum
+                   && prodBOM.ItemId    == this.ItemId
+                   && prodBOM.OprNum    == this.OprNum;
+            this.InventTransIdProdBOM = prodBOM.InventTransId;
+        }
+        super();
+
+        percentConsumptionProductionHistory.CreateKPMGCommon_PercentConsumptionProductionHistory(this);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>update</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    public void update()
+    {
+        KPMGCommon_PercentConsumptionProductionHistory  percentConsumptionProductionHistory;
+
+        super();
+
+        percentConsumptionProductionHistory.CreateKPMGCommon_PercentConsumptionProductionHistory(this);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateWrite</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public boolean validateWrite()
+    {
+        boolean ret;
+        ProdBOM     prodBOM;
+    
+        ret = super();
+    
+        if (ret)
+        {
+            select firstonly prodBOM
+                where prodBOM.ProdId    == this.ProdId
+                   && prodBOM.LineNum   == this.LineNum
+                   && prodBOM.ItemId    == this.ItemId
+                   && prodBOM.OprNum    == this.OprNum;
+            if (prodBOM && !prodBOM.KPMGCommon_PercentConsumption)
+                ret = checkFailed(strFmt("Línea %1 de la operación %2 no es de consumo porcentual-", this.LineNum, this.OprNum));
+        }
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<ConfigurationKey>Prod</ConfigurationKey>
+	<Label>@KPMGCommon:PercentageConsumptionProduction</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<AllowRowVersionChangeTracking>Yes</AllowRowVersionChangeTracking>
+	<Modules>ProductionControl</Modules>
+	<DeleteActions />
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>General</Name>
+			<Label>@SYS35893</Label>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>ProdId</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>LineNum</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>OprNum</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>ItemId</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>WrkCtrId</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>TypeId</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>TypePercent</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>ResourceMouth</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>DisableMouth</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>ResourceDryer</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>DryerPercent</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>InventLocationId</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>WMSLocationId</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>Percent</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt64">
+			<Name>SysRowVersionNumber</Name>
+			<AllowEdit>No</AllowEdit>
+			<AllowEditOnCreate>No</AllowEditOnCreate>
+			<ExtendedDataType>SysRowVersionNumber</ExtendedDataType>
+			<Null>Yes</Null>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>WrkCtrId</Name>
+			<AllowEdit>No</AllowEdit>
+			<AssetClassification>Customer Content </AssetClassification>
+			<ExtendedDataType>WrkCtrIdBase</ExtendedDataType>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventLocationId</Name>
+			<AllowEdit>No</AllowEdit>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>InventLocationId</ExtendedDataType>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>WMSLocationId</Name>
+			<AllowEdit>No</AllowEdit>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>WMSLocationId</ExtendedDataType>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>Percent</Name>
+			<ExtendedDataType>Percent</ExtendedDataType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ProdId</Name>
+			<AllowEdit>No</AllowEdit>
+			<ExtendedDataType>ProdId</ExtendedDataType>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ItemId</Name>
+			<AllowEdit>No</AllowEdit>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>ItemIdInventoried</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt">
+			<Name>OprNum</Name>
+			<AllowEdit>No</AllowEdit>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>OprNumBOM</ExtendedDataType>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>LineNum</Name>
+			<AllowEdit>No</AllowEdit>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>LineNum</ExtendedDataType>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>TypeId</Name>
+			<AllowEdit>No</AllowEdit>
+			<ExtendedDataType>KPMGCommon_TypeId</ExtendedDataType>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>TypePercent</Name>
+			<ExtendedDataType>KPMGCommon_TypePercent</ExtendedDataType>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ResourceDryer</Name>
+			<AllowEdit>No</AllowEdit>
+			<AssetClassification>Customer Content </AssetClassification>
+			<ExtendedDataType>WrkCtrIdBase</ExtendedDataType>
+			<Label>Secador</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ResourceMouth</Name>
+			<AllowEdit>No</AllowEdit>
+			<AssetClassification>Customer Content </AssetClassification>
+			<ExtendedDataType>WrkCtrIdBase</ExtendedDataType>
+			<Label>Boca</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>DryerPercent</Name>
+			<ExtendedDataType>KPMGCommon_DryerPercent</ExtendedDataType>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventTransIdProdBOM</Name>
+			<AllowEdit>No</AllowEdit>
+			<AllowEditOnCreate>No</AllowEditOnCreate>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>InventTransIdBase</ExtendedDataType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>DisableMouth</Name>
+			<ExtendedDataType>KPMGCommon_DisableMouth</ExtendedDataType>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes>
+		<AxTableIndex>
+			<Name>PercentConsumptionProductionIdx</Name>
+			<Fields>
+				<AxTableIndexField>
+					<DataField>ProdId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>LineNum</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>OprNum</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>ItemId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>TypeId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>TypePercent</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>ResourceDryer</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>ResourceMouth</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>DryerPercent</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>InventLocationId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>WMSLocationId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>Percent</DataField>
+				</AxTableIndexField>
+			</Fields>
+		</AxTableIndex>
+	</Indexes>
+	<Mappings />
+	<Relations>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>Resource</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>WrkCtrTable</RelatedTable>
+			<RelatedTableCardinality>ExactlyOne</RelatedTableCardinality>
+			<RelatedTableRole>Resource</RelatedTableRole>
+			<RelationshipType>Association</RelationshipType>
+			<Role>ResourceGroupMembership</Role>
+			<UseDefaultRoleNames>No</UseDefaultRoleNames>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>WrkCtrId</Name>
+					<Field>WrkCtrId</Field>
+					<RelatedField>WrkCtrId</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintRelatedFixed">
+					<Name>IsIndividualResource_Extern</Name>
+					<RelatedField>IsIndividualResource</RelatedField>
+					<Value>1</Value>
+				</AxTableRelationConstraint>
+			</Constraints>
+			<Index>WrkCtrIdx</Index>
+		</AxTableRelation>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>WMSLocation</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>WMSLocation</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<RelatedTableRole>Location</RelatedTableRole>
+			<RelationshipType>Association</RelationshipType>
+			<UseDefaultRoleNames>No</UseDefaultRoleNames>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>WMSLocationId</Name>
+					<Field>WMSLocationId</Field>
+					<RelatedField>wMSLocationId</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>InventLocationId</Name>
+					<Field>InventLocationId</Field>
+					<RelatedField>inventLocationId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+			<Index>LocationIdx</Index>
+		</AxTableRelation>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>InventLocation</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>InventLocation</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<RelatedTableRole>Warehouse</RelatedTableRole>
+			<RelationshipType>Association</RelationshipType>
+			<UseDefaultRoleNames>No</UseDefaultRoleNames>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>InventLocationId</Name>
+					<Field>InventLocationId</Field>
+					<RelatedField>InventLocationId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+			<Index>InventLocationIdx</Index>
+		</AxTableRelation>
+		<AxTableRelation>
+			<Name>ProdTable</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<EntityRelationshipRole>@SYS124136</EntityRelationshipRole>
+			<RelatedTable>ProdTable</RelatedTable>
+			<RelatedTableCardinality>ExactlyOne</RelatedTableCardinality>
+			<RelatedTableRole>ProductionOrder</RelatedTableRole>
+			<RelationshipType>Aggregation</RelationshipType>
+			<Role>ProductionBom</Role>
+			<UseDefaultRoleNames>No</UseDefaultRoleNames>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>ProdId</Name>
+					<Field>ProdId</Field>
+					<RelatedField>ProdId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+		</AxTableRelation>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>InventTable</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>InventTable</RelatedTable>
+			<RelatedTableCardinality>ExactlyOne</RelatedTableCardinality>
+			<RelationshipType>Association</RelationshipType>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>ItemId</Name>
+					<Field>ItemId</Field>
+					<RelatedField>ItemId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+			<Index>ItemIdx</Index>
+		</AxTableRelation>
+		<AxTableRelation>
+			<Name>ProdRoute</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<EntityRelationshipRole>@SYS124134</EntityRelationshipRole>
+			<RelatedTable>ProdRoute</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<RelatedTableRole>ProductionRoute</RelatedTableRole>
+			<RelationshipType>Association</RelationshipType>
+			<Role>ProductionBom</Role>
+			<UseDefaultRoleNames>No</UseDefaultRoleNames>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>ProdId</Name>
+					<Field>ProdId</Field>
+					<RelatedField>ProdId</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>OprNum</Name>
+					<Field>OprNum</Field>
+					<RelatedField>OprNum</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+		</AxTableRelation>
+		<AxTableRelation>
+			<Name>JmgTmpJobBundleProdFeedback</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>JmgTmpJobBundleProjStartup</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<RelatedTableRole>JmgTmpJobBundleProjStartup</RelatedTableRole>
+			<RelationshipType>Association</RelationshipType>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>ProdId</Name>
+					<Field>ProdId</Field>
+					<RelatedField>JobRef</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+		</AxTableRelation>
+		<AxTableRelation>
+			<Name>KPMGCommon_TypeConsumptionPercent</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>KPMGCommon_TypeConsumptionPercent</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<RelatedTableRole>TypeConsumptionPercent</RelatedTableRole>
+			<RelationshipType>Association</RelationshipType>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>TypeId</Name>
+					<Field>TypeId</Field>
+					<RelatedField>TypeId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+		</AxTableRelation>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>ResourceDryer</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>WrkCtrTable</RelatedTable>
+			<RelatedTableCardinality>ExactlyOne</RelatedTableCardinality>
+			<RelatedTableRole>Resource</RelatedTableRole>
+			<RelationshipType>Association</RelationshipType>
+			<Role>ResourceGroupMembership</Role>
+			<UseDefaultRoleNames>No</UseDefaultRoleNames>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>ResourceDryer</Name>
+					<Field>ResourceDryer</Field>
+					<RelatedField>WrkCtrId</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintRelatedFixed">
+					<Name>IsIndividualResource_Extern</Name>
+					<RelatedField>IsIndividualResource</RelatedField>
+					<Value>1</Value>
+				</AxTableRelationConstraint>
+			</Constraints>
+			<Index>WrkCtrIdx</Index>
+		</AxTableRelation>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>ResourceMouth</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>WrkCtrTable</RelatedTable>
+			<RelatedTableCardinality>ExactlyOne</RelatedTableCardinality>
+			<RelatedTableRole>Resource</RelatedTableRole>
+			<RelationshipType>Association</RelationshipType>
+			<Role>ResourceGroupMembership</Role>
+			<UseDefaultRoleNames>No</UseDefaultRoleNames>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>ResourceMouth</Name>
+					<Field>ResourceMouth</Field>
+					<RelatedField>WrkCtrId</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintRelatedFixed">
+					<Name>IsIndividualResource_Extern</Name>
+					<RelatedField>IsIndividualResource</RelatedField>
+					<Value>1</Value>
+				</AxTableRelationConstraint>
+			</Constraints>
+			<Index>WrkCtrIdx</Index>
+		</AxTableRelation>
+	</Relations>
+	<StateMachines />
+</AxTable>

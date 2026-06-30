@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>PurchAgreement.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlndjxao501</Name>
+			<FormControl xmlns=""
+				i:type="AxFormTabPageControl">
+				<Name>KPMGCommon_Configuration</Name>
+				<Pattern>FieldsFieldGroups</Pattern>
+				<PatternVersion>1.1</PatternVersion>
+				<Type>TabPage</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_TaxItemGroup</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Alignment>Left</Alignment>
+						<DataMethod>AgreementLines_KPMGCommon_Extension.KPMGCommon_calcTaxItemGroup</DataMethod>
+						<DataSource>ALine</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SupplierTaxGroup</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Alignment>Left</Alignment>
+						<DataMethod>AgreementLines_KPMGCommon_Extension.KPMGCommon_calcSupplierTaxGroup</DataMethod>
+						<DataSource>ALine</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormRealControl">
+						<Name>KPMGCommon_FinalTaxPercentage</Name>
+						<Type>Real</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Alignment>Left</Alignment>
+						<DataMethod>AgreementLines_KPMGCommon_Extension.KPMGCommon_calcFinalTaxPercentage</DataMethod>
+						<DataSource>ALine</DataSource>
+						<Label>@KPMGCommon:Percentage</Label>
+					</AxFormControl>
+				</Controls>
+				<ColumnsMode>Fill</ColumnsMode>
+				<Caption>@KPMGCommon:Configuration</Caption>
+			</FormControl>
+			<Parent>LineDetailsTab</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

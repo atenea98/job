@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_WMHEInboundActionInstrumentationActivities</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Provides activities for inbound action instrumentation logging.
+/// </summary>
+internal final class KPMGCommon_WMHEInboundActionInstrumentationActivities
+{
+    private const str ActivityNamePrefix = 'InboundAction.';
+
+    private KPMGCommon_WMHEInstrumentationLogger logger;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    private void new(KPMGCommon_WMHEInstrumentationLogger _logger)
+    {
+        logger = _logger;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>newFromLogger</Name>
+				<Source><![CDATA[
+    public static KPMGCommon_WMHEInboundActionInstrumentationActivities newFromLogger(KPMGCommon_WMHEInstrumentationLogger _logger)
+    {
+        return new KPMGCommon_WMHEInboundActionInstrumentationActivities(_logger);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>executeAction</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Instantiates an activity context for execution of an action.
+    /// </summary>
+    /// <param name = "_inboundTransType">
+    /// The inbound action type.
+    /// </param>
+    /// <returns>
+    /// A <c>SysInstrumentationActivityContext</c> object.
+    /// </returns>
+    public SysInstrumentationActivityContext executeAction(WMHEInboundTransType _inboundTransType)
+    {
+        var activity = logger.activity(ActivityNamePrefix + 'ExecuteAction');
+        SysInstrumentationActivityContext activityContext = logger.activityContext(activity);
+
+        activityContext.addCustomProperty('Inbound.TransactionType', any2Str(_inboundTransType));
+
+        return activityContext;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>executedAction</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Completes an activity context for execution of an action.
+    /// </summary>
+    /// <param name = "_activityContext">
+    /// A <c>SysInstrumentationActivityContext</c> object.
+    /// </param>
+    /// <param name = "_validInboundAction">
+    /// Boolean describing whether the action was valid.
+    /// </param>
+    public void executedAction(SysInstrumentationActivityContext _activityContext, boolean _validInboundAction)
+    {
+        _activityContext.addCustomProperty('Inbound.ValidInboundAction', any2Str(_validInboundAction));
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createInboundQueue</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Instantiates an activity context for creation of an inbound queue entry.
+    /// </summary>
+    /// <param name = "_inboundTransType">
+    /// The inbound action type.
+    /// </param>
+    /// <returns>
+    /// A <c>SysInstrumentationActivityContext</c> object.
+    /// </returns>
+    public SysInstrumentationActivityContext createInboundQueue(WMHEInboundTransType _inboundTransType)
+    {
+        var activity = logger.activity(ActivityNamePrefix + 'CreateInboundQueue');
+        SysInstrumentationActivityContext activityContext = logger.activityContext(activity);
+
+        activityContext.addCustomProperty('Inbound.TransactionType', any2Str(_inboundTransType));
+
+        return activityContext;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createdInboundQueue</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Completes an activity context for creation of an inbound queue entry.
+    /// </summary>
+    /// <param name = "_activityContext">
+    /// A <c>SysInstrumentationActivityContext</c> object.
+    /// </param>
+    /// <param name = "_validInboundQueue">
+    /// Boolean describing whether the queue entry was valid.
+    /// </param>
+    public void createdInboundQueue(SysInstrumentationActivityContext _activityContext, boolean _validInboundQueue)
+    {
+        _activityContext.addCustomProperty('Inbound.ValidInboundQueue', any2Str(_validInboundQueue));
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>reprocessAction</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Instantiates an activity context for reprocessing of an action.
+    /// </summary>
+    /// <param name = "_inboundTransType">
+    /// The inbound action type.
+    /// </param>
+    /// <returns>
+    /// A <c>SysInstrumentationActivityContext</c> object.
+    /// </returns>
+    public SysInstrumentationActivityContext reprocessAction(WMHEInboundTransType _inboundTransType)
+    {
+        var activity = logger.activity(ActivityNamePrefix + 'ReprocessAction');
+        SysInstrumentationActivityContext activityContext = logger.activityContext(activity);
+
+        activityContext.addCustomProperty('Inbound.TransactionType', any2Str(_inboundTransType));
+
+        return activityContext;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>reprocessedAction</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Completes an activity context for reprocessing of an action
+    /// </summary>
+    /// <param name = "_activityContext">
+    /// A <c>SysInstrumentationActivityContext</c> object.
+    /// </param>
+    /// <param name = "_validInboundQueue">
+    /// Boolean describing whether the queue entry was valid.
+    /// </param>
+    public void reprocessedAction(SysInstrumentationActivityContext _activityContext, boolean _validInboundQueue)
+    {
+        _activityContext.addCustomProperty('Inbound.ValidInboundQueue', any2Str(_validInboundQueue));
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>reprocessInboundQueue</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Instantiates an activity context for reprocessing of an inbound queue.
+    /// </summary>
+    /// <returns>
+    /// A <c>SysInstrumentationActivityContext</c> object.
+    /// </returns>
+    public SysInstrumentationActivityContext reprocessInboundQueue()
+    {
+        return logger.activityContext(logger.activity(ActivityNamePrefix + 'ReprocessInboundQueue'));
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>reprocessedInboundQueue</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Completes an activity context for reprocessing of an inbound queue.
+    /// </summary>
+    /// <param name = "_activityContext">
+    /// A <c>SysInstrumentationActivityContext</c> object.
+    /// </param>
+    /// <param name = "_inboundQueueCount">
+    /// A count of processed queue entries.
+    /// </param>
+    public void reprocessedInboundQueue(SysInstrumentationActivityContext _activityContext, int _inboundQueueCount)
+    {
+        _activityContext.addCustomProperty('Inbound.InboundQueueCount', any2Str(_inboundQueueCount));
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

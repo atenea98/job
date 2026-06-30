@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>SalesEditLines_Form_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(formStr(SalesEditLines))]
+final class SalesEditLines_Form_KPMGCommon_Extension
+{
+    public NoYes           _PrintFormLetterPackingList,
+                           _PrintFormLetterWayBill;
+    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>KPMGCommon_getSalesEditLinesForm</Name>
+				<Source><![CDATA[
+    public SalesEditLinesForm KPMGCommon_getSalesEditLinesForm()
+    {
+        return salesEditLinesForm;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    void  run()
+    {
+
+        next run();
+
+        if (salesParmUpdate.ParmId)
+        {
+            switch (documentStatus)
+            {
+                case DocumentStatus::PackingSlip:
+                    KPMGCommon_PrintFormLetterPackingList.visible(true);
+                    KPMGCommon_PrintFormLetterPackingList.label("@KPMGCommon:PackingListPrint"); // Imprimir PackingList
+                    
+                    KPMGCommon_PrintFormLetterWayBill.visible(true);
+                    KPMGCommon_PrintFormLetterWayBill.label("@KPMGCommon:PrintWayBill"); //// Imprimir carta de porte
+
+                    KPMGCommon_PrintDeclarationOfConformityCert.visible(true);
+                    KPMGCommon_PrintDeclarationOfConformityCert.label("@KPMGCommon:PrintDeclarationOfConformity"); // Imprimir declaración de conformidad
+
+                    KPMGCommon_GroupProductLines.visible(true);
+                    KPMGCommon_GroupProductLines.label("@KPMGCommon:GroupProductLines");
+                    
+                    KPMGCommon_PrintFormLetterPackingList.value(salesFormLetter.KPMGCommon_PrintFormLetterPackingList());
+                    KPMGCommon_PrintFormLetterWayBill.value(salesFormLetter.KPMGCommon_PrintFormLetterWayBill());
+                    KPMGCommon_PrintDeclarationOfConformityCert.value(salesFormLetter.KPMGCommon_PrintDeclarationOfConformityCert());
+                    KPMGCommon_GroupProductLines.value(salesFormLetter.KPMGCommon_GroupProductLines());
+                    
+
+                    break;
+                default:
+                    KPMGCommon_PrintFormLetterPackingList.visible(false);
+                    KPMGCommon_PrintFormLetterPackingList.label('');
+                    
+                    KPMGCommon_PrintFormLetterWayBill.visible(false);
+                    KPMGCommon_PrintFormLetterWayBill.label('');
+
+                    KPMGCommon_PrintDeclarationOfConformityCert.visible(false);
+                    KPMGCommon_PrintDeclarationOfConformityCert.label(' ');
+
+                    KPMGCommon_GroupProductLines.visible(false);
+                    KPMGCommon_GroupProductLines.label(' ');
+
+                    KPMGCommon_PrintFormLetterPackingList.value(NoYes::No);
+                    KPMGCommon_PrintFormLetterWayBill.value(NoYes::No);
+                    KPMGCommon_PrintDeclarationOfConformityCert.value(NoYes::No);
+                    KPMGCommon_GroupProductLines.value(NoYes::No);
+                    break;
+            }
+       }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateDesign_MX</Name>
+				<Source><![CDATA[
+    public void updateDesign_MX()
+    {
+        next updateDesign_MX();
+
+        if (EInvoiceCFDIParameters_MX::isElectronicInvoiceEnabled() && !salesFormLetter.proforma())
+        {
+            switch (documentStatus)
+            {
+                case DocumentStatus::Invoice:
+                case DocumentStatus::FreeTextInvoice:
+                case DocumentStatus::PackingSlip:
+                    KPMGCommon_PrintFormLetterPackingList.value(false);
+                    KPMGCommon_PrintFormLetterPackingList.enabled(false);
+                    KPMGCommon_PrintFormLetterWayBill.value(false);
+                    KPMGCommon_PrintFormLetterWayBill.enabled(false);
+                    KPMGCommon_PrintDeclarationOfConformityCert.value(false);
+                    KPMGCommon_PrintDeclarationOfConformityCert.enabled(false);
+                    break;
+            }
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initializeSalesFormLetter</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Initialize an instance of <c>SalesFormLetter</c>.
+    /// </summary>
+    protected void initializeSalesFormLetter()
+    {
+        next initializeSalesFormLetter();
+ 
+       salesFormLetter.KPMGCommon_initParameter_KPMGCommon_PrintFormLetterPackingList(
+            KPMGCommon_PrintFormLetterPackingList.value());
+        
+        salesFormLetter.KPMGCommon_initParameter_KPMGCommon_PrintFormLetterWayBill(
+            KPMGCommon_PrintFormLetterWayBill.value());
+
+        salesFormLetter.KPMGCommon_initParameter_KPMGCommon_PrintDeclarationOfConformityCert(
+            KPMGCommon_PrintDeclarationOfConformityCert.value());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>reArrange</Name>
+				<Source><![CDATA[
+    boolean reArrange()
+    {
+        boolean  ok = true;
+        
+        salesFormLetter.KPMGCommon_initParameter_KPMGCommon_PrintFormLetterPackingList(
+            KPMGCommon_PrintFormLetterPackingList.value());
+
+        salesFormLetter.KPMGCommon_initParameter_KPMGCommon_PrintFormLetterWayBill(
+            KPMGCommon_PrintFormLetterWayBill.value());
+
+        salesFormLetter.KPMGCommon_initParameter_KPMGCommon_PrintDeclarationOfConformityCert(
+            KPMGCommon_PrintDeclarationOfConformityCert.value());
+
+        ok = next reArrange();
+        return ok;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

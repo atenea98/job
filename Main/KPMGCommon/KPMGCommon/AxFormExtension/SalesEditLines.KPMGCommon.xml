@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>SalesEditLines.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlofwiau2c1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormStringControl">
+				<Name>SalesParmTable_KPMGCommon_InvoiceObservation</Name>
+				<Type>String</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_InvoiceObservation</DataField>
+				<DataSource>SalesParmTable</DataSource>
+			</FormControl>
+			<Parent>Heading</Parent>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>Copyztclmkk41</Name>
+			<FormControl xmlns=""
+				i:type="AxFormCheckBoxControl">
+				<Name>KPMGCommon_PrintFormLetterPackingList</Name>
+				<AutoDeclaration>Yes</AutoDeclaration>
+				<ElementPosition>613566756</ElementPosition>
+				<FilterExpression>%1</FilterExpression>
+				<HelpText>@SYS17200</HelpText>
+				<Type>CheckBox</Type>
+				<VerticalSpacing>-1</VerticalSpacing>
+				<FormControlExtension
+					i:nil="true" />
+				<Label>@SYS12608</Label>
+			</FormControl>
+			<Parent>PrintCheckboxGroup</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>PrintFormLetter</PreviousSibling>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>Copyiakr53c51</Name>
+			<FormControl xmlns=""
+				i:type="AxFormCheckBoxControl">
+				<Name>KPMGCommon_PrintFormLetterWayBill</Name>
+				<AutoDeclaration>Yes</AutoDeclaration>
+				<ElementPosition>613566756</ElementPosition>
+				<FilterExpression>%1</FilterExpression>
+				<HelpText>@KPMGCommon:PrintWayBill</HelpText>
+				<Type>CheckBox</Type>
+				<VerticalSpacing>-1</VerticalSpacing>
+				<FormControlExtension
+					i:nil="true" />
+				<Label>@SYS12608</Label>
+			</FormControl>
+			<Parent>PrintCheckboxGroup</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>PrintFormLetter</PreviousSibling>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlug55vzsr1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormCheckBoxControl">
+				<Name>KPMGCommon_PrintDeclarationOfConformityCert</Name>
+				<Type>CheckBox</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Label>@KPMGCommon:PrintDeclarationOfConformity</Label>
+			</FormControl>
+			<Parent>PrintCheckboxGroup</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>PrintFormLetter</PreviousSibling>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlymvmy5p11</Name>
+			<FormControl xmlns=""
+				i:type="AxFormCheckBoxControl">
+				<Name>KPMGCommon_GroupProductLines</Name>
+				<AutoDeclaration>Yes</AutoDeclaration>
+				<Type>CheckBox</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Label>@KPMGCommon:GroupProductLines</Label>
+			</FormControl>
+			<Parent>PrintCheckboxGroup</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

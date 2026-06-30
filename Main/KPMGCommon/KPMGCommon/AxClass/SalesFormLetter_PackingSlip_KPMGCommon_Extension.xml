@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>SalesFormLetter_PackingSlip_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(SalesFormLetter_PackingSlip))]
+final class SalesFormLetter_PackingSlip_KPMGCommon_Extension
+{   
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    public void  run()
+    {
+        CustPackingslipJour custPackingslipJour;
+        Args                args = new Args();
+        MenuFunction        menuFunction;
+        CompanyInfo         companyInfo;
+
+        next run();
+
+        companyInfo = CompanyInfo::find();
+        custPackingslipJour = this.parmJournalRecord();
+        args.record(custPackingslipJour);
+        
+        if(this.KPMGCommon_PrintDeclarationOfConformityCert() && companyInfo.DataArea == "omt")
+        {
+            menuFunction = new MenuFunction(menuitemActionStr(KPMGCommon_PrintDeclarationOfConformityCert), MenuItemType::Action);
+
+            if (menuFunction && menuFunction.checkAccessRights())
+            menuFunction.run(args);
+        }
+        
+        if (this.KPMGCommon_PrintFormLetterPackingList())
+        {
+            menuFunction = new MenuFunction(menuitemActionStr(KPMGCommon_SalesPrintPackingList), MenuItemType::Action);
+
+            if (menuFunction && menuFunction.checkAccessRights())
+                menuFunction.run(args);
+            
+        }
+
+        if (this.KPMGCommon_PrintFormLetterWayBill())
+        {
+            menuFunction = new MenuFunction(menuitemActionStr(KPMGCommon_SalesPrintWayBill), MenuItemType::Action);
+
+            if (menuFunction && menuFunction.checkAccessRights())
+                menuFunction.run(args);
+            
+        }
+
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

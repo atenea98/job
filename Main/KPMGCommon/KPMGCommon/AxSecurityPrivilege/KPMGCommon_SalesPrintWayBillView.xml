@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxSecurityPrivilege xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_SalesPrintWayBillView</Name>
+	<Label>@KPMGCommon:WayBill_View</Label>
+	<DataEntityPermissions />
+	<DirectAccessPermissions />
+	<EntryPoints>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_SalesPrintWayBill</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>KPMGCommon_SalesPrintWayBill</ObjectName>
+			<ObjectType>MenuItemAction</ObjectType>
+			<Forms />
+		</AxSecurityEntryPointReference>
+	</EntryPoints>
+	<FormControlOverrides />
+</AxSecurityPrivilege>

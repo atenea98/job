@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>InventQualityOrderValidate_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(InventQualityOrderValidate))]
+final class InventQualityOrderValidate_KPMGCommon_Extension
+{
+    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>dialog</Name>
+				<Source><![CDATA[
+    Object dialog()
+    {
+        //Object  object;
+        dialog = next dialog();
+        fieldWorker.value(hcmWorker::userId2Worker(curUserId()));
+
+        return dialog;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_DeclarationOfConformityERRunner</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class KPMGCommon_DeclarationOfConformityERRunner
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    static void main (Args _args)
+    {
+       
+
+        CustPackingSlipJour custPackingSlipJour;
+
+        //Get record from where we are calling the ER
+        select firstonly * from custPackingSlipJour where custPackingSlipJour.RecId == _args.record().RecId;
+
+        ERModelDefinitionInputParametersAction obj = new ERModelDefinitionInputParametersAction();
+
+        obj.addParameter('model/$PackingSlipId', custPackingSlipJour.PackingSlipId);
+        
+        ERObjectsFactory::createFormatMappingRunByFormatMappingId(
+            smmParametersTable::find().KPMGCommon_ERFormatMappingIdForDeclarationOfConformityCert,"",false)
+            .withParameter(obj).run();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

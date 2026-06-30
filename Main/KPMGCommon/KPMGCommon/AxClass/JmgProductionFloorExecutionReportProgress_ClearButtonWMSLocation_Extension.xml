@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgProductionFloorExecutionReportProgress_ClearButtonWMSLocation_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(formControlStr(JmgProductionFloorExecutionReportProgress, ClearButtonWMSLocation))]
+final class JmgProductionFloorExecutionReportProgress_ClearButtonWMSLocation_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>clicked</Name>
+				<Source><![CDATA[
+    public void clicked()
+    {
+        next clicked();
+
+        element.setLocationId('');
+
+        //WMSLocationId.setFocus();
+        FormControl _WMSLocationId = this.formRun().control(this.formRun().controlId('WMSLocationId'));
+        _WMSLocationId.setFocus();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtInt">
+	<Name>KPMGCommon_WHSLicensePlateIdMonth</Name>
+	<DisplayLength>2</DisplayLength>
+	<Extends>Months</Extends>
+	<Label>@SYS11451</Label>
+	<ArrayElements />
+	<Relations />
+	<TableReferences />
+</AxEdt>

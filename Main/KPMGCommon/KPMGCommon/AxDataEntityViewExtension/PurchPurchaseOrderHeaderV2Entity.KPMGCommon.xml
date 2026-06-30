@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxDataEntityViewExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>PurchPurchaseOrderHeaderV2Entity.KPMGCommon</Name>
+	<DataSources />
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyAllowIndirectCreation</Name>
+			<DataField>InterCompanyAllowIndirectCreation</DataField>
+			<DataSource>PurchTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyCompanyId</Name>
+			<DataField>InterCompanyCompanyId</DataField>
+			<DataSource>PurchTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyCustPurchOrderFormNum</Name>
+			<DataField>InterCompanyCustPurchOrderFormNum</DataField>
+			<DataSource>PurchTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyDirectDelivery</Name>
+			<DataField>InterCompanyDirectDelivery</DataField>
+			<DataSource>PurchTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyOrder</Name>
+			<DataField>InterCompanyOrder</DataField>
+			<DataSource>PurchTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyOrigin</Name>
+			<DataField>InterCompanyOrigin</DataField>
+			<DataSource>PurchTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyOriginalCustAccount</Name>
+			<DataField>InterCompanyOriginalCustAccount</DataField>
+			<DataSource>PurchTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyOriginalSalesId</Name>
+			<DataField>InterCompanyOriginalSalesId</DataField>
+			<DataSource>PurchTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanySalesId</Name>
+			<DataField>InterCompanySalesId</DataField>
+			<DataSource>PurchTable</DataSource>
+		</AxDataEntityViewField>
+	</Fields>
+	<Mappings />
+	<PropertyModifications />
+	<Relations />
+</AxDataEntityViewExtension>

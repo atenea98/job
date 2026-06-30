@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_PrinterWHSLicensePlateLabels</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class KPMGCommon_PrinterWHSLicensePlateLabels
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+        public static void main(Args _args)
+    {
+        KPMGCommon_PrinterWHSLicensePlateLabels action = new KPMGCommon_PrinterWHSLicensePlateLabels();
+        FormRun callerForm = _args.caller();
+        FormDataSource WHSLicensePlateLabel_ds;
+        int regLabel;
+
+        WHSLicensePlateLabel_ds = callerForm.dataSource(formDataSourceStr(WHSLicensePlateLabel, WHSLicensePlateLabel));
+        regLabel = action.TotallabelsPrinter(WHSLicensePlateLabel_ds);
+        if (Box::yesNo(strFmt("@KPMGCommon:LabelsPrint",regLabel) , DialogButton::No)) //Etiquetas a imprimir: %1. Desea continuar?
+        {
+            action.printlabels(WHSLicensePlateLabel_ds);
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>TotallabelsPrinter</Name>
+				<Source><![CDATA[
+    public int TotallabelsPrinter(FormDataSource WHSLicensePlateLabel_ds)
+    {
+        WHSLicensePlateLabel wHSLicensePlateLabel;
+        int                  regLabel = 0;
+
+        for (wHSLicensePlateLabel = WHSLicensePlateLabel_ds.getFirst() ? WHSLicensePlateLabel_ds.getFirst() : WHSLicensePlateLabel_ds.cursor();
+
+        wHSLicensePlateLabel;
+
+        wHSLicensePlateLabel = WHSLicensePlateLabel_ds.getNext())
+        {
+            ++regLabel;
+        }
+        return regLabel;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>PrintLabels</Name>
+				<Source><![CDATA[
+    public void PrintLabels(FormDataSource WHSLicensePlateLabel_ds)
+    {
+        WHSLicensePlateLabel wHSLicensePlateLabel;
+
+        for (wHSLicensePlateLabel = WHSLicensePlateLabel_ds.getFirst() ? WHSLicensePlateLabel_ds.getFirst() : WHSLicensePlateLabel_ds.cursor();
+
+        wHSLicensePlateLabel;
+
+        wHSLicensePlateLabel = WHSLicensePlateLabel_ds.getNext())
+        {
+            this.printLabel(wHSLicensePlateLabel.LicensePlateId);
+
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>printLabel</Name>
+				<Source><![CDATA[
+    void printLabel(WHSLastPrintedLicensePlate _enteredLP)
+    {
+        WHSDocumentRouting          documentRouting = WHSDocumentRouting::construct();
+        WHSLicensePlateLabel        licensePlateLabel;
+
+        select firstonly licensePlateLabel
+            order by licensePlateLabel.PrintedDate desc
+            where licensePlateLabel.LicensePlateId == _enteredLP;
+
+        documentRouting.parmUserId(WHSParameters::find().GenericWorkUserId);
+        documentRouting.printDocument(licensePlateLabel.WorkTransType, licensePlateLabel);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>OMLegalEntity.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlus5h35n41</Name>
+			<FormControl xmlns=""
+				i:type="AxFormStringControl">
+				<Name>CompanyInfo_KPMGCommon_PackerNumber</Name>
+				<Type>String</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_PackerNumber</DataField>
+				<DataSource>CompanyInfo</DataSource>
+			</FormControl>
+			<Parent>TaxRegistration</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>CompanyInfo_EnterpriseCode</PreviousSibling>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlndtp410e1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormStringControl">
+				<Name>CompanyInfo_KPMGCommon_TradeRegisterNumber</Name>
+				<Type>String</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_TradeRegisterNumber</DataField>
+				<DataSource>CompanyInfo</DataSource>
+			</FormControl>
+			<Parent>TaxRegistration</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>CompanyInfo_EnterpriseCode</PreviousSibling>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControls1w3n4ap1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormTabPageControl">
+				<Name>KPMGCommon_ReportingSignature</Name>
+				<Pattern>ImagePreview</Pattern>
+				<PatternVersion>1.1</PatternVersion>
+				<Type>TabPage</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormActionPaneControl">
+						<Name>KPMGCommon_ActionPaneReportingSignature</Name>
+						<Type>ActionPane</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonGroupControl">
+								<Name>KPMGCommon_ButtonGroup</Name>
+								<Type>ButtonGroup</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<Controls>
+									<AxFormControl xmlns=""
+										i:type="AxFormButtonControl">
+										<Name>KPMGCommon_ChangeButton</Name>
+										<Type>Button</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<Text>@SYS1038</Text>
+									</AxFormControl>
+									<AxFormControl xmlns=""
+										i:type="AxFormButtonControl">
+										<Name>KPMGCommon_RemoveButton</Name>
+										<Type>Button</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<Text>@SYS26394</Text>
+									</AxFormControl>
+								</Controls>
+								<DataSource>CompanyInfo</DataSource>
+							</AxFormControl>
+						</Controls>
+						<DataSource>CompanyInfo</DataSource>
+						<Style>Strip</Style>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormGroupControl">
+						<Name>KPMGCommon_ReportingSignatureGroup</Name>
+						<Type>Group</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormImageControl">
+								<Name>FormImageControl1</Name>
+								<Type>Image</Type>
+								<FormControlExtension
+									i:nil="true" />
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormGroupControl">
+								<Name>FormGroupControl2</Name>
+								<Pattern>FieldsFieldGroups</Pattern>
+								<PatternVersion>1.1</PatternVersion>
+								<Type>Group</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<Controls />
+								<ColumnsMode>Fill</ColumnsMode>
+							</AxFormControl>
+						</Controls>
+						<Columns>2</Columns>
+						<DataSource>CompanyInfo</DataSource>
+					</AxFormControl>
+				</Controls>
+				<Caption>@KPMGCommon:CompanySignatureAndStampForReports</Caption>
+				<DataSource>CompanyInfo</DataSource>
+			</FormControl>
+			<Parent>Tab</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>ReportCompanyLogo</PreviousSibling>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

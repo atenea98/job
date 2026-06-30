@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_SalesPrintPackingListService</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class KPMGCommon_SalesPrintPackingListService
+{
+    CustPackingSlipJour                                     custPackingSlipJour;
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>process</Name>
+				<Source><![CDATA[
+    public void process(KPMGCommon_SalesPrintPackingListContract  _contract)
+    {
+
+        custPackingSlipJour = _contract.parmCustPackingSlipJour();
+        this.ReportSalesPackingList();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ReportSalesPackingList</Name>
+				<Source><![CDATA[
+    public void ReportSalesPackingList()
+    {   
+        SalesParameters    salesParameters = SalesParameters::find();
+
+        if(!salesParameters.KPMGCommon_ERFormatPackingListId)
+        {
+            warning("@KPMGCommon:ERFormatPackingListNoExist");
+        }
+        else
+        {
+            ERModelDefinitionInputParametersAction  obj = new ERModelDefinitionInputParametersAction();
+            obj.addParameter('model/$PackingSlipId', custPackingSlipJour.PackingSlipId);
+            obj.addParameter('model/$DeliveryDate', custPackingSlipJour.DeliveryDate);
+            ERObjectsFactory::createFormatMappingRunByFormatMappingId(salesParameters.KPMGCommon_ERFormatPackingListId,"").withParameter(obj).run();
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>CustTable.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlvpo14wib1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormStringControl">
+				<Name>CustTable_KPMGCommon_CompanyBankAccountIdPay</Name>
+				<Type>String</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_CompanyBankAccountIdPay</DataField>
+				<DataSource>CustTable</DataSource>
+			</FormControl>
+			<Parent>Payment</Parent>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlod0zvlw21</Name>
+			<FormControl xmlns=""
+				i:type="AxFormCheckBoxControl">
+				<Name>CustTable_KPMGCommon_ValuedPackingSlip</Name>
+				<Type>CheckBox</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_ValuedPackingSlip</DataField>
+				<DataSource>CustTable</DataSource>
+			</FormControl>
+			<Parent>Administration</Parent>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlehunhaou1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormCheckBoxControl">
+				<Name>CustTable_KPMGCommon_PendienteActualizarKaytek</Name>
+				<AllowEdit>No</AllowEdit>
+				<Type>CheckBox</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_PendienteActualizarKaytek</DataField>
+				<DataSource>CustTable</DataSource>
+			</FormControl>
+			<Parent>OtherInformation</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>AddressBooks</PreviousSibling>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

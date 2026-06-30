@@ -1,0 +1,7 @@
+﻿ErrorPostPackingSlip=No se ha generado albarán de venta.
+LoadError=Carga %1 no existe.
+LoadLoadedStatusError=Carga %1 debe de estar en estado "Cargado".
+NewLabel0=Label files created on 12/03/2025 08:10:18 for label file Id KPMGCommon_GeneratePackingSlipForLoad and language es
+ ;Label file comment - see above label
+PropertyIsMandatoryError=La propiedad %1 es obligatoria.
+ValidateCompanyError=La empresa no existe para la entidad jurídica %1.

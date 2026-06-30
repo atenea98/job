@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>JmgMEParameters.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlzhoouiyi1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormGroupControl">
+				<Name>KPMGCommon_PrintLabel</Name>
+				<Type>Group</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormCheckBoxControl">
+						<Name>KPMGCommon_PrintLabel_KPMGCommon_PrintCoProductLabel</Name>
+						<Type>CheckBox</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>KPMGCommon_PrintCoProductLabel</DataField>
+						<DataSource>JmgParameters</DataSource>
+					</AxFormControl>
+				</Controls>
+				<DataGroup>KPMGCommon_PrintLabel</DataGroup>
+				<DataSource>JmgParameters</DataSource>
+			</FormControl>
+			<Parent>GeneralBody</Parent>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlcdo05vit1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormGroupControl">
+				<Name>KPMGCommon_WarehouseEntityWHSLicensePlateId_OMT</Name>
+				<Type>Group</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormCheckBoxControl">
+						<Name>KPMGCommon_WarehouseEntityWHSLicensePlateId_OMT_KPMGCommon_AssignmentIntelligentLicensePlateCode</Name>
+						<Type>CheckBox</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>KPMGCommon_AssignmentIntelligentLicensePlateCode</DataField>
+						<DataSource>JmgParameters</DataSource>
+					</AxFormControl>
+				</Controls>
+				<DataGroup>KPMGCommon_WarehouseEntityWHSLicensePlateId_OMT</DataGroup>
+				<DataSource>JmgParameters</DataSource>
+			</FormControl>
+			<Parent>GeneralBody</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>ProdParmReportFinished.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlpqqbmt2i1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormMenuFunctionButtonControl">
+				<Name>KPMGCommon_PercentConsumptionProductionHistory</Name>
+				<Type>MenuFunctionButton</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataSource>ProdParmReportFinished</DataSource>
+				<MenuItemName>KPMGCommon_PercentConsumptionProductionHistory</MenuItemName>
+			</FormControl>
+			<Parent>ButtonGroup</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

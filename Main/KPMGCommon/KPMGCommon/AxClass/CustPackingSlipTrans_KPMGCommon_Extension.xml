@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>CustPackingSlipTrans_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(CustPackingSlipTrans))]
+final class CustPackingSlipTrans_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>insert</Name>
+				<Source><![CDATA[
+    public void insert()
+    {
+        next insert();
+        this.updateTrazability();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateTrazability</Name>
+				<Source><![CDATA[
+    public void updateTrazability()
+    {
+        KPMGCommon_Trazability trazabilityTable;
+        InventTrans inventTrans;
+        InventTransOrigin inventTransOrigin;        
+
+        inventTransOrigin = InventTransOrigin::findByInventTransId(this.InventTransId);
+
+        if(this.Qty > 0)
+        {
+            while select inventTrans
+                where inventTrans.InventTransOrigin == inventTransOrigin.RecId
+                && !inventTrans.PackingSlipId
+                && inventTrans.ItemId == this.ItemId
+            {
+                    if(inventTrans.inventDim().LicensePlateId)
+                    {
+                        select firstonly trazabilityTable
+                            where trazabilityTable.ItemId == this.ItemId
+                            && trazabilityTable.ProducedLicensePlateId == inventTrans.inventDim().LicensePlateId;
+            
+                        if(trazabilityTable.RecId)
+                        {
+                            ttsbegin;
+                            trazabilityTable.selectForUpdate(true);
+                            trazabilityTable.CustAccount = this.custPackingslipJour().OrderAccount;
+                            trazabilityTable.PackingSlipId = this.PackingSlipId;
+                            trazabilityTable.SalesId = this.SalesId;
+                            trazabilityTable.update();
+                           ttscommit;
+                        }
+                    }
+            }
+            
+        }        
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

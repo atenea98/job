@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxForm xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>KPMGCommon_CertificateAnalysisLogo</Name>
+	<SourceCode>
+		<Methods xmlns="">
+			<Method>
+				<Name>classDeclaration</Name>
+				<Source><![CDATA[
+[Form]
+public class KPMGCommon_CertificateAnalysisLogo extends FormRun
+{
+    container imageContainer;
+    str imageFilePathName;
+
+    InventParameters inventParameters;
+
+}
+]]></Source>
+			</Method>
+			<Method>
+				<Name>delete</Name>
+				<Source><![CDATA[
+    private void delete()
+    {
+        ttsbegin;
+        inventParameters = InventParameters::find(true);
+        if (inventParameters)
+        {
+            inventParameters.KPMGCommon_CertificateAnalysisLogo = conNull();
+            inventParameters.doUpdate();
+        }
+        ttscommit;
+
+        imageContainer = conNull();
+        imageFilePathName = '';
+        element.showLogo();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>init</Name>
+				<Source><![CDATA[
+    public void init()
+    {
+        super();
+
+        Common callerRecord = element.args().record();
+
+        if (callerRecord == null)
+        {
+            throw error(strFmt("@SYS22640", funcName()));
+        }
+
+        // Resolve with deliverable 552760
+        // <GSA>
+        //if (LedgerParameters::find().IsZakatEnabled_SA && refTableId == tableNum(LedgerReportIndexZakat_SA))
+        //{
+        //    LedgerReportIndexZakat_SA ledgerReportIndexZakat;
+
+        //    select firstonly RecId
+        //        from ledgerReportIndexZakat;
+
+        //    refRecId = ledgerReportIndexZakat.RecId;
+        //}
+        // </GSA>
+
+        inventParameters = InventParameters::find();
+        if (inventParameters)
+        {
+            imageContainer = inventParameters.KPMGCommon_CertificateAnalysisLogo;
+        }
+
+        AccessRight menuItemAccessRight = FormSecurity::getMenuItemAccessRight(this);
+        this.makeButtonsVisible(menuItemAccessRight);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>insert</Name>
+				<Source><![CDATA[
+    void insert()
+    {
+        ttsbegin;
+        inventParameters = InventParameters::find(true);
+        if (inventParameters)
+        {
+            inventParameters.KPMGCommon_CertificateAnalysisLogo = imageContainer;
+            inventParameters.doUpdate();
+        }
+        ttscommit;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>makeButtonsVisible</Name>
+				<Source><![CDATA[
+    private void makeButtonsVisible(AccessRight _menuItemAccessRight)
+    {
+
+        switch (_menuItemAccessRight)
+        {
+            case AccessRight::View:
+                change.visible(false);
+                remove.visible(false);
+                break;
+            case AccessRight::Add:
+            case AccessRight::Edit:
+                remove.visible(false);
+                break;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    public void run()
+    {
+        super();
+
+        element.showLogo();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>showLogo</Name>
+				<Source><![CDATA[
+    private void showLogo()
+    {
+        Image logoImage;
+        
+        try
+        {
+            if (imageContainer)
+            {
+                logoImage = new Image();
+                logoImage.setData(imageContainer);
+                image.image(logoImage);
+            }
+            else
+            {
+                image.image(null);
+            }
+        }
+        catch (Exception::Warning)
+        {
+            throw error(strFmt("@SYS19312", imageFilePathName));
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+		<DataSources xmlns="" />
+		<DataControls xmlns="">
+			<Control>
+				<Name>Change</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        public void clicked()
+        {
+            FileUploadTemporaryStorageResult fileUploadResult = File::GetFileFromUser(classstr(ImageFileUploadTemporaryStorageStrategy));
+            
+            if (fileUploadResult != null && fileUploadResult.getUploadStatus())
+            {
+                imageFilePathName = fileUploadResult.getDownloadUrl();
+                imageContainer = ImageReference::GetPackedBinaryData(imageFilePathName);
+
+                element.showLogo();
+                element.insert();
+            }
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>Remove</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        public void clicked()
+        {
+            super();
+            element.delete();
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+		</DataControls>
+		<Members xmlns="" />
+	</SourceCode>
+	<DataSources />
+	<Design>
+		<Caption xmlns="">@SYS58650</Caption>
+		<HeightMode xmlns="">SizeToContent</HeightMode>
+		<HideIfEmpty xmlns="">No</HideIfEmpty>
+		<Pattern xmlns="">SimpleDetails-ToolbarFields</Pattern>
+		<PatternVersion xmlns="">1.3</PatternVersion>
+		<WidthMode xmlns="">SizeToAvailable</WidthMode>
+		<WindowResize xmlns="">Dynamic</WindowResize>
+		<Controls xmlns="">
+			<AxFormControl xmlns=""
+				i:type="AxFormActionPaneControl">
+				<Name>ActionPane</Name>
+				<ElementPosition>715827882</ElementPosition>
+				<FilterExpression>%1</FilterExpression>
+				<Type>ActionPane</Type>
+				<VerticalSpacing>-1</VerticalSpacing>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormButtonGroupControl">
+						<Name>ButtonGroup</Name>
+						<ElementPosition>1073741823</ElementPosition>
+						<FilterExpression>%1</FilterExpression>
+						<HeightMode>Auto</HeightMode>
+						<Left>0</Left>
+						<Type>ButtonGroup</Type>
+						<VerticalSpacing>-1</VerticalSpacing>
+						<WidthMode>Auto</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>Change</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
+								<ElementPosition>1073741822</ElementPosition>
+								<FilterExpression>%1</FilterExpression>
+								<HeightMode>Auto</HeightMode>
+								<Type>Button</Type>
+								<VerticalSpacing>-1</VerticalSpacing>
+								<WidthMode>Auto</WidthMode>
+								<FormControlExtension
+									i:nil="true" />
+								<ButtonDisplay>TextOnly</ButtonDisplay>
+								<Text>@SYS1038</Text>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>Remove</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
+								<ElementPosition>1610612733</ElementPosition>
+								<FilterExpression>%1</FilterExpression>
+								<HeightMode>Auto</HeightMode>
+								<Type>Button</Type>
+								<VerticalSpacing>-1</VerticalSpacing>
+								<WidthMode>Auto</WidthMode>
+								<FormControlExtension
+									i:nil="true" />
+								<ButtonDisplay>TextOnly</ButtonDisplay>
+								<Text>@SYS26394</Text>
+							</AxFormControl>
+						</Controls>
+						<ArrangeMethod>Vertical</ArrangeMethod>
+					</AxFormControl>
+				</Controls>
+				<AlignChild>No</AlignChild>
+				<AlignChildren>No</AlignChildren>
+				<ArrangeMethod>Vertical</ArrangeMethod>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGroupControl">
+				<Name>GroupImage</Name>
+				<ElementPosition>1431655764</ElementPosition>
+				<FilterExpression>%1</FilterExpression>
+				<Height>0</Height>
+				<HeightMode>SizeToAvailable</HeightMode>
+				<Pattern>ImagePreview</Pattern>
+				<PatternVersion>1.1</PatternVersion>
+				<Type>Group</Type>
+				<VerticalSpacing>-1</VerticalSpacing>
+				<Width>0</Width>
+				<WidthMode>SizeToAvailable</WidthMode>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormImageControl">
+						<Name>Image</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<ElementPosition>1431655764</ElementPosition>
+						<FilterExpression>%1</FilterExpression>
+						<Height>0</Height>
+						<HeightMode>SizeToAvailable</HeightMode>
+						<Type>Image</Type>
+						<VerticalSpacing>-1</VerticalSpacing>
+						<Width>0</Width>
+						<WidthMode>SizeToAvailable</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<Label>@ApplicationFoundation:CompanyImage</Label>
+						<ShowLabel>No</ShowLabel>
+					</AxFormControl>
+				</Controls>
+				<FrameType>None</FrameType>
+				<OptionValue>0</OptionValue>
+			</AxFormControl>
+		</Controls>
+	</Design>
+	<Parts />
+</AxForm>

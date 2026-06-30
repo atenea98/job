@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>InventQualityOrderLineResults_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(InventQualityOrderLineResults))]
+final class InventQualityOrderLineResults_Table_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>initFromInventQualityOrderLine</Name>
+				<Source><![CDATA[
+    public void initFromInventQualityOrderLine(InventQualityOrderLine _inventQualityOrderLine)
+    {
+        next initFromInventQualityOrderLine(_inventQualityOrderLine);
+        
+        if (!this.TestResultQuantity || !this.PdsCWTestResultQuantity)
+        {
+            InventQualityOrderTable inventQualityOrderTable = _inventQualityOrderLine.inventQualityOrderTable();
+            this.TestResultQuantity = inventQualityOrderTable.Qty;
+            this.PdsCWTestResultQuantity = inventQualityOrderTable.PdsCWQty;
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

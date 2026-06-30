@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>WrkCtrResourceGroup.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>Copy2xwfoaln1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormTabPageControl">
+				<Name>KPMGCommon_PercentConsumptionByResource</Name>
+				<ElementPosition>2113929214</ElementPosition>
+				<FilterExpression>%1</FilterExpression>
+				<HeightMode>Auto</HeightMode>
+				<Pattern>ToolbarList</Pattern>
+				<PatternVersion>1.2</PatternVersion>
+				<Type>TabPage</Type>
+				<VerticalSpacing>-1</VerticalSpacing>
+				<WidthMode>Auto</WidthMode>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormActionPaneControl">
+						<Name>ActionPaneKPMGCommon_PercentConsumptionByResource</Name>
+						<ElementPosition>613566756</ElementPosition>
+						<FilterExpression>%1</FilterExpression>
+						<Type>ActionPane</Type>
+						<VerticalSpacing>-1</VerticalSpacing>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormActionPaneTabControl">
+								<Name>ActionPaneTabKPMGCommon_PercentConsumptionByResource</Name>
+								<ElementPosition>1431655764</ElementPosition>
+								<FilterExpression>%1</FilterExpression>
+								<HeightMode>Auto</HeightMode>
+								<Type>ActionPaneTab</Type>
+								<VerticalSpacing>-1</VerticalSpacing>
+								<WidthMode>Auto</WidthMode>
+								<FormControlExtension
+									i:nil="true" />
+								<Controls>
+									<AxFormControl xmlns=""
+										i:type="AxFormButtonGroupControl">
+										<Name>NewDeleteGroup_ResourceTabCopy1</Name>
+										<ElementPosition>954437176</ElementPosition>
+										<FilterExpression>%1</FilterExpression>
+										<HeightMode>Auto</HeightMode>
+										<Left>0</Left>
+										<Type>ButtonGroup</Type>
+										<VerticalSpacing>-1</VerticalSpacing>
+										<WidthMode>Auto</WidthMode>
+										<FormControlExtension
+											i:nil="true" />
+										<Controls>
+											<AxFormControl xmlns=""
+												i:type="AxFormCommandButtonControl">
+												<Name>NewResourceGroupCopy1</Name>
+												<ElementPosition>1073741822</ElementPosition>
+												<FilterExpression>%1</FilterExpression>
+												<HeightMode>Auto</HeightMode>
+												<Type>CommandButton</Type>
+												<VerticalSpacing>-1</VerticalSpacing>
+												<WidthMode>Auto</WidthMode>
+												<FormControlExtension
+													i:nil="true" />
+												<Big>Yes</Big>
+												<ButtonDisplay>TextWithImageLeft</ButtonDisplay>
+												<Command>New</Command>
+												<NormalImage>New</NormalImage>
+												<Text>@SYS2318</Text>
+											</AxFormControl>
+											<AxFormControl xmlns=""
+												i:type="AxFormCommandButtonControl">
+												<Name>ButtonDeleteResourceGroupCopy1</Name>
+												<AutoDeclaration>Yes</AutoDeclaration>
+												<ElementPosition>1610612733</ElementPosition>
+												<FilterExpression>%1</FilterExpression>
+												<HeightMode>Auto</HeightMode>
+												<Type>CommandButton</Type>
+												<VerticalSpacing>-1</VerticalSpacing>
+												<WidthMode>Auto</WidthMode>
+												<FormControlExtension
+													i:nil="true" />
+												<ButtonDisplay>TextWithImageLeft</ButtonDisplay>
+												<Command>DeleteRecord</Command>
+												<NormalImage>Delete</NormalImage>
+												<SaveRecord>No</SaveRecord>
+												<Text>@SYS311855</Text>
+											</AxFormControl>
+											<AxFormControl xmlns=""
+												i:type="AxFormCommandButtonControl">
+												<Name>ButtonEditResourceGroupCopy1</Name>
+												<AutoDeclaration>Yes</AutoDeclaration>
+												<NeededPermission>Update</NeededPermission>
+												<Type>CommandButton</Type>
+												<FormControlExtension
+													i:nil="true" />
+												<Command>EditRecord</Command>
+												<NeedsRecord>Yes</NeedsRecord>
+												<NormalImage>Edit</NormalImage>
+												<Text>@SYS313242</Text>
+											</AxFormControl>
+										</Controls>
+										<ArrangeMethod>Vertical</ArrangeMethod>
+									</AxFormControl>
+								</Controls>
+								<AlignChild>No</AlignChild>
+								<AlignChildren>No</AlignChildren>
+								<ArrangeMethod>Vertical</ArrangeMethod>
+							</AxFormControl>
+						</Controls>
+						<AlignChild>No</AlignChild>
+						<AlignChildren>No</AlignChildren>
+						<ArrangeMethod>Vertical</ArrangeMethod>
+						<DataSource>KPMGCommon_PercentConsumptionByResource</DataSource>
+						<Style>Strip</Style>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormGridControl">
+						<Name>KPMGCommon_PercentConsumptionByResource_Grid</Name>
+						<ElementPosition>920350134</ElementPosition>
+						<FilterExpression>%1</FilterExpression>
+						<Type>Grid</Type>
+						<VerticalSpacing>-1</VerticalSpacing>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormStringControl">
+								<Name>KPMGCommon_PercentConsumptionByResource_TypeId</Name>
+								<Type>String</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataField>TypeId</DataField>
+								<DataSource>KPMGCommon_PercentConsumptionByResource</DataSource>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormRealControl">
+								<Name>KPMGCommon_PercentConsumptionByResource_TypePercent</Name>
+								<Type>Real</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataField>TypePercent</DataField>
+								<DataSource>KPMGCommon_PercentConsumptionByResource</DataSource>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormStringControl">
+								<Name>KPMGCommon_PercentConsumptionByResource_ResourceMouth</Name>
+								<Type>String</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataField>ResourceMouth</DataField>
+								<DataSource>KPMGCommon_PercentConsumptionByResource</DataSource>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormStringControl">
+								<Name>KPMGCommon_PercentConsumptionByResource_ResourceDryer</Name>
+								<Type>String</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataField>ResourceDryer</DataField>
+								<DataSource>KPMGCommon_PercentConsumptionByResource</DataSource>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormRealControl">
+								<Name>KPMGCommon_PercentConsumptionByResource_DryerPercent</Name>
+								<Type>Real</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataField>DryerPercent</DataField>
+								<DataSource>KPMGCommon_PercentConsumptionByResource</DataSource>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormStringControl">
+								<Name>KPMGCommon_PercentConsumptionByResource_InventLocationId</Name>
+								<Type>String</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataField>InventLocationId</DataField>
+								<DataSource>KPMGCommon_PercentConsumptionByResource</DataSource>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormStringControl">
+								<Name>KPMGCommon_PercentConsumptionByResource_WMSLocationId</Name>
+								<Type>String</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataField>WMSLocationId</DataField>
+								<DataSource>KPMGCommon_PercentConsumptionByResource</DataSource>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormRealControl">
+								<Name>KPMGCommon_PercentConsumptionByResource_Percent</Name>
+								<Type>Real</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataField>Percent</DataField>
+								<DataSource>KPMGCommon_PercentConsumptionByResource</DataSource>
+							</AxFormControl>
+						</Controls>
+						<DataSource>KPMGCommon_PercentConsumptionByResource</DataSource>
+						<MultiSelect>No</MultiSelect>
+						<ShowRowLabels>No</ShowRowLabels>
+						<VisibleRows>3</VisibleRows>
+						<VisibleRowsMode>Fixed</VisibleRowsMode>
+					</AxFormControl>
+				</Controls>
+				<BackgroundColor>WindowBackground</BackgroundColor>
+				<Caption>@KPMGCommon:PercentageConsumption</Caption>
+				<Scrollbars>Auto</Scrollbars>
+			</FormControl>
+			<Parent>Tab</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>WorkCellCapacity</PreviousSibling>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources>
+		<AxFormDataSource xmlns="">
+			<Name>KPMGCommon_PercentConsumptionByResource</Name>
+			<Table>KPMGCommon_PercentConsumptionByResource</Table>
+			<Fields>
+				<AxFormDataSourceField>
+					<DataField>DataAreaId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>DryerPercent</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>InventLocationId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Partition</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Percent</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ResourceDryer</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ResourceMouth</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>SysRowVersionNumber</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TypeId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TypePercent</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>WMSLocationId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>WrkCtrId</DataField>
+				</AxFormDataSourceField>
+			</Fields>
+			<ReferencedDataSources />
+			<JoinSource>WrkCtrTable</JoinSource>
+			<InsertIfEmpty>No</InsertIfEmpty>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+	</DataSources>
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

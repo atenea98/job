@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxSecurityPrivilege xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_KaytekIntegrationView</Name>
+	<DataEntityPermissions />
+	<DirectAccessPermissions />
+	<EntryPoints>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_KaytekIntegrationDisplay</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>KPMGCommon_KaytekIntegrationDisplay</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>KPMGCommon_KaytekIntegrationForm</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_KaytekIntegrationJobDisplay</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>KPMGCommon_KaytekIntegrationJobDisplay</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms />
+		</AxSecurityEntryPointReference>
+	</EntryPoints>
+	<FormControlOverrides />
+</AxSecurityPrivilege>

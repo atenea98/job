@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_SalesInvoiceFas5LoadContract</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[DataContractAttribute]
+class KPMGCommon_SalesInvoiceFas5LoadContract
+{
+    private boolean postJournals;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>parmPostJournals</Name>
+				<Source><![CDATA[
+    [DataMember, SysOperationLabel(literalStr("@KPMGCommon:PostJournals")),SysOperationDisplayOrder('1')]
+    public boolean parmPostJournals(boolean _postJournals = postJournals)
+    {
+        postJournals = _postJournals;
+        return postJournals;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTableExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgTmpJobBundleProdFeedback.KPMGCommon</Name>
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>KPMGCommon_WMSlocation</Name>
+			<AssetClassification>System Metadata</AssetClassification>
+			<ExtendedDataType>WMSlocationId</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes />
+	<Mappings />
+	<PropertyModifications />
+	<RelationExtensions />
+	<RelationModifications />
+	<Relations>
+		<AxTableRelation>
+			<Name>WMSLocation</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>WMSLocation</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<RelationshipType>Association</RelationshipType>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>wMSLocation</Name>
+					<SourceEDT>InventBatch</SourceEDT>
+					<Field>KPMGCommon_WMSlocation</Field>
+					<RelatedField>wMSLocationId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+		</AxTableRelation>
+	</Relations>
+</AxTableExtension>

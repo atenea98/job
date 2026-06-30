@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_SalesPrintWayBillContract</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[DataContractAttribute]
+public class KPMGCommon_SalesPrintWayBillContract
+{
+    CustPackingSlipJour custPackingSlipJour;
+
+}
+
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>parmCustPackingSlipJour</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute]
+    public CustPackingSlipJour parmCustPackingSlipJour(CustPackingSlipJour _custPackingSlipJour = custPackingSlipJour)
+    {
+        custPackingSlipJour = _custPackingSlipJour;
+        return custPackingSlipJour;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

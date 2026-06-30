@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_GeneratePackingSlipForLoadProcessService</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Class for processing the generate packingslip for Load services
+/// </summary>
+class KPMGCommon_GeneratePackingSlipForLoadProcessService
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>processGeneratePackingSlipdRequest</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Generate PackingSlip service to create record
+    /// </summary>
+    /// <param name = "KPMGCommon_GeneratePackingSlipForLoadResponse_GeneratePackingSlip"> KPMGCommon_GeneratePackingSlipForLoadRequest_GeneratePackingSlip details as input</param>
+    /// <returns> HSO_KPMGVendingRequest_CreateRecord details as output</returns>
+    public KPMGCommon_GeneratePackingSlipForLoadResponse_GeneratePackingSlip processGeneratePackingSlipdRequest(KPMGCommon_GeneratePackingSlipForLoadRequest_GeneratePackingSlip _generatePackingSlip)
+    {
+        return KPMGCommon_GeneratePackingSlipForLoadProcess::construct(KPMGCommon_GeneratePackingSlipForLoadProcessType::GeneratePackingSlip, _generatePackingSlip).run();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

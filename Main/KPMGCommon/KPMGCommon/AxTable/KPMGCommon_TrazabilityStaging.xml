@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTable xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_TrazabilityStaging</Name>
+	<SourceCode>
+		<Methods />
+	</SourceCode>
+	<DeveloperDocumentation>@DMF:StagingDeveloperDocumentation</DeveloperDocumentation>
+	<Label>@KPMGCommon:Trazability</Label>
+	<TableGroup>Staging</TableGroup>
+	<TitleField1>JournalId</TitleField1>
+	<TitleField2>TrazabilityJournalType</TitleField2>
+	<PrimaryIndex>StagingIdx</PrimaryIndex>
+	<ReplacementKey>StagingIdx</ReplacementKey>
+	<SaveDataPerCompany>No</SaveDataPerCompany>
+	<DeleteActions />
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>ExtensionList</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@DMF:StagingExtensionGroup</Label>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>DefinitionGroup</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>IsSelected</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>TransferStatus</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>ExecutionId</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>DefinitionGroup</Name>
+			<AllowEdit>No</AllowEdit>
+			<ExtendedDataType>DMFDefinitionGroupName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Mandatory>Yes</Mandatory>
+			<StringSize>60</StringSize>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ExecutionId</Name>
+			<AllowEdit>No</AllowEdit>
+			<ExtendedDataType>DMFExecutionId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Mandatory>Yes</Mandatory>
+			<StringSize>90</StringSize>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>IsSelected</Name>
+			<ExtendedDataType>DMFIsSelected</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>TransferStatus</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<EnumType>DMFTransferStatus</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>TrazabilityJournalType</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<EnumType>KPMGCommon_TrazabilityJournalType</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt">
+			<Name>Level</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@SYS14422</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ProducedLicensePlateId</Name>
+			<ExtendedDataType>WHSLicensePlateId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@KPMGCommon:ProducedLicensePlateId</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ProductionMachine</Name>
+			<ExtendedDataType>WrkCtrIdBase</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@KPMGCommon:WrkCtrIdBase</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ProducedInventBatchId</Name>
+			<ExtendedDataType>InventBatchId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@KPMGCommon:ProducedInventBatchId</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldUtcDateTime">
+			<Name>DateTime</Name>
+			<ExtendedDataType>DateTimeExecuted</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@SYS121179</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ItemId</Name>
+			<ExtendedDataType>ItemId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ItemName</Name>
+			<ExtendedDataType>ItemName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>Qty</Name>
+			<ExtendedDataType>Qty</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>UnitId</Name>
+			<ExtendedDataType>UnitOfMeasureSymbol</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventSiteId</Name>
+			<ExtendedDataType>InventSiteId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventLocationId</Name>
+			<ExtendedDataType>InventLocationId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventBatchId</Name>
+			<ExtendedDataType>InventBatchId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@KPMGCommon:ProducedInventBatchId</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>VendAccount</Name>
+			<ExtendedDataType>VendAccount</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>VendName</Name>
+			<ExtendedDataType>VendName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>WMSLocationId</Name>
+			<ExtendedDataType>WMSLocationId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>WHSInventStatusId</Name>
+			<ExtendedDataType>WHSInventStatusId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>LicensePlateId</Name>
+			<ExtendedDataType>WHSLicensePlateId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@KPMGCommon:ProducedLicensePlateId</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>SalesId</Name>
+			<ExtendedDataType>SalesId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>PackingSlipId</Name>
+			<ExtendedDataType>PackingSlipId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>CustAccount</Name>
+			<ExtendedDataType>CustAccount</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>JournalId</Name>
+			<ExtendedDataType>JournalId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ProdId</Name>
+			<ExtendedDataType>ProdId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes>
+		<AxTableIndex>
+			<Name>StagingIdx</Name>
+			<AlternateKey>Yes</AlternateKey>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Fields>
+				<AxTableIndexField>
+					<DataField>DefinitionGroup</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>ExecutionId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>ProdId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>JournalId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>TrazabilityJournalType</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>ItemId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>ProductionMachine</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>ProducedLicensePlateId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>LicensePlateId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>SalesId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>PackingSlipId</DataField>
+				</AxTableIndexField>
+			</Fields>
+		</AxTableIndex>
+	</Indexes>
+	<Mappings />
+	<Relations>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>DataEntity</Name>
+			<Cardinality>ExactlyOne</Cardinality>
+			<EntityRelationshipRole>@DMF:StagingToDataEntityRelationshipRole</EntityRelationshipRole>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<RelatedTable>KPMGCommon_TrazabilityEntity</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<RelationshipType>Link</RelationshipType>
+			<Validate>No</Validate>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>ProdId</Name>
+					<Field>ProdId</Field>
+					<RelatedField>ProdId</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>JournalId</Name>
+					<Field>JournalId</Field>
+					<RelatedField>JournalId</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>TrazabilityJournalType</Name>
+					<Field>TrazabilityJournalType</Field>
+					<RelatedField>TrazabilityJournalType</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>ItemId</Name>
+					<Field>ItemId</Field>
+					<RelatedField>ItemId</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>ProductionMachine</Name>
+					<Field>ProductionMachine</Field>
+					<RelatedField>ProductionMachine</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>ProducedLicensePlateId</Name>
+					<Field>ProducedLicensePlateId</Field>
+					<RelatedField>ProducedLicensePlateId</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>LicensePlateId</Name>
+					<Field>LicensePlateId</Field>
+					<RelatedField>LicensePlateId</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>SalesId</Name>
+					<Field>SalesId</Field>
+					<RelatedField>SalesId</RelatedField>
+				</AxTableRelationConstraint>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>PackingSlipId</Name>
+					<Field>PackingSlipId</Field>
+					<RelatedField>PackingSlipId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+		</AxTableRelation>
+	</Relations>
+	<StateMachines />
+</AxTable>

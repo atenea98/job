@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxSecurityPrivilege xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_SalesInvoiceFas5Maintain</Name>
+	<DataEntityPermissions />
+	<DirectAccessPermissions />
+	<EntryPoints>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_SalesInvoiceFas5</Name>
+			<Grant>
+				<Correct>Allow</Correct>
+				<Create>Allow</Create>
+				<Delete>Allow</Delete>
+				<Read>Allow</Read>
+				<Update>Allow</Update>
+			</Grant>
+			<ObjectName>KPMGCommon_SalesInvoiceFas5</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>KPMGCommon_SalesInvoiceFas5</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_SalesInvoiceFas5Delete</Name>
+			<Grant>
+				<Correct>Allow</Correct>
+				<Create>Allow</Create>
+				<Delete>Allow</Delete>
+				<Read>Allow</Read>
+				<Update>Allow</Update>
+			</Grant>
+			<ObjectName>KPMGCommon_SalesInvoiceFas5Delete</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>KPMGCommon_SalesInvoiceFas5Delete</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_SalesInvoiceFas5Error</Name>
+			<Grant>
+				<Correct>Allow</Correct>
+				<Create>Allow</Create>
+				<Delete>Allow</Delete>
+				<Read>Allow</Read>
+				<Update>Allow</Update>
+			</Grant>
+			<ObjectName>KPMGCommon_SalesInvoiceFas5Error</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>KPMGCommon_SalesInvoiceFas5Error</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_SalesInvoiceFas5FixErrors</Name>
+			<Grant>
+				<Correct>Allow</Correct>
+				<Create>Allow</Create>
+				<Delete>Allow</Delete>
+				<Read>Allow</Read>
+				<Update>Allow</Update>
+			</Grant>
+			<ObjectName>KPMGCommon_SalesInvoiceFas5FixErrors</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>KPMGCommon_SalesInvoiceFas5FixErrors</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_SalesInvoiceFas5SelectDelete</Name>
+			<Grant>
+				<Correct>Allow</Correct>
+				<Create>Allow</Create>
+				<Delete>Allow</Delete>
+				<Read>Allow</Read>
+				<Update>Allow</Update>
+			</Grant>
+			<ObjectName>KPMGCommon_SalesInvoiceFas5SelectDelete</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>KPMGCommon_SalesInvoiceFas5SelectDelete</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_ProcessNonTreatedRecords</Name>
+			<Grant>
+				<Correct>Allow</Correct>
+				<Create>Allow</Create>
+				<Delete>Allow</Delete>
+				<Read>Allow</Read>
+				<Update>Allow</Update>
+			</Grant>
+			<ObjectName>KPMGCommon_ProcessNonTreatedRecords</ObjectName>
+			<ObjectType>MenuItemAction</ObjectType>
+			<Forms />
+		</AxSecurityEntryPointReference>
+	</EntryPoints>
+	<FormControlOverrides />
+</AxSecurityPrivilege>

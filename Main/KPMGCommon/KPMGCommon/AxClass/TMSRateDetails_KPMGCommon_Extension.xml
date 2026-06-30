@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>TMSRateDetails_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(TMSRateDetails))]
+final class TMSRateDetails_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>insert</Name>
+				<Source><![CDATA[
+    public void insert()
+    {
+        this.KPMGCommon_initializeNegativeFuelOil();
+
+        next insert();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_initializeNegativeFuelOil</Name>
+				<Source><![CDATA[
+    public void KPMGCommon_initializeNegativeFuelOil()
+    {
+        if (this.RateType == TMSRateType::Accessorial)
+        {
+            TMSParameters               tMSParameters = TMSParameters::find();
+            TMSRouteSegmentTable        tMSRouteSegmentTable = TMSRouteSegmentTable::find(this.RefRecId, true);
+            TMSRouteTable               tMSRouteTable = TMSRouteTable::find(tMSRouteSegmentTable.RouteRecId, true);
+            TMSAccessorialAssignment    tMSAccessorialAssignment;
+            TMSDeliveryUTCDateTime      unspecifiedDateTime = DateTimeUtil::newDateTime(dateNull(), 0);
+            TMSDeliveryUTCDateTime      effectiveDateTime = tMSRouteSegmentTable.DeliveryUTCDateTime;
+            int                         posBlank =strFind(tMSRouteSegmentTable.originName," ",1,strLen(tMSRouteSegmentTable.originName));
+            InventLocationId            inventLocationId = subStr(tMSRouteSegmentTable.originName, 1, (posBlank-1));
+            InventLocation              wharehouse = InventLocation::find(inventLocationId);
+
+            select firstonly tMSAccessorialAssignment
+            where tMSAccessorialAssignment.CarrierCode == tMSRouteSegmentTable.CarrierCode
+               && (tMSAccessorialAssignment.CarrierServiceCode == '' ||tMSAccessorialAssignment.CarrierServiceCode == tMSRouteSegmentTable.CarrierServiceCode)
+               && tMSAccessorialAssignment.CarrierAccessorialId == tMSParameters.KPMGCommon_CarrierAccessorialNegativeId
+               && tMSAccessorialAssignment.AccessorialAssignmentLevel == TMSAccessorialAssignmentLevel::Shipment
+               && (tMSAccessorialAssignment.EffectiveUTCDateTimeFrom <= effectiveDateTime || tMSAccessorialAssignment.EffectiveUTCDateTimeFrom == unspecifiedDateTime)
+               && (tMSAccessorialAssignment.EffectiveUTCDateTimeTo >= effectiveDateTime || tMSAccessorialAssignment.EffectiveUTCDateTimeTo == unspecifiedDateTime)
+               && tMSAccessorialAssignment.FeeType == TMSFeeType::Percent
+               && (tMSAccessorialAssignment.CurrencyCode == '' ||tMSAccessorialAssignment.CurrencyCode == tMSRouteSegmentTable.CurrencyCode)
+               && (tMSAccessorialAssignment.InventSiteId == '' || tMSAccessorialAssignment.InventSiteId == wharehouse.InventSiteId )
+               && (tMSAccessorialAssignment.InventLocationId == '' || tMSAccessorialAssignment.InventLocationId == wharehouse.InventLocationId)
+               && (tMSAccessorialAssignment.State == '' || tMSAccessorialAssignment.State == tMSRouteSegmentTable.OriginState)
+               && (tMSAccessorialAssignment.PostalCodeLow == '' || tMSAccessorialAssignment.PostalCodeLow <= tMSRouteSegmentTable.OriginPostalCode)
+               && (tMSAccessorialAssignment.PostalCodeHigh == '' || tMSAccessorialAssignment.PostalCodeHigh >= tMSRouteSegmentTable.OriginPostalCode)
+
+               && (tMSAccessorialAssignment.CountryRegion == '' || tMSAccessorialAssignment.CountryRegion == tMSRouteSegmentTable.OriginCountryRegion);
+
+            if (tMSAccessorialAssignment.KPMGCommon_NegativeFuelOilPercentage)
+            {
+                this.CustomerRate   = -this.CustomerRate;
+                this.RateCur        = -this.RateCur;
+                this.RateUnitRate   = -this.RateUnitRate;
+                this.ShipperRate    = -this.ShipperRate;
+
+                ttsbegin;
+                tMSRouteTable.TotalRate = tMSRouteTable.TotalRate + (this.RateCur * 2);
+                tMSRouteTable.CustomerRate = tMSRouteTable.CustomerRate + (this.CustomerRate * 2);
+                tMSRouteTable.ShipperRate = tMSRouteTable.ShipperRate + (this.ShipperRate * 2);
+                tMSRouteTable.update();
+
+                tMSRouteSegmentTable.TotalRate = tMSRouteSegmentTable.TotalRate + (this.RateCur * 2);
+                tMSRouteSegmentTable.CustomerRate = tMSRouteSegmentTable.CustomerRate + (this.CustomerRate * 2);
+                tMSRouteSegmentTable.ShipperRate = tMSRouteSegmentTable.ShipperRate + (this.ShipperRate * 2);
+                tMSRouteSegmentTable.update();
+                ttscommit;
+            }
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

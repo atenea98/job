@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>ProdTable.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlxdadvebg1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormTabPageControl">
+				<Name>KPMGCommon_WarehouseEntityWHSLicensePlateId_OMT</Name>
+				<Pattern>FieldsFieldGroups</Pattern>
+				<PatternVersion>1.1</PatternVersion>
+				<Type>TabPage</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>ProdTable_KPMGCommon_WHSLicensePlateIdYear</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>KPMGCommon_WHSLicensePlateIdYear</DataField>
+						<DataSource>ProdTable</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>ProdTable_KPMGCommon_WHSLicensePlateIdMonth</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>KPMGCommon_WHSLicensePlateIdMonth</DataField>
+						<DataSource>ProdTable</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>ProdTable_KPMGCommon_WHSLicensePlateIdDay</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>KPMGCommon_WHSLicensePlateIdDay</DataField>
+						<DataSource>ProdTable</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>ProdTable_KPMGCommon_WHSLicensePlateIdNumberSack</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>KPMGCommon_WHSLicensePlateIdNumberSack</DataField>
+						<DataSource>ProdTable</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>ProdTable_KPMGCommon_WHSLicensePlateIdLine</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>KPMGCommon_WHSLicensePlateIdLine</DataField>
+						<DataSource>ProdTable</DataSource>
+					</AxFormControl>
+				</Controls>
+				<ColumnsMode>Fill</ColumnsMode>
+				<Caption>@KPMGCommon:WarehouseEntityWHSLicensePlateId_OMT</Caption>
+				<DataSource>ProdTable</DataSource>
+			</FormControl>
+			<Parent>TabHeader</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_RequestBase</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Base class for Request message classes
+/// </summary>
+public abstract class KPMGCommon_RequestBase implements SysOperationValidatable
+{
+    DataAreaId dataAreaId;
+     
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>parmDataAreaId</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Get and set the legal entity.
+    /// </summary>
+    /// <param name = "_value">The value to set.</param>
+    /// <returns>Current value of parameter.</returns>
+    [DataMember('LegalEntity', RequiredValidation::Mandatory)]
+    public DataAreaId parmDataAreaId(DataAreaId _value = dataAreaId)
+    {
+        dataAreaId = _value;
+
+        return dataAreaId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validate</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Validates the data contract values.
+    /// </summary>
+    /// <returns>
+    /// True if all the contract values are valid; otherwise, false.
+    /// </returns>
+    public boolean validate()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>checkFailedRequired</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Checks failed for required proprties.
+    /// </summary>
+    /// <param name = "_methodName">The method name.</param>
+    /// <returns>The False value.</returns>
+    protected boolean checkFailedRequired(MethodName _methodName)
+    {
+        error(strfmt("@KPMGCommon_GeneratePackingSlipForLoad:PropertyIsMandatoryError", this.getDataMemberAttributeName(_methodName)));
+
+        return false;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getDataMemberAttributeName</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Gets the name property of the data member attribute by a method name.
+    /// </summary>
+    /// <param name = "_methodName">The method name.</param>
+    /// <returns>The name property of data member attribute.</returns>
+    protected str getDataMemberAttributeName(MethodName _methodName)
+    {
+        str ret;
+
+        if (_methodName)
+        {
+            SysDictMethod dictMethod = new SysDictMethod(UtilElementType::ClassInstanceMethod, classIdGet(this), _methodName);
+
+            if (dictMethod && dictMethod.getAttribute(classStr(DataMemberAttribute)))
+            {
+                ret = (dictMethod.getAttribute(classStr(DataMemberAttribute)) as DataMemberAttribute).Name();
+            }
+        }
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

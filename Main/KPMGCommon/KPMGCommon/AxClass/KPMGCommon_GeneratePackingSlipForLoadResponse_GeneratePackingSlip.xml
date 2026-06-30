@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_GeneratePackingSlipForLoadResponse_GeneratePackingSlip</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Class for the generate packingslip for load service response structure
+/// </summary>
+class KPMGCommon_GeneratePackingSlipForLoadResponse_GeneratePackingSlip extends KPMGCommon_ResponseBase
+{
+    WHSLoadId       loadId;
+    PackingSlipId   packingSlipId;
+     
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>parmLoadId</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Load number
+    /// </summary>
+    /// <param name = "_LoadId">Load number as input</param>
+    /// <returns>Load number as output</returns>
+    [DataMemberAttribute('LoadId')]
+    public WHSLoadId parmLoadId(WHSLoadId _loadId = loadId)
+    {
+        loadId = _loadId;
+        return loadId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmPackingSlipId</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// PackingSlip number
+    /// </summary>
+    /// <param name = "_packingSlipId">PackingSlip number as input</param>
+    /// <returns>PackingSlip number as output</returns>
+    [DataMemberAttribute('PackingSlipId')]
+    public PackingSlipId parmPackingSlipId(PackingSlipId _packingSlipId = packingSlipId)
+    {
+        packingSlipId = _packingSlipId;
+        return packingSlipId;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

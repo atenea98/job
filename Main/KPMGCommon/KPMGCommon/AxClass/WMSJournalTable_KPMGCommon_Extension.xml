@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>WMSJournalTable_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(WMSJournalTable))]
+final class WMSJournalTable_KPMGCommon_Extension
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>insert</Name>
+				<Source><![CDATA[
+    public void insert()
+    {
+        next insert();
+        this.insertKaytekJournal();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>insertKaytekJournal</Name>
+				<Source><![CDATA[
+    public void insertKaytekJournal()
+    {
+        KPMGCommon_KaytekIntegrationTable msg;
+
+        if(WMSJournalName::find(this.JournalNameId).KPMGCommon_KaytekIntegration)
+        {
+            msg.clear();
+
+            msg.OperationType   = this.mapWmsJournalTypeToOperationType(this.journalType);
+            msg.DateTime        = DateTimeUtil::utcNow();
+            msg.JournalId       = this.journalId;
+            msg.Status          = KPMGCommon_OperationStatus::Pending;
+            msg.ErrorMessage    = "";
+            msg.DateTimeLastTry = Global::utcDateTimeNull();
+
+            msg.insert();
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>mapWmsJournalTypeToOperationType</Name>
+				<Source><![CDATA[
+    private KPMGCommon_OperationType mapWmsJournalTypeToOperationType(WMSJournalType _journalType)
+    {
+        switch (_journalType)
+        {
+            case WMSJournalType::Reception:
+                return KPMGCommon_OperationType::DailyReceiptItemJournal;
+            default:
+                return KPMGCommon_OperationType::Blank;
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

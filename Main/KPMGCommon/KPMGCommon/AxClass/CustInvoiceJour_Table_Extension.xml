@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>CustInvoiceJour_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(CustInvoiceJour))]
+final class CustInvoiceJour_Table_Extension
+{
+    }
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>initFromSalesParmTable</Name>
+				<Source><![CDATA[
+    void initFromSalesParmTable(SalesParmTable _salesParmTable)
+    {
+        next initFromSalesParmTable(_salesParmTable);
+
+        this.kPMGCommon_InvoiceObservation = _salesParmTable.KPMGCommon_InvoiceObservation;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initFromSalesTable</Name>
+				<Source><![CDATA[
+    public void initFromSalesTable(SalesTable salesTable, SalesParmTable _salesParmTable)
+    {
+        next initFromSalesTable(salesTable, _salesParmTable);
+
+        // CompanyBankAccountPay
+        
+        BankAccountTable    bankAccountTable = BankAccountTable::find(this.custTable_InvoiceAccount().KPMGCommon_CompanyBankAccountIdPay);
+        CustTable           custTable_InvoiceAccount = this.custTable_InvoiceAccount();
+        
+        if (CustPaymModeTable::find(salesTable.paymMode).KPMGCommon_TransferPayment && custTable_InvoiceAccount.KPMGCommon_CompanyBankAccountIdPay)
+            this.KPMGCommon_BankAccountCompanyPay = strFmt("%1 %2 %3", bankAccountTable.Name, bankAccountTable.IBAN, bankAccountTable.SWIFTNo);
+        
+        this.KPMGCommon_LIVAArticle = this.KPMGCommon_ReturnTextLIVAArticle(salesTable, this);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_ReturnTextLIVAArticle</Name>
+				<Source><![CDATA[
+    public KPMGCommon_LIVAArticle KPMGCommon_ReturnTextLIVAArticle(SalesTable _salesTable, CustInvoiceJour  _custInvoiceJour)
+    {
+        TmpTaxWorkTrans         tmpTaxWorkTrans;
+        TaxTable                taxTable;
+        SalesTotals salesTotals = SalesTotals::construct(_salesTable, SalesUpdate::All);
+        KPMGCommon_LIVAArticle  lIVAArticle;
+        
+         salesTotals.calc();
+         tmpTaxWorkTrans = salesTotals.tax().tmpTaxWorkTrans();
+        
+        while select TaxCode from tmpTaxWorkTrans
+                group by TaxCode
+        {
+            if (lIVAArticle)
+                continue;
+
+            taxTable = TaxTable::find(tmpTaxWorkTrans.TaxCode);
+            if (!lIVAArticle && (taxTable.KPMGCommon_LIVAArticle_ES || taxTable.KPMGCommon_LIVAArticle_EN))
+            {
+                if (_custInvoiceJour.LanguageId == CompanyInfo::find().LanguageId)
+                {
+                    lIVAArticle = taxTable.KPMGCommon_LIVAArticle_ES;
+                }
+                else
+                {
+                    lIVAArticle = taxTable.KPMGCommon_LIVAArticle_EN;
+                }
+            }
+        }
+        
+        return lIVAArticle;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

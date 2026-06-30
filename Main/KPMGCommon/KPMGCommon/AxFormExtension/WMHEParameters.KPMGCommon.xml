@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>WMHEParameters.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlrkimhwxm1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormCheckBoxControl">
+				<Name>WMHEParameters_KPMGCommon_EnableAvailableStockExcessSelections</Name>
+				<Type>CheckBox</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_EnableAvailableStockExcessSelections</DataField>
+				<DataSource>WMHEParameters</DataSource>
+			</FormControl>
+			<Parent>Group_</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>SalesEditLines_SalesParmTableDS_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(formDataSourceStr(SalesEditLines, SalesParmTable))]
+final class SalesEditLines_SalesParmTableDS_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>active</Name>
+				<Source><![CDATA[
+    int  active()
+    {
+        int ret;
+        FormDataSource fds = this;
+        SalesParmTable salesParmTable;
+
+        ret = next active();
+
+        salesParmTable = fds.formRun().dataSource(formDataSourceStr(SalesEditLines, SalesParmTable)).cursor();
+
+        fds.object(fieldNum(SalesParmTable, KPMGCommon_InvoiceObservation)).visible(false);
+        if (salesParmTable.Ordering == DocumentStatus::Invoice)
+            fds.object(fieldNum(SalesParmTable, KPMGCommon_InvoiceObservation)).visible(true);
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

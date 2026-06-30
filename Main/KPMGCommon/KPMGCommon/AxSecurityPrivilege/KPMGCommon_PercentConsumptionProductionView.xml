@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxSecurityPrivilege xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_PercentConsumptionProductionView</Name>
+	<Label>@KPMGCommon:PercentageConsumptionProductionView</Label>
+	<DataEntityPermissions />
+	<DirectAccessPermissions>
+		<AxSecurityDataEntityReference>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<Name>KPMGCommon_PercentConsumptionByResource</Name>
+			<Fields />
+		</AxSecurityDataEntityReference>
+		<AxSecurityDataEntityReference>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<Name>KPMGCommon_PercentConsumptionProduction</Name>
+			<Fields />
+		</AxSecurityDataEntityReference>
+		<AxSecurityDataEntityReference>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<Name>KPMGCommon_PercentConsumptionProductionHistory</Name>
+			<Fields />
+		</AxSecurityDataEntityReference>
+		<AxSecurityDataEntityReference>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<Name>KPMGCommon_TypeConsumptionPercent</Name>
+			<Fields />
+		</AxSecurityDataEntityReference>
+	</DirectAccessPermissions>
+	<EntryPoints>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_TypeConsumptionPercent</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>KPMGCommon_TypeConsumptionPercent</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>KPMGCommon_TypeConsumptionPercent</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_PercentConsumptionProductionHistory</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>KPMGCommon_PercentConsumptionProductionHistory</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>KPMGCommon_PercentConsumptionProductionHistory</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_PercentConsumptionProduction</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>KPMGCommon_PercentConsumptionProduction</ObjectName>
+			<ObjectType>MenuItemDisplay</ObjectType>
+			<Forms>
+				<AxSecurityEntryPointReferenceForm>
+					<Name>KPMGCommon_PercentConsumptionProduction</Name>
+					<Controls />
+					<DataSources />
+				</AxSecurityEntryPointReferenceForm>
+			</Forms>
+		</AxSecurityEntryPointReference>
+	</EntryPoints>
+	<FormControlOverrides />
+</AxSecurityPrivilege>

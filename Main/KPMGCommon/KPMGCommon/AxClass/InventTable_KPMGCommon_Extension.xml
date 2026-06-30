@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>InventTable_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(InventTable))]
+final class InventTable_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>insert</Name>
+				<Source><![CDATA[
+    public void insert(boolean _doInsert)
+    {
+        this.KPMGCommon_PendienteActualizarKaytek = true;
+        next insert(_doInsert);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>update</Name>
+				<Source><![CDATA[
+    void update()
+    {
+        InventTable inventTable = this.orig();
+        if (inventTable.KPMGCommon_PendienteActualizarKaytek == false)
+        {
+            this.KPMGCommon_PendienteActualizarKaytek = true;
+        }
+        next update();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgTmpJobBundleProdFeedback_Table_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(JmgTmpJobBundleProdFeedback))]
+final class JmgTmpJobBundleProdFeedback_Table_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>KPMGCommon_checkWhsLicensePlateEnabledForCoByProduct</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///     Checks if the co/by-product is warehouse and license plate enabled.
+    /// </summary>
+    /// <returns>
+    ///     true if the co/by-product is warehouse and license plate enabled; otherwise false.
+    /// </returns>
+    [Hookable(false)]
+    public boolean KPMGCommon_checkWhsLicensePlateEnabledForCoByProduct()
+    {
+        InventTable inventTable = InventTable::find(this.ItemId);
+        if (this.isForLastOperation() && this.KPMGCommon_isCoByProduct() && inventTable.whsItemIsWHSControlled())
+        {
+            if (this.InventTransId) // Is not co/by product variation
+            {
+                InventDim coByInventDim = InventDim::find(PmfProdCoBy::findTransId(this.InventTransId).InventDimId);
+
+                if (coByInventDim.wMSLocationId)
+                {
+                    return WMSLocation::find(coByInventDim.wMSLocationId, coByInventDim.InventLocationId).whsLocationIsLPControlled();
+                }
+            }
+
+            ProdTable prodTable = ProdTable::find(this.JobRef);
+            var currentDate = DateTimeUtil::date(DateTimeUtil::applyTimeZoneOffset(DateTimeUtil::getSystemDateTime(), DateTimeUtil::getUserPreferredTimeZone()));
+            return prodTable && prodTable.defaultOutputLocationIsLPControlled(this.ItemId, currentDate);
+        }
+
+        return false;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_isCoByProduct</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    public boolean KPMGCommon_isCoByProduct()
+    {
+        return (this.ProductType == PmfProductType::By_Product
+            || this.ProductType == PmfProductType::Co_Product);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

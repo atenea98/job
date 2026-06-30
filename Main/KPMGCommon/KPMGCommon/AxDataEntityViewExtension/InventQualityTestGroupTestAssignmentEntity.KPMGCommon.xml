@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxDataEntityViewExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>InventQualityTestGroupTestAssignmentEntity.KPMGCommon</Name>
+	<DataSources />
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>KPMGCommon_CertOfAnalysisTestLimitValue</Name>
+			<DataField>KPMGCommon_CertOfAnalysisTestLimitValue</DataField>
+			<DataSource>InventTestGroupMember</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>KPMGCommon_CertOfAnalysisTestUnit</Name>
+			<DataField>KPMGCommon_CertOfAnalysisTestUnit</DataField>
+			<DataSource>InventTestGroupMember</DataSource>
+		</AxDataEntityViewField>
+	</Fields>
+	<Mappings />
+	<PropertyModifications />
+	<Relations />
+</AxDataEntityViewExtension>

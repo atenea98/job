@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_KaytekIntegrationController</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class KPMGCommon_KaytekIntegrationController extends SysOperationServiceController
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super(
+            classStr(KPMGCommon_KaytekIntegrationService),
+            methodStr(KPMGCommon_KaytekIntegrationService, process),
+            SysOperationExecutionMode::Synchronous);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static KPMGCommon_KaytekIntegrationController construct(SysOperationExecutionMode _executionMode = SysOperationExecutionMode::Synchronous)
+    {
+        KPMGCommon_KaytekIntegrationController controller = new KPMGCommon_KaytekIntegrationController();
+        controller.parmExecutionMode(_executionMode);
+        return controller;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        KPMGCommon_KaytekIntegrationController controller = KPMGCommon_KaytekIntegrationController::construct();
+        controller.parmArgs(_args);
+        controller.startOperation();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

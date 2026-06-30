@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>TMSAccessorialAssignment_TMSAccessorialAssignmentDS_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(formDataSourceStr(TMSAccessorialAssignment, TMSAccessorialAssignment))]
+final class TMSAccessorialAssignment_TMSAccessorialAssignmentDS_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>active</Name>
+				<Source><![CDATA[
+    int  active()
+    {
+        int ret;
+        TMSParameters   tMSParameters = TMSParameters::find();
+        FormDataSource  fds = this;
+        TMSAccessorialAssignment  tMSAccessorialAssignment;
+
+        ret = next active();
+
+        tMSAccessorialAssignment = fds.formRun().dataSource(formDataSourceStr(TMSAccessorialAssignment, TMSAccessorialAssignment)).cursor();
+
+        fds.object(fieldNum(TMSAccessorialAssignment, KPMGCommon_NegativeFuelOilPercentage)).enabled(false);
+        if (tMSParameters.KPMGCommon_CarrierAccessorialNegativeId == tMSAccessorialAssignment.CarrierAccessorialId)
+            fds.object(fieldNum(TMSAccessorialAssignment, KPMGCommon_NegativeFuelOilPercentage)).enabled(true);
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

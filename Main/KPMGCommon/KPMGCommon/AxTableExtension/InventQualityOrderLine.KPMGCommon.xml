@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTableExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>InventQualityOrderLine.KPMGCommon</Name>
+	<FieldGroupExtensions>
+		<AxTableFieldGroupExtension>
+			<Name>TestUnit</Name>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>KPMGCommon_CertOfAnalysisTestUnit</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroupExtension>
+		<AxTableFieldGroupExtension>
+			<Name>MeasurementValues</Name>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>KPMGCommon_CertOfAnalysisTestLimitValue</DataField>
+					<PositionType>AfterItem</PositionType>
+					<PreviousSibling>UpperLimit</PreviousSibling>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroupExtension>
+	</FieldGroupExtensions>
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>KPMGCommon_CertOfAnalysisTestUnit</Name>
+			<AllowEdit>No</AllowEdit>
+			<ExtendedDataType>KPMGCommon_CertOfAnalysisTestUnit</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>KPMGCommon_CertOfAnalysisTestLimitValue</Name>
+			<ExtendedDataType>KPMGCommon_CertOfAnalysisTestLimitValue</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes />
+	<Mappings />
+	<PropertyModifications />
+	<RelationExtensions />
+	<RelationModifications />
+	<Relations />
+</AxTableExtension>

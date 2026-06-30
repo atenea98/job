@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTableExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>SalesParameters.KPMGCommon</Name>
+	<FieldGroupExtensions />
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>KPMGCommon_SalesPrintFormats</Name>
+			<Label>@SYS105419</Label>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>KPMGCommon_ERFormatPackingListId</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>KPMGCommon_ERFormatWaybillId</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<FieldModifications />
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt64">
+			<Name>KPMGCommon_ERFormatPackingListId</Name>
+			<ExtendedDataType>ERFormatMappingID</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@KPMGCommon:PackinglistFormat</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldInt64">
+			<Name>KPMGCommon_ERFormatWaybillId</Name>
+			<ExtendedDataType>ERFormatMappingID</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Label>@KPMGCommon:WaybillFormat</Label>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes />
+	<Mappings />
+	<PropertyModifications />
+	<RelationExtensions />
+	<RelationModifications />
+	<Relations>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>ERFormatMappingTablePackingList</Name>
+			<RelatedTable>ERFormatMappingTable</RelatedTable>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>KPMGCommon_ERFormatPackingListId</Name>
+					<Field>KPMGCommon_ERFormatPackingListId</Field>
+					<RelatedField>RecId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+			<Index>RecId</Index>
+		</AxTableRelation>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>ERFormatMappingTableWayBill</Name>
+			<RelatedTable>ERFormatMappingTable</RelatedTable>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>KPMGCommon_ERFormatWaybillId</Name>
+					<Field>KPMGCommon_ERFormatWaybillId</Field>
+					<RelatedField>RecId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+			<Index>RecId</Index>
+		</AxTableRelation>
+	</Relations>
+</AxTableExtension>

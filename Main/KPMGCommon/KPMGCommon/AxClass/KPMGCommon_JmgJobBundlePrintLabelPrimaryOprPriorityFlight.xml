@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_JmgJobBundlePrintLabelPrimaryOprPriorityFlight</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+final class KPMGCommon_JmgJobBundlePrintLabelPrimaryOprPriorityFlight extends Flight
+{
+    static public KPMGCommon_JmgJobBundlePrintLabelPrimaryOprPriorityFlight singleton = new KPMGCommon_JmgJobBundlePrintLabelPrimaryOprPriorityFlight();
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>isEnabledByDefault</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    protected boolean isEnabledByDefault()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>instance</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    public static KPMGCommon_JmgJobBundlePrintLabelPrimaryOprPriorityFlight instance()
+    {
+        return singleton;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

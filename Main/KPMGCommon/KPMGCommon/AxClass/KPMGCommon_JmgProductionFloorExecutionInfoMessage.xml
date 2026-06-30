@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_JmgProductionFloorExecutionInfoMessage</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+///    The <c>JmgProductionFloorExecutionInfoMessage</c> class is used to show dialogs to the user during the use of
+///    the Production Floor Execution form.
+/// </summary>
+internal class KPMGCommon_JmgProductionFloorExecutionInfoMessage
+{
+    private str     headLine;
+    private str     detailText;
+    private boolean cancelButtonVisible;
+    private boolean doTimeOut;
+    private int     timeOutInSec;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Creates a new instance of the <c>JmgProductionFloorExecutionInfoMessage</c> class.
+    /// </summary>
+    /// <param name="_headline">
+    ///    The headline to display on the dialog.
+    /// </param>
+    /// <param name="_detailText">
+    ///    The detail information to display on the dialog.
+    /// </param>
+    /// <param name="_timeOut">
+    ///    true if the dialog must be automatically closed after a timeout; otherwise, false.
+    /// </param>
+    /// <param name="_timeOutInSec">
+    ///    the time out in seconds.
+    /// </param>
+    internal void new(str _headline, str _detailText, boolean _timeOut = true, int _timeOutInSec = 2)
+    {
+        headLine     = _headline;
+        detailText   = _detailText;
+        doTimeOut    = _timeOut;
+        timeOutInSec = _timeOutInSec;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmCancelButtonVisible</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    internal boolean parmCancelButtonVisible(boolean _cancelButtonVisible = cancelButtonVisible)
+    {
+        cancelButtonVisible = _cancelButtonVisible;
+        return cancelButtonVisible;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>openMessageDialog</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Initializes the dialog to use for displaying an info or error message to workers.
+    /// </summary>
+    /// <param name = "_messageFormName">
+    /// The name of form which should be shown.
+    /// </param>
+    ///  /// <param name = "_messageMenuItemName">
+    /// The name of menu item which should be shown.
+    /// </param>
+    [Hookable(false)]
+    internal void openMessageDialog(str _messageFormName, str _messageMenuItemName)
+    {
+        Args args;
+        if (KPMGCommon_JmgProductionFloorExecutionInfoMessageMenuItemFlight::instance().isEnabled())
+        {
+            args = new Args();
+            args.name(_messageFormName);
+            args.menuItemName(_messageMenuItemName);
+            args.caller(this);
+        }
+        else
+        {
+            args = new Args(_messageFormName);
+            args.caller(this);
+        }
+
+        Object formRun = classfactory.formRunClass(args);
+        formRun.init();
+        formRun.setHeadline(headLine);
+        formRun.setDetailText(detailText);
+        formRun.setCancelButtonlVisible(cancelButtonVisible);
+
+        formRun.setTimerEnabled(doTimeOut);
+        formRun.settimeOutInSec(timeOutInSec);
+
+        formRun.run();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>openInfoDialog</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Initializes the dialog to use for displaying an info message to workers.
+    /// </summary>
+    [Hookable(false)]
+    internal void openInfoDialog()
+    {
+        this.openMessageDialog(formStr(JmgProductionFloorExecutionInfoMessage), menuItemDisplayStr(JmgProductionFloorExecutionInfoMessage));
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>openErrorDialog</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Initializes the dialog to use for displaying an error message to workers.
+    /// </summary>
+    [Hookable(false)]
+    internal void openErrorDialog()
+    {
+        this.openMessageDialog(formStr(JmgProductionFloorExecutionErrorMessage), menuItemDisplayStr(JmgProductionFloorExecutionErrorMessage));
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>openWarningDialog</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Initializes the dialog to use for displaying a warning message to workers.
+    /// </summary>
+    [Hookable(false)]
+    internal void openWarningDialog()
+    {
+        this.openMessageDialog(formStr(JmgProductionFloorExecutionWarningMessage), menuItemDisplayStr(JmgProductionFloorExecutionWarningMessage));
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxMenuExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V1">
+	<Name>InventoryManagement.KPMGCommon</Name>
+	<Customizations />
+	<Elements>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>QualityManagement_2</Parent>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementMenuItem">
+				<Name>KPMGCommon_ProcessImportQualityResults_OMT</Name>
+				<MenuItemName>KPMGCommon_ProcessImportQualityResults_OMT</MenuItemName>
+				<MenuItemType>Action</MenuItemType>
+			</MenuElement>
+		</AxMenuExtensionElement>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>QualityManagement_2</Parent>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementMenuItem">
+				<Name>KPMGCommon_TrazabilityDisplay</Name>
+				<MenuItemName>KPMGCommon_TrazabilityDisplay</MenuItemName>
+			</MenuElement>
+		</AxMenuExtensionElement>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>QualityManagement_3</Parent>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementMenuItem">
+				<Name>KPMGCommon_TrazabilyItemsAllowedDisplay</Name>
+				<MenuItemName>KPMGCommon_TrazabilyItemsAllowedDisplay</MenuItemName>
+			</MenuElement>
+		</AxMenuExtensionElement>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>PeriodicTasks</Parent>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementSubMenu">
+				<Name>KaytekIntegrationPT</Name>
+				<Label>@KPMGCommon:KaytekIntegration</Label>
+				<Elements>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>KPMGCommon_KaytekIntegrationJobDisplay</Name>
+						<MenuItemName>KPMGCommon_KaytekIntegrationJobDisplay</MenuItemName>
+					</AxMenuElement>
+				</Elements>
+			</MenuElement>
+		</AxMenuExtensionElement>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>InquiriesAndReports</Parent>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementSubMenu">
+				<Name>KaytekIntegrationIR</Name>
+				<Label>@KPMGCommon:KaytekIntegration</Label>
+				<Elements>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>KPMGCommon_KaytekIntegrationDisplay</Name>
+						<MenuItemName>KPMGCommon_KaytekIntegrationDisplay</MenuItemName>
+					</AxMenuElement>
+				</Elements>
+			</MenuElement>
+		</AxMenuExtensionElement>
+	</Elements>
+	<MenuElementModifications />
+	<PropertyModifications />
+</AxMenuExtension>

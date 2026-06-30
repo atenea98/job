@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_SalesPrintWayBillController</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+final class KPMGCommon_SalesPrintWayBillController extends SysOperationServiceController
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super(classStr(KPMGCommon_SalesPrintWayBillService), methodStr(KPMGCommon_SalesPrintWayBillService, process), SysOperationExecutionMode::Synchronous); //¿Qué modo de ejecución queremos?
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>defaultCaption</Name>
+				<Source><![CDATA[
+    public ClassDescription defaultCaption()
+    {
+        return "@KPMGCommon:PrintWayBill"; //Imprimir Carta de porte
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static KPMGCommon_SalesPrintWayBillController construct(SysOperationExecutionMode _executionMode = SysOperationExecutionMode::Synchronous)
+    {
+        KPMGCommon_SalesPrintWayBillController controller;
+        controller = new KPMGCommon_SalesPrintWayBillController();
+        controller.parmExecutionMode(_executionMode);
+        controller.parmShowDialog(false);
+        return controller;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main (Args _args)
+    {
+        KPMGCommon_SalesPrintWayBillContract    contract;
+        KPMGCommon_SalesPrintWayBillController  controller;
+        CustPackingSlipJour                     custPackingSlipJour;
+
+        controller = KPMGCommon_SalesPrintWayBillController::construct();
+        controller.parmArgs(_args);
+        custPackingSlipJour = _args.record();
+        contract = controller.getDataContractObject();
+        contract.parmCustPackingSlipJour(custPackingSlipJour);
+        controller.startOperation();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

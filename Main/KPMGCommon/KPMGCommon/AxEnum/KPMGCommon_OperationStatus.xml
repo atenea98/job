@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEnum xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_OperationStatus</Name>
+	<Label>@SYS183849</Label>
+	<UseEnumValue>No</UseEnumValue>
+	<EnumValues>
+		<AxEnumValue>
+			<Name>Blank</Name>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Success</Name>
+			<Label>@SYS50316</Label>
+			<Value>3</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Pending</Name>
+			<Label>@SYS104366</Label>
+			<Value>4</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Error</Name>
+			<Label>@SYS87219</Label>
+			<Value>5</Value>
+		</AxEnumValue>
+	</EnumValues>
+	<IsExtensible>true</IsExtensible>
+</AxEnum>

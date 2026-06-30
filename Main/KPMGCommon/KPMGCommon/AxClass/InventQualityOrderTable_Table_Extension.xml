@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>InventQualityOrderTable_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(InventQualityOrderTable))]
+final class InventQualityOrderTable_Table_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createInventQualityOrderLines</Name>
+				<Source><![CDATA[
+    public void createInventQualityOrderLines()
+    {
+        InventQualityOrderLineResults   inventQualityOrderLineResults;
+        InventQualityOrderTable         inventQualityOrderTable;
+
+        next createInventQualityOrderLines();
+        
+        inventQualityOrderTable = InventQualityOrderTable::find(this.QualityOrderId);
+        
+        if (this.TestGroupId)
+        {
+            utcdatetime currentTime = DateTimeUtil::getSystemDateTime();
+            this.KPMGCommon_UpdateInventQualityOrderLinesFromTestGroupMember(currentTime);
+        }
+
+        ttsbegin;
+        while select forupdate inventQualityOrderLineResults
+            where inventQualityOrderLineResults.QualityOrderId == this.QualityOrderId
+               && !inventQualityOrderLineResults.TestResultQuantity
+               && !inventQualityOrderLineResults.PdsCWTestResultQuantity
+        {
+            inventQualityOrderLineResults.TestResultQuantity        = inventQualityOrderTable.Qty;
+            inventQualityOrderLineResults.PdsCWTestResultQuantity   = inventQualityOrderTable.PdsCWQty;
+            inventQualityOrderLineResults.update();       
+        }
+        ttscommit;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_UpdateInventQualityOrderLinesFromTestGroupMember</Name>
+				<Source><![CDATA[
+    protected void KPMGCommon_UpdateInventQualityOrderLinesFromTestGroupMember(utcdatetime _currentTime)
+    {
+        InventQualityOrderLine          inventQualityOrderLine;
+        InventTestGroupMember           inventTestGroupMember;
+        InventQualityOrderId            inventQualityOrderId    = this.QualityOrderId;
+
+        update_recordset inventQualityOrderLine 
+            setting
+                KPMGCommon_CertOfAnalysisTestUnit = inventTestGroupMember.KPMGCommon_CertOfAnalysisTestUnit,
+                KPMGCommon_CertOfAnalysisTestLimitValue = inventTestGroupMember.KPMGCommon_CertOfAnalysisTestLimitValue
+            //order by QualityOrderId, TestSequence
+            where inventQualityOrderLine.QualityOrderId == inventQualityOrderId
+            join inventTestGroupMember
+              where inventTestGroupMember.TestGroupId       == this.TestGroupId
+                 && inventTestGroupMember.TestId            == inventQualityOrderLine.TestId
+                 && inventTestGroupMember.ValidFromDateTime <= _currentTime
+                 && inventTestGroupMember.ValidToDateTime   >  _currentTime;
+
+        /*
+        ttsbegin;
+        while select forupdate inventQualityOrderLine
+            order by QualityOrderId, TestSequence
+            where inventQualityOrderLine.QualityOrderId == inventQualityOrderId
+            join inventTestGroupMember
+                where inventTestGroupMember.TestGroupId       == this.TestGroupId
+                   && inventTestGroupMember.TestId            == inventQualityOrderLine.TestId
+                   && inventTestGroupMember.ValidFromDateTime <= _currentTime
+                   && inventTestGroupMember.ValidToDateTime   >  _currentTime
+        {
+            inventQualityOrderLine.KPMGCommon_CertOfAnalysisTestUnit = inventTestGroupMember.KPMGCommon_CertOfAnalysisTestUnit;
+            inventQualityOrderLine.KPMGCommon_CertOfAnalysisTestLimitValue = inventTestGroupMember.KPMGCommon_CertOfAnalysisTestLimitValue;
+            inventQualityOrderLine.doUpdate();
+        }
+        ttscommit;
+        */
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

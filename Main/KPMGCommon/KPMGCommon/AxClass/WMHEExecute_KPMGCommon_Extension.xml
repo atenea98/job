@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>WMHEExecute_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(WMHEExecute))]
+final class WMHEExecute_KPMGCommon_Extension
+{
+    private KPMGCommon_WMHEInstrumentationLogger kPMGCommon_instrumentationLogger;
+    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>KPMGCommon_instrumentationLogger</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Provides access to an instrumentation logger.
+    /// </summary>
+    /// <returns>
+    /// The <c>WMHEInstrumentationLogger</c> object.
+    /// </returns>
+    internal final KPMGCommon_WMHEInstrumentationLogger KPMGCommon_instrumentationLogger()
+    {
+        if (!kPMGCommon_instrumentationLogger)
+        {
+            kPMGCommon_instrumentationLogger = KPMGCommon_WMHEInstrumentationLogger::createLogger(classId2Name(classIdGet(this)));
+        }
+
+        return kPMGCommon_instrumentationLogger;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

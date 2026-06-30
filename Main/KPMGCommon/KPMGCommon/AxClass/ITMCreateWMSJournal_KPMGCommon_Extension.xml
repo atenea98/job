@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>ITMCreateWMSJournal_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(ITMCreateWMSJournal))]
+final class ITMCreateWMSJournal_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createLine</Name>
+				<Source><![CDATA[
+    public WMSJournalTrans createLine(InventTrans _inventTrans,
+                             PurchLine _purchLine,
+                             InventTransOrigin _inventTransOrigin,
+                             ITMId _shipId,
+                             ITMContainerId _shipContainerId,
+                             ITMFolioId _shipFolioId,
+                             ITMArrivalGroupId _arrivalGroupId,
+                             InventQty _possibleQty)
+    {
+        WMSJournalTrans wmsJournalTrans = next createLine(_inventTrans,
+                                                          _purchLine,
+                                                          _inventTransOrigin,
+                                                          _shipId,
+                                                          _shipContainerId,
+                                                          _shipFolioId,
+                                                          _arrivalGroupId,
+                                                          _possibleQty);
+
+        this.KPMGCommon_initFromGITWMSJournalTable(wmsJournalTrans, _inventTransOrigin);
+
+        return wmsJournalTrans;
+  }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_initFromGITWMSJournalTable</Name>
+				<Source><![CDATA[
+    public void KPMGCommon_initFromGITWMSJournalTable(WMSJournalTrans   _wmsJournalTrans,
+                                                      InventTransOrigin _inventTransOrigin)
+    {
+        WMSJournalTable         wmsJournalTable;
+        ITMGoodsInTransitOrder  iTMGoodsInTransitOrder;
+        ITMLine                 iTMLine;
+
+        if (initFromGIT)
+        {
+            ttsbegin;
+            select firstonly forupdate wmsJournalTable
+                where wmsJournalTable.journalId == _wmsJournalTrans.journalId;
+            if (wmsJournalTable)
+            {
+                wmsJournalTable.InventTransType = _inventTransOrigin.ReferenceCategory;
+                wmsJournalTable.inventTransRefId = _inventTransOrigin.ReferenceId;
+                wmsJournalTable.update();
+            }
+            ttscommit;
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

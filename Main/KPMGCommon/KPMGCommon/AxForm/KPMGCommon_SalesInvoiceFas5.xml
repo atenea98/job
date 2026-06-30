@@ -1,0 +1,841 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxForm xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>KPMGCommon_SalesInvoiceFas5</Name>
+	<SourceCode>
+		<Methods xmlns="">
+			<Method>
+				<Name>classDeclaration</Name>
+				<Source><![CDATA[
+[Form]
+public class KPMGCommon_SalesInvoiceFas5 extends FormRun
+{
+
+}
+]]></Source>
+			</Method>
+			<Method>
+				<Name>init</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    public void init()
+    {
+        super();
+        KPMGCommon_SalesInvoiceFas5_ds.executeQuery();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+		<DataSources xmlns="">
+			<DataSource>
+				<Name>KPMGCommon_SalesInvoiceFas5</Name>
+				<Methods>
+					<Method>
+						<Name>executeQuery</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void executeQuery()
+        {
+            //Query registros no tratados
+            QueryBuildDataSource qbds = this.query().dataSourceTable(tableNum(KPMGCommon_SalesInvoiceFas5));
+            qbds.clearRanges();
+
+            QueryBuildRange TreatedRange = qbds.addRange(fieldNum(KPMGCommon_SalesInvoiceFas5, Treated));
+
+            if (ShowAllCheckBoxFilter.checked())
+            {
+                qbds.clearRanges();
+            }
+            else{
+                TreatedRange.value(queryValue(NoYes::No));
+            }
+
+            super();
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+				<Fields />
+			</DataSource>
+		</DataSources>
+		<DataControls xmlns="">
+			<Control>
+				<Name>KPMGCommon_ValidateNonTreatedRecords</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void clicked()
+        {
+            super();
+            List journals;
+            KPMGCommon_SalesInvoiceFas5LoadService::validateSalesInvoiceFas5Table(true, journals);
+            KPMGCommon_SalesInvoiceFas5_ds.reread();
+
+            //this.validateSalesInvoiceFas5Table();
+        }
+
+        /*private void validateSalesInvoiceFas5Table()
+        {
+            KPMGCommon_SalesInvoiceFas5 _SalesInvoiceFas5;
+            KPMGCommon_SalesInvoiceFas5Error salesInvoiceFas5Error;
+
+            CustTable custTable;
+            CustInvoiceJour custInvoiceJour;
+            MainAccount mainAccount;
+            CustPaymModeTable custPaymModeTable;
+            TaxGroupHeading taxGroupHeading;
+            TaxItemGroupHeading taxItemGroupHeading;
+            CustParameters custParameters;
+            TaxTable taxTable;
+
+            boolean invoiceError = false;
+            String20 invoiceId;
+
+            while select _SalesInvoiceFas5
+            order by InvoiceId
+            where !_SalesInvoiceFas5.Treated
+            {
+                try
+                {
+                    //Al cambiar de factura, si alguna línea da error, se cambia a error todas las lineas
+                    if (_SalesInvoiceFas5.InvoiceId != invoiceId)
+                    {
+                        //Revisamos si ha habido errores en la factura anterior
+                        this.checkErrorInInvoice(invoiceError, invoiceId);
+                        //Si la siguiente factura tiene errores, se eliminan para actualizarlos
+                        while select forupdate salesInvoiceFas5Error where salesInvoiceFas5Error.RefRecId == _SalesInvoiceFas5.RecId
+                        {
+                            ttsbegin;
+                            salesInvoiceFas5Error.delete();
+                            ttscommit;
+                        }
+                        invoiceId = _SalesInvoiceFas5.InvoiceId;
+                        invoiceError = false;
+                    }
+
+                    //Validación #1 - CustomerId existe en F&O
+                    custTable = CustTable::find(_SalesInvoiceFas5.CustomerId, false);
+                    if (!custTable)
+                    {
+                        this.createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorCustomerId",_SalesInvoiceFas5.CustomerId));
+                        invoiceError = true;
+                    }
+                    //Validación #2 - No existe ya una factura con el mismo InvoiceId en custInvoiceJour
+                    select firstonly custInvoiceJour where _SalesInvoiceFas5.InvoiceId == custInvoiceJour.InvoiceId;
+                    if (custInvoiceJour)
+                    {
+                        this.createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    "@KPMGCommon:SalesInvoiceFas5Load_ErrorCustInvoiceJour");
+                        invoiceError = true;
+                    }
+                    //Validación #3 - Existe la cuenta contable en MainAccount
+                    if (!MainAccount::findByMainAccountId(_SalesInvoiceFas5.CContable))
+                    {
+                        this.createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorCustLedgerAccount", _SalesInvoiceFas5.CContable));
+                        invoiceError = true;
+                    }
+                    //Validación #4 - Existe el modo de pago
+                    select firstonly custPaymModeTable
+                where _SalesInvoiceFas5.PaymentMode == custPaymModeTable.PaymMode;
+                    if (!custPaymModeTable)
+                    {
+                        this.createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorPaymentMode", _SalesInvoiceFas5.PaymentMode));
+                        invoiceError = true;
+                    }
+                    //Validación #5 - Existe el grupo de impuestos
+                    if (!TaxGroupHeading::find(_SalesInvoiceFas5.TaxGroup))
+                    {
+                        this.createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorTaxGroup", _SalesInvoiceFas5.TaxGroup));
+                        invoiceError = true;
+                    }
+                    //Validación #6 - Existe el grupo de impuestos de artículo
+                    if (!TaxItemGroupHeading::find(_SalesInvoiceFas5.ItemTaxGroup))
+                    {
+                        this.createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorTaxItemGroup", _SalesInvoiceFas5.ItemTaxGroup));
+                        invoiceError = true;
+                    }
+                    select firstonly custParameters;
+                    //Validación #7 - Diario para facturas FAS5 introducido
+                    if (custParameters.FAS5Journal == '')
+                    {
+                        this.createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    "@KPMGCommon:SalesInvoiceFas5Load_ErrorFAS5Journal");
+                        invoiceError = true;
+                    }
+                    //Validación #8 - Cuenta de impuesto al plástico introducida
+                    if (custParameters.PlasticTaxAccount == '')
+                    {
+                        this.createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    "@KPMGCommon:SalesInvoiceFas5Load_ErrorPlasticTaxAccount");
+                        invoiceError = true;
+                    }
+
+                    //Validación #9 - El porcentaje de impuestos coincide con el generado en D365
+                    TaxAmountCur taxAmountCur;
+                
+                    taxAmountCur = Tax::calcTaxAmount(_SalesInvoiceFas5.TaxGroup, _SalesInvoiceFas5.ItemTaxGroup,
+                _SalesInvoiceFas5.InvoiceDate, custTable.currencyName(),
+                _SalesInvoiceFas5.NetAmount, TaxModuleType::SalesInvoice);
+          
+                    if (decRound(_SalesInvoiceFas5.CuotaIVA,2) != taxAmountCur)
+                    {
+                        this.createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorTaxValue", decRound(_SalesInvoiceFas5.CuotaIVA,2), taxAmountCur));
+                        invoiceError = true;
+                    }
+
+                }
+                catch
+                {
+                                    this.createSalesInvoiceFas5Error(_SalesInvoiceFas5, infolog.text(infologLine()));
+                invoiceError = true;
+                }
+            }
+            this.checkErrorInInvoice(invoiceError, invoiceId); //Se comprueba si la última factura tiene errores
+        }
+
+        private void createSalesInvoiceFas5Error(KPMGCommon_SalesInvoiceFas5 salesInvoiceFas5, Description1000 ErrorDescription)
+        {
+            KPMGCommon_SalesInvoiceFas5Error salesInvoiceFas5Error;
+
+            salesInvoiceFas5Error.InvoiceId = salesInvoiceFas5.InvoiceId;
+            salesInvoiceFas5Error.CContable = salesInvoiceFas5.CContable;
+            salesInvoiceFas5Error.RefRecId = salesInvoiceFas5.RecId;
+            salesInvoiceFas5Error.RefTableId = salesInvoiceFas5.TableId;
+            salesInvoiceFas5Error.DescriptionError = ErrorDescription;
+            salesInvoiceFas5Error.Corrected = NoYes::No;
+            salesInvoiceFas5Error.Periodo = KPMGCommon_Period::New;
+
+            salesInvoiceFas5Error.insert();
+
+            Message::Add(MessageSeverity::Error, strFmt("@KPMGCommon:SalesInvoiceFas5_ErrorMessage", salesInvoiceFas5.InvoiceId, salesInvoiceFas5.NumLine, ErrorDescription));
+
+        }
+
+        private void checkErrorInInvoice(boolean invoiceError, String20 invoiceId)
+        {
+            KPMGCommon_SalesInvoiceFas5 salesInvoiceFas5_InvoicesWithError;
+
+            if(invoiceId != '')
+            {
+                if(invoiceError)
+                {
+            
+                    while select forupdate salesInvoiceFas5_InvoicesWithError
+                    where
+                    salesInvoiceFas5_InvoicesWithError.Error == NoYes::No
+                    && salesInvoiceFas5_InvoicesWithError.InvoiceId == invoiceId
+                    {
+                        ttsbegin;
+                        salesInvoiceFas5_InvoicesWithError.Error = NoYes::Yes;
+                        salesInvoiceFas5_InvoicesWithError.Update();
+                        ttscommit;
+                    }
+                }
+                else
+                {
+                    
+                    Message::Add(MessageSeverity::Informational, strFmt("@KPMGCommon:SalesInvoiceFas5_ValidateMessage", invoiceId));
+
+                    while select forupdate salesInvoiceFas5_InvoicesWithError
+                    where
+                    salesInvoiceFas5_InvoicesWithError.Error == NoYes::Yes
+                    && salesInvoiceFas5_InvoicesWithError.InvoiceId == invoiceId
+                    {
+                        ttsbegin;
+                        salesInvoiceFas5_InvoicesWithError.Error = NoYes::No;
+                        salesInvoiceFas5_InvoicesWithError.Update();
+                        ttscommit;
+                    }
+                    //this.generateInvoiceJournal(invoiceId);
+                }
+            }
+        }*/
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>KPMGCommon_FixInvoicesWithErrors</Name>
+				<Type>MenuFunctionButton</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void clicked()
+        {
+            KPMGCommon_SalesInvoiceFas5 salesInvoiceFas5;
+            FormDataSource      salesInvoiceFas5_ds;
+            FormRun             formRun;
+
+            formRun = this.formRun();
+            salesInvoiceFas5_ds = formRun.dataSource("KPMGCommon_SalesInvoiceFas5");
+            salesInvoiceFas5 = salesInvoiceFas5_ds.cursor();
+            if(!salesInvoiceFas5.Treated)
+            {
+                super();
+                KPMGCommon_SalesInvoiceFas5_ds.reread();
+            }
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>KPMGCommon_ProcessNonTreatedRecords</Name>
+				<Type>MenuFunctionButton</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void clicked()
+        {
+            super();
+            KPMGCommon_SalesInvoiceFas5_ds.reread();
+
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>KPMGCommon_SalesInvoiceFas5SelectDelete</Name>
+				<Type>MenuFunctionButton</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void clicked()
+        {
+            super();
+            KPMGCommon_SalesInvoiceFas5_ds.reread();
+
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>ShowAllCheckBoxFilter</Name>
+				<Type>CheckBox</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        /// <summary>
+        ///
+        /// </summary>
+        public void clicked()
+        {
+            super();
+            KPMGCommon_SalesInvoiceFas5_ds.executeQuery();
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+		</DataControls>
+		<Members xmlns="" />
+	</SourceCode>
+	<DataSources>
+		<AxFormDataSource xmlns="">
+			<Name>KPMGCommon_SalesInvoiceFas5</Name>
+			<Table>KPMGCommon_SalesInvoiceFas5</Table>
+			<Fields>
+				<AxFormDataSourceField>
+					<DataField>CContable</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Cif</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CreatedBy</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CreatedDateTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CuotaIVA</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CuotaPlasticIVA</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CustomerId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>CustomerName</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>DataAreaId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>DescTV</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>DiarioId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Error</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>FVencimiento</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>InvoiceDate</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>InvoiceId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>InvoiceYear</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ItemTaxGroup</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>IVA</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ModifiedBy</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>ModifiedDateTime</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>NetAmount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>NumFact5</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>NumLine</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Partition</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>PaymentMode</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>PlasticIVA</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>PlasticNetAmount</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>RecId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TableId</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TaxGroup</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TipoVenta</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>TotalInvoice</DataField>
+				</AxFormDataSourceField>
+				<AxFormDataSourceField>
+					<DataField>Treated</DataField>
+				</AxFormDataSourceField>
+			</Fields>
+			<ReferencedDataSources />
+			<AllowCreate>No</AllowCreate>
+			<AllowDelete>No</AllowDelete>
+			<AllowEdit>No</AllowEdit>
+			<DataSourceLinks />
+			<DerivedDataSources />
+		</AxFormDataSource>
+	</DataSources>
+	<Design>
+		<Caption xmlns="">@KPMGCommon:SalesInvoiceFas5</Caption>
+		<DataSource xmlns="">KPMGCommon_SalesInvoiceFas5</DataSource>
+		<Pattern xmlns="">SimpleList</Pattern>
+		<PatternVersion xmlns="">1.1</PatternVersion>
+		<Style xmlns="">SimpleList</Style>
+		<Controls xmlns="">
+			<AxFormControl xmlns=""
+				i:type="AxFormActionPaneControl">
+				<Name>FormActionPaneControl1</Name>
+				<Type>ActionPane</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormButtonGroupControl">
+						<Name>FormButtonGroupControl1</Name>
+						<Type>ButtonGroup</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>KPMGCommon_ValidateNonTreatedRecords</Name>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<AutoRefreshData>Yes</AutoRefreshData>
+								<Text>@KPMGCommon:ValidateNonTreatedRecord</Text>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>KPMGCommon_ShowErrors</Name>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+								<MenuItemName>KPMGCommon_SalesInvoiceFas5Error</MenuItemName>
+								<Text>@KPMGCommon:ShowErrors</Text>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>KPMGCommon_FixInvoicesWithErrors</Name>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+								<MenuItemName>KPMGCommon_SalesInvoiceFas5FixErrors</MenuItemName>
+								<Text>@KPMGCommon:FixRecordsWithErrors</Text>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>KPMGCommon_ProcessNonTreatedRecords</Name>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<MenuItemName>KPMGCommon_ProcessNonTreatedRecords</MenuItemName>
+								<MenuItemType>Action</MenuItemType>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormMenuFunctionButtonControl">
+								<Name>KPMGCommon_SalesInvoiceFas5SelectDelete</Name>
+								<Type>MenuFunctionButton</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<MenuItemName>KPMGCommon_SalesInvoiceFas5SelectDelete</MenuItemName>
+							</AxFormControl>
+						</Controls>
+					</AxFormControl>
+				</Controls>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGroupControl">
+				<Name>FormGroupControl1</Name>
+				<Pattern>CustomAndQuickFilters</Pattern>
+				<PatternVersion>1.1</PatternVersion>
+				<Type>Group</Type>
+				<WidthMode>SizeToAvailable</WidthMode>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl>
+						<Name>QuickFilterControl1</Name>
+						<Visible>No</Visible>
+						<FormControlExtension>
+							<Name>QuickFilterControl</Name>
+							<ExtensionComponents />
+							<ExtensionProperties>
+								<AxFormControlExtensionProperty>
+									<Name>targetControlName</Name>
+									<Type>String</Type>
+									<Value>FormGridControl1</Value>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>placeholderText</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>defaultColumnName</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+							</ExtensionProperties>
+						</FormControlExtension>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormCheckBoxControl">
+						<Name>ShowAllCheckBoxFilter</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>CheckBox</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Label>@KPMGCommon:ShowAll</Label>
+						<LabelPosition>Above</LabelPosition>
+					</AxFormControl>
+				</Controls>
+				<ArrangeMethod>HorizontalLeft</ArrangeMethod>
+				<FrameType>None</FrameType>
+				<Style>CustomFilter</Style>
+				<ViewEditMode>Edit</ViewEditMode>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGridControl">
+				<Name>FormGridControl1</Name>
+				<Type>Grid</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_InvoiceYear</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>InvoiceYear</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormIntegerControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_NumLine</Name>
+						<Type>Integer</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>NumLine</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_NumFact5</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>NumFact5</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_InvoiceId</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>InvoiceId</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_InvoiceDate</Name>
+						<Type>Date</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>InvoiceDate</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_TipoVenta</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>TipoVenta</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_DescTV</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>DescTV</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_CContable</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>CContable</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_CustomerId</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>CustomerId</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_Cif</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>Cif</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_CustomerName</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>CustomerName</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormDateControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_FVencimiento</Name>
+						<Type>Date</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>FVencimiento</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_TaxGroup</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>TaxGroup</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_ItemTaxGroup</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>ItemTaxGroup</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormRealControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_TotalInvoice</Name>
+						<Type>Real</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>TotalInvoice</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormRealControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_NetAmount</Name>
+						<Type>Real</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>NetAmount</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormRealControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_IVA</Name>
+						<Type>Real</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>IVA</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormRealControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_CuotaIVA</Name>
+						<Type>Real</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>CuotaIVA</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormRealControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_PlasticNetAmount</Name>
+						<Type>Real</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>PlasticNetAmount</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormRealControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_PlasticIVA</Name>
+						<Type>Real</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>PlasticIVA</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormRealControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_CuotaPlasticIVA</Name>
+						<Type>Real</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>CuotaPlasticIVA</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormCheckBoxControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_Error</Name>
+						<Type>CheckBox</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>Error</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_DiarioId</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>DiarioId</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormCheckBoxControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_Treated</Name>
+						<Type>CheckBox</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>Treated</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_SalesInvoiceFas5_PaymentMode</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>PaymentMode</DataField>
+						<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+					</AxFormControl>
+				</Controls>
+				<DataSource>KPMGCommon_SalesInvoiceFas5</DataSource>
+				<Style>Tabular</Style>
+			</AxFormControl>
+		</Controls>
+	</Design>
+	<Parts />
+</AxForm>

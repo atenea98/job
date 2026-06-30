@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>SalesEditLines_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(formStr(SalesEditLines))]
+final class SalesEditLines_KPMGCommon_Extension
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>closeOk</Name>
+				<Source><![CDATA[
+    void closeOk()
+    {
+        CompanyInfo         companyInfo;
+
+        next closeOk();
+
+        companyInfo = CompanyInfo::find();
+
+        if(KPMGCommon_PrintDeclarationOfConformityCert.Value() && companyInfo.DataArea == "omt")
+        {
+            FormDataSource      fds = SalesParmTable_ds;
+            SalesParmTable      salesParmtable = fds.cursor() as SalesParmTable;
+            CustPackingSlipJour custPackingSlipJour;
+
+            /*select firstonly custPackingSlipJour
+                order by CreatedDateTime desc
+                where custPackingSlipJour.CreatedBy == curUserId();*/
+
+            custPackingSlipJour = CustPackingSlipJour::findRecId(salesParmtable.CustPackingSlipJour);
+
+            if (custPackingSlipJour.RecId)
+            {
+                Args args = new Args();
+                args.record(custPackingSlipJour);
+
+                KPMGCommon_DeclarationOfConformityERRunner::main(args);
+            }
+        }
+
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

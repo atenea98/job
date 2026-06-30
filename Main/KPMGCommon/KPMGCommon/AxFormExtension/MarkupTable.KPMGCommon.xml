@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>MarkupTable.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlim2ica4p1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormCheckBoxControl">
+				<Name>MarkupTable_KPMGCommon_Scrap</Name>
+				<Type>CheckBox</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_Scrap</DataField>
+				<DataSource>MarkupTable</DataSource>
+			</FormControl>
+			<Parent>DetailsHeader</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>MarkupTable_MCRProRate</PreviousSibling>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

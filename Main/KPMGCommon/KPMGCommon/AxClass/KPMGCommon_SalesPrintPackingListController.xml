@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_SalesPrintPackingListController</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+final class KPMGCommon_SalesPrintPackingListController extends SysOperationServiceController
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super(classStr(KPMGCommon_SalesPrintPackingListService), methodStr(KPMGCommon_SalesPrintPackingListService, process), SysOperationExecutionMode::Synchronous); //¿Qué modo de ejecución queremos?
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>defaultCaption</Name>
+				<Source><![CDATA[
+    public ClassDescription defaultCaption()
+    {
+        return "@KPMGCommon:PackingListPrint"; //Imprimir Packinglist
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static KPMGCommon_SalesPrintPackingListController construct(SysOperationExecutionMode _executionMode = SysOperationExecutionMode::Synchronous)
+    {
+        KPMGCommon_SalesPrintPackingListController controller;
+        controller = new KPMGCommon_SalesPrintPackingListController();
+        controller.parmExecutionMode(_executionMode);
+        controller.parmShowDialog(false);
+        return controller;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main (Args _args)
+    {
+        KPMGCommon_SalesPrintPackingListContract   contract;
+        KPMGCommon_SalesPrintPackingListController controller;
+        CustPackingSlipJour                             custPackingSlipJour;
+
+        controller = KPMGCommon_SalesPrintPackingListController::construct();
+        controller.parmArgs(_args);
+        custPackingSlipJour = _args.record();
+        contract = controller.getDataContractObject();
+        contract.parmCustPackingSlipJour(custPackingSlipJour);
+        controller.startOperation();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

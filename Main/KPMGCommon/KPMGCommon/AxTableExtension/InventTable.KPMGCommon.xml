@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTableExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>InventTable.KPMGCommon</Name>
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>KPMGCommon_LocProfileId</Name>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>WHSLocProfileId</ExtendedDataType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>KPMGCommon_AssignmentIntelligentLicensePlateCode</Name>
+			<ExtendedDataType>KPMGCommon_AssignmentIntelligentLicensePlateCode</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>KPMGCommon_PendienteActualizarKaytek</Name>
+			<Label>@KPMGCommon:PendingUpdateKaytek</Label>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes />
+	<Mappings />
+	<PropertyModifications />
+	<RelationExtensions />
+	<RelationModifications />
+	<Relations>
+		<AxTableRelation>
+			<Name>WHSLocationProfile</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<OnDelete>Restricted</OnDelete>
+			<RelatedTable>WHSLocationProfile</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<RelationshipType>Aggregation</RelationshipType>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>KPMGCommon_LocProfileId</Name>
+					<SourceEDT>WHSLocProfileId</SourceEDT>
+					<Field>KPMGCommon_LocProfileId</Field>
+					<RelatedField>LocProfileId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+		</AxTableRelation>
+	</Relations>
+</AxTableExtension>

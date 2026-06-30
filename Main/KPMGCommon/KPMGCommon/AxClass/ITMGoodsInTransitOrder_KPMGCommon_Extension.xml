@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>ITMGoodsInTransitOrder_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(ITMGoodsInTransitOrder))]
+final class ITMGoodsInTransitOrder_KPMGCommon_Extension
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>insert</Name>
+				<Source><![CDATA[
+    public void insert(NoYes _dropEstimated, NoYes _updateReservation)
+    {
+        this.KPMGCommon_PendienteActualizarKaytek = true;
+        next insert(_dropEstimated, _updateReservation);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>update</Name>
+				<Source><![CDATA[
+    void update(NoYes _dropEstimated, NoYes _updateReservation)
+    {
+        ITMGoodsInTransitOrder ITMGoodsInTransitOrder = this.orig();
+
+        if (ITMGoodsInTransitOrder.KPMGCommon_PendienteActualizarKaytek == false)
+        {
+            this.KPMGCommon_PendienteActualizarKaytek = true;
+        }
+        next update(_dropEstimated,_updateReservation);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

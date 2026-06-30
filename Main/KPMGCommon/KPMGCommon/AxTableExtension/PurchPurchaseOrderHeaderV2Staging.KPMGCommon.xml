@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTableExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>PurchPurchaseOrderHeaderV2Staging.KPMGCommon</Name>
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>InterCompanyAllowIndirectCreation</Name>
+			<AllowEdit>No</AllowEdit>
+			<AllowEditOnCreate>No</AllowEditOnCreate>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>InterCompanyAllowIndirectCreation</ExtendedDataType>
+			<Visible>No</Visible>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InterCompanyCompanyId</Name>
+			<AllowEdit>No</AllowEdit>
+			<AllowEditOnCreate>No</AllowEditOnCreate>
+			<AssetClassification>Customer Content </AssetClassification>
+			<ExtendedDataType>InterCompanyCompanyId</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InterCompanyCustPurchOrderFormNum</Name>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>CustPurchaseOrder</ExtendedDataType>
+			<Label>@SCM:InterCompanyCustomerRequisition</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>InterCompanyDirectDelivery</Name>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>InterCompanyDirectDelivery</ExtendedDataType>
+			<Label>@InterCompany:InterCompanyDirectDelivery</Label>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>InterCompanyOrder</Name>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>InterCompanyVendor</ExtendedDataType>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>InterCompanyOrigin</Name>
+			<AllowEdit>No</AllowEdit>
+			<AllowEditOnCreate>No</AllowEditOnCreate>
+			<AssetClassification>Customer Content</AssetClassification>
+			<Visible>No</Visible>
+			<EnumType>InterCompanyOrigin</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InterCompanyOriginalCustAccount</Name>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>InterCompanyOriginalCustAccount</ExtendedDataType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InterCompanyOriginalSalesId</Name>
+			<AllowEdit>No</AllowEdit>
+			<AllowEditOnCreate>No</AllowEditOnCreate>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>InterCompanyOriginalSalesId</ExtendedDataType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InterCompanySalesId</Name>
+			<AllowEdit>No</AllowEdit>
+			<AllowEditOnCreate>No</AllowEditOnCreate>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>InterCompanySalesId</ExtendedDataType>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes />
+	<Mappings />
+	<PropertyModifications />
+	<RelationExtensions />
+	<RelationModifications />
+	<Relations />
+</AxTableExtension>

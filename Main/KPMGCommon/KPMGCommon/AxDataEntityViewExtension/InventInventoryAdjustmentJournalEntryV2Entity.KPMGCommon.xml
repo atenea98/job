@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxDataEntityViewExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>InventInventoryAdjustmentJournalEntryV2Entity.KPMGCommon</Name>
+	<DataSources />
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>SystemBlocked</Name>
+			<DataField>SystemBlocked</DataField>
+			<DataSource>InventJournalTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>BlockUserId</Name>
+			<DataField>BlockUserId</DataField>
+			<DataSource>InventJournalTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>BlockUserGroupId</Name>
+			<DataField>BlockUserGroupId</DataField>
+			<DataSource>InventJournalTable</DataSource>
+		</AxDataEntityViewField>
+	</Fields>
+	<Mappings />
+	<PropertyModifications />
+	<Relations />
+</AxDataEntityViewExtension>

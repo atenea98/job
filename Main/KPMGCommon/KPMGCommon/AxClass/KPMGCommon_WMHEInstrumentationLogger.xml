@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_WMHEInstrumentationLogger</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// Provides activities and activity contexts for material handling equipment interface instrumentation logging.
+/// </summary>
+final internal class KPMGCommon_WMHEInstrumentationLogger extends SysInstrumentationLoggerBase
+{
+    private const str InstrumentationNamespace = 'MaterialHandlingEquipmentInterface';
+    private KPMGCommon_WMHEInboundActionInstrumentationActivities activities;
+    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+        protected void new(str _name)
+    {
+        super(_name);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>namespace</Name>
+				<Source><![CDATA[
+    protected final str namespace()
+    {
+        return InstrumentationNamespace;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>logRecordInformation</Name>
+				<Source><![CDATA[
+    final internal void logRecordInformation(Common _common)
+    {
+        logger.logInformation(strFmt('%1:%2', tableId2Name(_common.TableId), _common.RecId));
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createLogger</Name>
+				<Source><![CDATA[
+    internal static KPMGCommon_WMHEInstrumentationLogger createLogger(str _name)
+    {
+        return new KPMGCommon_WMHEInstrumentationLogger(_name);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>inboundAction</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Provides access to the set of inbound action activities.
+    /// </summary>
+    /// <returns>
+    /// The <c>WMHEOutboundPublishInstrumentationActivities</c> activity object.
+    /// </returns>
+    public KPMGCommon_WMHEInboundActionInstrumentationActivities inboundAction()
+    {
+        if (!activities)
+        {
+            activities = KPMGCommon_WMHEInboundActionInstrumentationActivities::newFromLogger(this);
+        }
+
+        return activities;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

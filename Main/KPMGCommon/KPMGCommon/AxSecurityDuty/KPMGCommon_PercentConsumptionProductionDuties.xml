@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxSecurityDuty xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_PercentConsumptionProductionDuties</Name>
+	<Label>@KPMGCommon:PercentageConsumptionProduction</Label>
+	<Privileges>
+		<AxSecurityPrivilegeReference>
+			<Name>KPMGCommon_PercentConsumptionProductionMaintain</Name>
+		</AxSecurityPrivilegeReference>
+		<AxSecurityPrivilegeReference>
+			<Name>KPMGCommon_PercentConsumptionProductionView</Name>
+		</AxSecurityPrivilegeReference>
+	</Privileges>
+</AxSecurityDuty>

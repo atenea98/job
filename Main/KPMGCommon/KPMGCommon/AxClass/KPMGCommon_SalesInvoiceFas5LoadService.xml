@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_SalesInvoiceFas5LoadService</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class KPMGCommon_SalesInvoiceFas5LoadService extends SysOperationServiceBase
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>process</Name>
+				<Source><![CDATA[
+    public void process(KPMGCommon_SalesInvoiceFas5LoadContract _contract)
+    {
+        List ledgerJournalsCreated = new List(Types::String);
+
+        KPMGCommon_SalesInvoiceFas5LoadService::validateSalesInvoiceFas5Table(false, ledgerJournalsCreated);
+        if ( _contract.parmPostJournals())
+        {
+
+            KPMGCommon_SalesInvoiceFas5LoadService::postJournals(ledgerJournalsCreated);
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateSalesInvoiceFas5Table</Name>
+				<Source><![CDATA[
+    public static void validateSalesInvoiceFas5Table(boolean onlyValidate, List ledgerJournalsCreated)
+    {
+        KPMGCommon_SalesInvoiceFas5 _SalesInvoiceFas5;
+        KPMGCommon_SalesInvoiceFas5Error salesInvoiceFas5Error;
+        CustTable custTable;
+        CustInvoiceJour custInvoiceJour;
+        CustPaymModeTable custPaymModeTable;
+        TaxGroupHeading taxGroupHeading;
+        TaxItemGroupHeading taxItemGroupHeading;
+        CustParameters custParameters;
+        TaxTable taxTable;
+
+        boolean invoiceError = false;
+        String20 invoiceId;
+
+        while select _SalesInvoiceFas5
+            order by InvoiceId
+            where !_SalesInvoiceFas5.Treated
+        {
+            try
+            {
+                //Al cambiar de factura, si alguna línea da error, se cambia a error todas las lineas
+                if (_SalesInvoiceFas5.InvoiceId != invoiceId)
+                {
+                    //Revisamos si ha habido errores en la factura anterior
+                    KPMGCommon_SalesInvoiceFas5LoadService::checkErrorInInvoice(invoiceError, invoiceId, onlyValidate, ledgerJournalsCreated);
+                    //Si la siguiente factura tiene errores, se eliminan para actualizarlos
+                    while select forupdate salesInvoiceFas5Error where salesInvoiceFas5Error.RefRecId == _SalesInvoiceFas5.RecId
+                    {
+                        ttsbegin;
+                        salesInvoiceFas5Error.delete();
+                        ttscommit;
+                    }
+                    invoiceId = _SalesInvoiceFas5.InvoiceId;
+                    invoiceError = false;
+                }
+
+                //Validación #1 - CustomerId existe en F&O
+                custTable = CustTable::find(_SalesInvoiceFas5.CustomerId, false);
+                if (!custTable)
+                {
+                    KPMGCommon_SalesInvoiceFas5LoadService::createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorCustomerId",_SalesInvoiceFas5.CustomerId));
+                    invoiceError = true;
+                }
+
+                //Validación #2 - No existe ya una factura con el mismo InvoiceId en custInvoiceJour
+                select firstonly custInvoiceJour where _SalesInvoiceFas5.InvoiceId == custInvoiceJour.InvoiceId;
+                if (custInvoiceJour)
+                {
+                    KPMGCommon_SalesInvoiceFas5LoadService::createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    "@KPMGCommon:SalesInvoiceFas5Load_ErrorCustInvoiceJour");
+                    invoiceError = true;
+                }
+                //Validación #3 - Existe la cuenta contable en MainAccount
+                if(!MainAccount::findByMainAccountId(_SalesInvoiceFas5.CContable))
+                {
+                    KPMGCommon_SalesInvoiceFas5LoadService::createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorCustLedgerAccount", _SalesInvoiceFas5.CContable));
+                    invoiceError = true;
+                }
+                //Validación #4 - Existe el modo de pago
+                select firstonly custPaymModeTable where _SalesInvoiceFas5.PaymentMode == custPaymModeTable.PaymMode;
+                if (!custPaymModeTable)
+                {
+                    KPMGCommon_SalesInvoiceFas5LoadService::createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorPaymentMode", _SalesInvoiceFas5.PaymentMode));
+                    invoiceError = true;
+                }
+                //Validación #5 - Existe el grupo de impuestos
+                if (!TaxGroupHeading::find(_SalesInvoiceFas5.TaxGroup))
+                {
+                    KPMGCommon_SalesInvoiceFas5LoadService::createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorTaxGroup", _SalesInvoiceFas5.TaxGroup));
+                    invoiceError = true;
+                }
+                //Validación #6 - Existe el grupo de impuestos de artículo
+                if (!TaxItemGroupHeading::find(_SalesInvoiceFas5.ItemTaxGroup))
+                {
+                    KPMGCommon_SalesInvoiceFas5LoadService::createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorTaxItemGroup", _SalesInvoiceFas5.ItemTaxGroup));
+                    invoiceError = true;
+                }
+                select firstonly custParameters;
+                //Validación #7 - Diario para facturas FAS5 introducido
+                if (custParameters.FAS5Journal == '')
+                {
+                    KPMGCommon_SalesInvoiceFas5LoadService::createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    "@KPMGCommon:SalesInvoiceFas5Load_ErrorFAS5Journal");
+                    invoiceError = true;
+                }
+                //Validación #8 - Cuenta de impuesto al plástico introducida
+                if (custParameters.PlasticTaxAccount == '')
+                {
+                    KPMGCommon_SalesInvoiceFas5LoadService::createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    "@KPMGCommon:SalesInvoiceFas5Load_ErrorPlasticTaxAccount");
+                    invoiceError = true;
+                }
+                //Validación #9 - El porcentaje de impuestos coincide con el generado en D365
+                TaxAmountCur taxAmountCur;
+                taxAmountCur = Tax::calcTaxAmount(_SalesInvoiceFas5.TaxGroup, _SalesInvoiceFas5.ItemTaxGroup,
+                _SalesInvoiceFas5.InvoiceDate, custTable.currencyName(),
+                _SalesInvoiceFas5.NetAmount, TaxModuleType::SalesInvoice);
+
+                //Rango de error entre ambas cantidades
+
+                LedgerParameters ledgerParameters;
+                select firstonly ledgerParameters;
+                TaxAmountCur minValue = taxAmountCur - ledgerParameters.MaxRoundingDifferenceMST;
+                TaxAmountCur maxValue = taxAmountCur + ledgerParameters.MaxRoundingDifferenceMST;
+                
+                if (decRound(_SalesInvoiceFas5.CuotaIVA,2) > maxValue)
+                {
+                    KPMGCommon_SalesInvoiceFas5LoadService::createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorTaxValue", decRound(_SalesInvoiceFas5.CuotaIVA,2), taxAmountCur));
+                    invoiceError = true;
+                }
+                if (decRound(_SalesInvoiceFas5.CuotaIVA,2) < minValue)
+                {
+                    KPMGCommon_SalesInvoiceFas5LoadService::createSalesInvoiceFas5Error(_SalesInvoiceFas5,
+                    strFmt("@KPMGCommon:SalesInvoiceFas5Load_ErrorTaxValue", decRound(_SalesInvoiceFas5.CuotaIVA,2), taxAmountCur));
+                    invoiceError = true;
+                }
+
+            }
+            catch
+            {
+                KPMGCommon_SalesInvoiceFas5LoadService::createSalesInvoiceFas5Error(_SalesInvoiceFas5, infolog.text(infologLine()));
+                invoiceError = true;
+            }
+        }
+        KPMGCommon_SalesInvoiceFas5LoadService::checkErrorInInvoice(invoiceError, invoiceId, onlyValidate, ledgerJournalsCreated); //Se comprueba si la última factura tiene errores
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createSalesInvoiceFas5Error</Name>
+				<Source><![CDATA[
+    private static void createSalesInvoiceFas5Error(KPMGCommon_SalesInvoiceFas5 salesInvoiceFas5, Description1000 ErrorDescription)
+    {
+        KPMGCommon_SalesInvoiceFas5Error salesInvoiceFas5Error;
+
+        salesInvoiceFas5Error.InvoiceId = salesInvoiceFas5.InvoiceId;
+        salesInvoiceFas5Error.CContable = salesInvoiceFas5.CContable;
+        salesInvoiceFas5Error.RefRecId = salesInvoiceFas5.RecId;
+        salesInvoiceFas5Error.RefTableId = salesInvoiceFas5.TableId;
+        salesInvoiceFas5Error.DescriptionError = ErrorDescription;
+        salesInvoiceFas5Error.Corrected = NoYes::No;
+        salesInvoiceFas5Error.Periodo = KPMGCommon_Period::New;
+
+        salesInvoiceFas5Error.insert();
+
+        Message::Add(MessageSeverity::Error, strFmt("@KPMGCommon:SalesInvoiceFas5_ErrorMessage", salesInvoiceFas5.InvoiceId, salesInvoiceFas5.NumLine, ErrorDescription));
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>checkErrorInInvoice</Name>
+				<Source><![CDATA[
+    private static void checkErrorInInvoice(boolean invoiceError, String20 invoiceId, boolean onlyValidate, List ledgerJournalsCreated)
+    {
+        KPMGCommon_SalesInvoiceFas5 salesInvoiceFas5_InvoicesWithError;
+
+        if(invoiceId != '')
+        {
+            if(invoiceError)
+            { 
+                while select forupdate salesInvoiceFas5_InvoicesWithError
+                    where
+                    salesInvoiceFas5_InvoicesWithError.Error == NoYes::No
+                    && salesInvoiceFas5_InvoicesWithError.InvoiceId == invoiceId
+                {
+                    ttsbegin;
+                    salesInvoiceFas5_InvoicesWithError.Error = NoYes::Yes;
+                    salesInvoiceFas5_InvoicesWithError.Update();
+                    ttscommit;
+                }
+            }
+            else
+            {
+                Message::Add(MessageSeverity::Informational, strFmt("@KPMGCommon:SalesInvoiceFas5_ValidateMessage", invoiceId));
+
+                while select forupdate salesInvoiceFas5_InvoicesWithError
+                    where
+                    salesInvoiceFas5_InvoicesWithError.Error == NoYes::Yes
+                    && salesInvoiceFas5_InvoicesWithError.InvoiceId == invoiceId
+                {
+                    ttsbegin;
+                    salesInvoiceFas5_InvoicesWithError.Error = NoYes::No;
+                    salesInvoiceFas5_InvoicesWithError.Update();
+                    ttscommit;
+                }
+
+                if(!onlyValidate)
+                {
+                    KPMGCommon_SalesInvoiceFas5LoadService::generateInvoiceJournal(invoiceId, ledgerJournalsCreated);
+                }
+            }
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>generateInvoiceJournal</Name>
+				<Source><![CDATA[
+    private static void generateInvoiceJournal(String20 invoiceId, List ledgerJournalsCreated)
+    {
+        LedgerJournalTrans ledgerJournalTrans;
+        LedgerJournalTable ledgerJournalTable;
+        LedgerJournalName ledgerJournalName;
+        CustParameters custParameters;
+        KPMGCommon_SalesInvoiceFas5 salesInvoiceFas5;
+        KPMGCommon_SalesInvoiceFas5 salesInvoiceFas5_witherror;
+        LedgerJournalEngine ledgerJournalEngine;
+        Voucher voucher;
+        
+        select firstonly salesInvoiceFas5 
+            order by salesInvoiceFas5.NumLine
+            where salesInvoiceFas5.InvoiceId == invoiceId;
+
+        select firstonly custParameters;
+
+        try
+        {
+            ttsbegin;
+
+            select firstonly ledgerJournalName
+            where ledgerJournalName.JournalName == custParameters.FAS5Journal;
+
+            ledgerJournalTable.clear();
+            ledgerJournalTable.initValue();
+            ledgerJournalTable.JournalName = custParameters.FAS5Journal;
+            ledgerJournalTable.initFromLedgerJournalName();
+            ledgerJournalTable.JournalNum = JournalTableData::newTable(ledgerJournalTable).nextJournalId();
+            ledgerJournalTable.Name = strFmt("%1", ledgerJournalTable.JournalNum);
+            ledgerJournalTable.insert();
+
+            if (ledgerJournalTable.RecId)
+            {
+                voucher = new JournalVoucherNum(JournalTableData::newTable(ledgerJournalTable)).getNew(false);
+
+                ledgerJournalEngine = LedgerJournalEngine::construct(ledgerJournalTable.JournalType);
+                ledgerJournalEngine.newJournalActive(ledgerJournalTable);
+
+                //Se genera la primera línea con total a cliente
+                ledgerJournalTrans.clear();
+                ledgerJournalTrans.initValue();
+                ledgerJournalTrans.initFromLedgerJournalTable_LT(ledgerJournalTable);
+                ledgerJournalTrans.JournalNum = ledgerJournalTable.JournalNum;
+                ledgerJournalTrans.Voucher = voucher;
+                ledgerJournalTrans.LineNum = LedgerJournalTrans::lastLineNum(ledgerJournalTrans.JournalNum);
+                ledgerJournalTrans.CurrencyCode = CustTable::find(salesInvoiceFas5.CustomerId).Currency;
+                ledgerJournalTrans.TransDate = salesInvoiceFas5.InvoiceDate;
+                ledgerJournalTrans.TransactionType = LedgerTransType::GeneralJournal;
+                ledgerJournalTrans.Approved = true;
+                ledgerJournalTrans.AccountType = LedgerJournalACType::Cust;
+                ledgerjournalTrans.LedgerDimension = LedgerDynamicAccountHelper::getDynamicAccountFromAccountNumber
+                (salesInvoiceFas5.CustomerId, LedgerJournalACType::Cust);
+                ledgerJournalTrans.modifiedField(fieldNum(LedgerJournalTrans, LedgerDimension));
+                ledgerJournalEngine.accountModified(ledgerJournalTrans);
+
+
+                ledgerjournalTrans.VATNumJournal = CustTable::find(salesInvoiceFas5.CustomerId).VATNum;
+
+                if (salesInvoiceFas5.TotalInvoice > 0)
+                {
+                    ledgerJournalTrans.AmountCurDebit = abs(salesInvoiceFas5.TotalInvoice);
+                }
+                if (salesInvoiceFas5.TotalInvoice < 0)
+                {
+                    ledgerJournalTrans.AmountCurCredit = abs(salesInvoiceFas5.TotalInvoice);
+                }
+                ledgerJournalTrans.TaxGroup = salesInvoiceFas5.TaxGroup;
+                ledgerJournalTrans.Invoice = salesInvoiceFas5.InvoiceId;
+                ledgerJournalTrans.DocumentDate = salesInvoiceFas5.InvoiceDate;
+                ledgerJournalTrans.Due = salesInvoiceFas5.FVencimiento;
+                ledgerJournalTrans.PaymMode = salesInvoiceFas5.PaymentMode;
+
+                ledgerJournalTrans.insert();
+                ledgerJournalEngine.write(ledgerJournalTrans);
+
+                while select forupdate salesInvoiceFas5
+            order by salesInvoiceFas5.NumLine
+            where salesInvoiceFas5.InvoiceId == invoiceId
+                {
+                    ledgerJournalTrans.clear();
+                    ledgerJournalTrans.initValue();
+                    ledgerJournalTrans.initFromLedgerJournalTable_LT(ledgerJournalTable);
+                    ledgerJournalTrans.JournalNum = ledgerJournalTable.JournalNum;
+                    ledgerJournalTrans.Voucher = voucher;
+                    ledgerJournalTrans.LineNum = LedgerJournalTrans::lastLineNum(ledgerJournalTrans.JournalNum);
+                    ledgerJournalTrans.CurrencyCode = CustTable::find(salesInvoiceFas5.CustomerId).Currency;
+                    ledgerJournalTrans.TransDate = salesInvoiceFas5.InvoiceDate;
+                    ledgerJournalTrans.TransactionType = LedgerTransType::GeneralJournal;
+                    ledgerJournalTrans.AccountType = LedgerJournalACType::Ledger;
+                    ledgerJournalTrans.Approved = true;
+
+
+                    Array  acctDimAttrArray                     = new Array(Types::String);
+                    acctDimAttrArray.value(1,"MainAccount");
+
+                    Array acctDimArray                          = new Array(Types::String);
+                    acctDimArray.value(1, salesInvoiceFas5.CContable);
+
+                    DefaultDimensionIntegrationValues DefaultDimensionIntegrationValues   = DimensionResolver::getEntityDisplayValue
+                    (acctDimAttrArray, acctDimArray, extendedTypeStr(DimensionDynamicAccount), LedgerJournalACType::Ledger);
+                    DimensionDynamicAccountResolver DimensionDynamicAccountResolver     = DimensionDynamicAccountResolver::newResolver
+                    (DefaultDimensionIntegrationValues, LedgerJournalACType::Ledger, curExt());
+                    ledgerjournalTrans.LedgerDimension = DimensionDynamicAccountResolver.resolve();
+                    ledgerJournalTrans.modifiedField(fieldNum(LedgerJournalTrans, LedgerDimension));
+                    ledgerJournalEngine.accountModified(ledgerJournalTrans);
+
+
+                    ledgerjournalTrans.OffsetAccountType = LedgerJournalACType::Ledger;
+ 
+                    if (salesInvoiceFas5.NetAmount < 0)
+                    {
+                        ledgerJournalTrans.AmountCurDebit = abs(salesInvoiceFas5.NetAmount + salesInvoiceFas5.CuotaIVA);
+                    }
+                    if (salesInvoiceFas5.NetAmount > 0)
+                    {
+                        ledgerJournalTrans.AmountCurCredit = abs(salesInvoiceFas5.NetAmount + salesInvoiceFas5.CuotaIVA);
+                    }
+                    ledgerJournalTrans.TaxGroup = salesInvoiceFas5.TaxGroup;
+                    ledgerJournalTrans.TaxItemGroup = salesInvoiceFas5.ItemTaxGroup;
+                    ledgerJournalTrans.Invoice = salesInvoiceFas5.InvoiceId;
+                    ledgerJournalTrans.DocumentDate = salesInvoiceFas5.InvoiceDate;
+                    ledgerJournalTrans.Due = salesInvoiceFas5.FVencimiento;
+
+                    ledgerJournalTrans.insert();
+                    ledgerJournalEngine.write(ledgerJournalTrans);
+
+
+                    if(salesInvoiceFas5.PlasticNetAmount != 0)
+                    {
+                        ledgerJournalTrans.clear();
+                        ledgerJournalTrans.initValue();
+                        ledgerJournalTrans.initFromLedgerJournalTable_LT(ledgerJournalTable);
+                        ledgerJournalTrans.JournalNum = ledgerJournalTable.JournalNum;
+                        LedgerJournalTrans.Voucher = voucher;
+                        ledgerJournalTrans.LineNum = LedgerJournalTrans::lastLineNum(ledgerJournalTrans.JournalNum);
+                        ledgerJournalTrans.CurrencyCode = CustTable::find(salesInvoiceFas5.CustomerId).Currency;
+                        ledgerJournalTrans.TransactionType = LedgerTransType::GeneralJournal;
+                        ledgerJournalTrans.Approved = true;
+                        ledgerJournalTrans.TransDate = salesInvoiceFas5.InvoiceDate;
+                        ledgerJournalTrans.AccountType = LedgerJournalACType::Ledger;
+
+                        acctDimAttrArray                     = new Array(Types::String);
+                        acctDimAttrArray.value(1,"MainAccount");
+
+                        acctDimArray                          = new Array(Types::String);
+                        acctDimArray.value(1, custParameters.PlasticTaxAccount);
+
+                        DefaultDimensionIntegrationValues   = DimensionResolver::getEntityDisplayValue
+                        (acctDimAttrArray, acctDimArray, extendedTypeStr(DimensionDynamicAccount), LedgerJournalACType::Ledger);
+                        DimensionDynamicAccountResolver     = DimensionDynamicAccountResolver::newResolver
+                        (DefaultDimensionIntegrationValues, LedgerJournalACType::Ledger, curExt());
+                        ledgerjournalTrans.LedgerDimension = DimensionDynamicAccountResolver.resolve();
+                        ledgerJournalTrans.modifiedField(fieldNum(LedgerJournalTrans, LedgerDimension));
+                        ledgerJournalEngine.accountModified(ledgerJournalTrans);
+
+
+                        ledgerjournalTrans.OffsetAccountType = LedgerJournalACType::Ledger;
+
+
+                        if (salesInvoiceFas5.PlasticNetAmount < 0)
+                        {
+                            ledgerJournalTrans.AmountCurDebit = abs(salesInvoiceFas5.PlasticNetAmount + salesInvoiceFas5.CuotaPlasticIVA);
+                        }
+                        if (salesInvoiceFas5.PlasticNetAmount > 0)
+                        {
+                            ledgerJournalTrans.AmountCurCredit = abs(salesInvoiceFas5.PlasticNetAmount + salesInvoiceFas5.CuotaPlasticIVA);
+                        }
+                        ledgerJournalTrans.TaxGroup = salesInvoiceFas5.TaxGroup;
+                        ledgerJournalTrans.TaxItemGroup = salesInvoiceFas5.ItemTaxGroup;
+
+                        ledgerJournalTrans.Invoice = salesInvoiceFas5.InvoiceId;
+                        ledgerJournalTrans.DocumentDate = salesInvoiceFas5.InvoiceDate;
+                        ledgerJournalTrans.Due = salesInvoiceFas5.FVencimiento;
+
+                        ledgerJournalTrans.insert();
+                        ledgerJournalEngine.write(ledgerJournalTrans);
+
+                    }
+
+                    //Se introduce el id del diario en los registros de Fas5
+                    salesInvoiceFas5.DiarioId = ledgerJournalTable.JournalNum;
+                    salesInvoiceFas5.Treated = true;
+                    salesInvoiceFas5.Error = false;
+                    salesInvoiceFas5.update();
+                }
+
+                ledgerJournalsCreated.addEnd(ledgerJournalTable.JournalNum);
+
+            }
+            ttscommit;
+        }
+        catch
+        {
+            KPMGCommon_SalesInvoiceFas5LoadService::journalError(ledgerJournalTable, invoiceId);
+        }    
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>postJournals</Name>
+				<Source><![CDATA[
+    private static void postJournals(List ledgerJournalsCreated)
+    {
+        ListEnumerator enumerator = ledgerJournalsCreated.getEnumerator();
+        LedgerJournalTable ledgerJournalTable;
+
+        while (enumerator.moveNext())
+        {
+            try
+            {
+                LedgerJournalCheckPost jourPost;
+                jourPost = LedgerJournalCheckPost::newLedgerJournalTable(ledgerJournalTable::find(enumerator.current()), NoYes::Yes);
+                jourPost.runOperation();
+            }
+            catch
+            {
+                KPMGCommon_SalesInvoiceFas5LoadService::journalError(ledgerJournalTable::find(enumerator.current(), true), '');
+            }
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>journalError</Name>
+				<Source><![CDATA[
+    private static void journalError(LedgerJournalTable ledgerJournalTable, String20 invoiceId)
+    {
+        KPMGCommon_SalesInvoiceFas5 salesInvoiceFas5_witherror;
+
+        //Error a la hora de generar una linea de una factura
+        if(ledgerJournalTable)
+        {
+            while select forupdate salesInvoiceFas5_witherror where salesInvoiceFas5_witherror.InvoiceId == invoiceId || salesInvoiceFas5_witherror.DiarioId == ledgerJournalTable.JournalNum
+            {
+                ttsbegin;
+                salesInvoiceFas5_witherror.Error = true;
+                salesInvoiceFas5_witherror.Treated = false;
+                salesInvoiceFas5_witherror.DiarioId = '';
+                salesInvoiceFas5_witherror.update();
+                ttscommit;
+            }
+            KPMGCommon_SalesInvoiceFas5LoadService::createSalesInvoiceFas5Error(salesInvoiceFas5_witherror, infolog.text(infologLine()));
+
+            ttsbegin;
+            LedgerJournalTrans::deleteChildrenForLedgerJournalTable(ledgerJournalTable);
+            ledgerJournalTable.delete();
+            ttscommit;
+        }  
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

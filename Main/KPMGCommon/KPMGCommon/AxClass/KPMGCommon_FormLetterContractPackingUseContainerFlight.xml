@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_FormLetterContractPackingUseContainerFlight</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+final class KPMGCommon_FormLetterContractPackingUseContainerFlight extends Flight
+{
+    private static KPMGCommon_FormLetterContractPackingUseContainerFlight singleton = new KPMGCommon_FormLetterContractPackingUseContainerFlight();
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>isEnabledByDefault</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    protected boolean isEnabledByDefault()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>instance</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    public static KPMGCommon_FormLetterContractPackingUseContainerFlight instance()
+    {
+        return singleton;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

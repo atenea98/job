@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>CustParameters.KPMGCommon1</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlhm3xjmzu1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormStringControl">
+				<Name>FAS5Journal</Name>
+				<Type>String</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>FAS5Journal</DataField>
+				<DataSource>CustParameters</DataSource>
+			</FormControl>
+			<Parent>LedgerVATGeneralTabPage</Parent>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlagcuhokk1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormStringControl">
+				<Name>PlasticTaxAccount</Name>
+				<Type>String</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>PlasticTaxAccount</DataField>
+				<DataSource>CustParameters</DataSource>
+			</FormControl>
+			<Parent>LedgerVATGeneralTabPage</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

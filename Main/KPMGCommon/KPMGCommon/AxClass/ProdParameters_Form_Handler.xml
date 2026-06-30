@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>ProdParameters_Form_Handler</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class ProdParameters_Form_Handler
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>GridKPMGCommon_AutomaticOrderCreationParameters_ItemId_OnLookup</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    [FormControlEventHandler(formControlStr(ProdParameters, GridKPMGCommon_AutomaticOrderCreationParameters_ItemId), FormControlEventType::Lookup)]
+    public static void GridKPMGCommon_AutomaticOrderCreationParameters_ItemId_OnLookup(FormControl sender, FormControlEventArgs e)
+    {
+        InventTable::lookupFormulaItemId(sender);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>GridKPMGCommon_AutomaticOrderCreationParameters_FormulaId_OnLookup</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    [FormControlEventHandler(formControlStr(ProdParameters, GridKPMGCommon_AutomaticOrderCreationParameters_FormulaId), FormControlEventType::Lookup)]
+    public static void GridKPMGCommon_AutomaticOrderCreationParameters_FormulaId_OnLookup(FormControl sender, FormControlEventArgs e)
+    {
+        KPMGCommon_AutomaticOrderCreationParameters automaticOrderCreationParameters = sender.dataSourceObject().cursor();
+        InventTable                                 inventTable = InventTable::find(automaticOrderCreationParameters.itemId);
+        InventDim                                   inventDim;
+
+        inventDim.initFromInventTable(inventTable,
+                                      InventItemOrderSetupType::Invent,
+                                      null);
+
+        if (inventTable.isFormulaAllowed())
+        {
+            InventTable::lookupFormulaId(sender, automaticOrderCreationParameters.ItemId,inventDim);
+        }
+        else
+        {
+            InventTable::lookupBOMId(sender, automaticOrderCreationParameters.ItemId, inventDim, true, false);
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>GridKPMGCommon_AutomaticOrderCreationParameters_RouteId_OnLookup</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    [FormControlEventHandler(formControlStr(ProdParameters, GridKPMGCommon_AutomaticOrderCreationParameters_RouteId), FormControlEventType::Lookup)]
+    public static void GridKPMGCommon_AutomaticOrderCreationParameters_RouteId_OnLookup(FormControl sender, FormControlEventArgs e)
+    {
+        KPMGCommon_AutomaticOrderCreationParameters automaticOrderCreationParameters = sender.dataSourceObject().cursor();
+        InventTable                                 inventTable = InventTable::find(automaticOrderCreationParameters.itemId);
+        InventDim                                   inventDim;
+
+        inventDim.initFromInventTable(inventTable,
+                                    InventItemOrderSetupType::Invent,
+                                    null);
+
+        InventTable::lookupRouteId(sender, automaticOrderCreationParameters.ItemId, inventDim, true, false);
+        
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

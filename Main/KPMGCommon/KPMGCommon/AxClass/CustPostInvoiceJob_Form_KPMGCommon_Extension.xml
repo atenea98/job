@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>CustPostInvoiceJob_Form_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(formStr(CustPostInvoiceJob))]
+final class CustPostInvoiceJob_Form_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>closeOk</Name>
+				<Source><![CDATA[
+    public void closeOk()
+    {
+        CustPostInvoiceJob custPostInvoiceJob  = this.args().caller().runbase();
+        
+        custPostInvoiceJob.KPMGCommon_initInvoiceObservation(KPMGCommon_InvoiceObservation.valueStr());
+        
+        next closeOK();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

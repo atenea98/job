@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>CustParameters.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>Copy4cgsmrcu1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormTabPageControl">
+				<Name>KPMGCommon_TabSalesPrintFormats</Name>
+				<Type>TabPage</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormGroupControl">
+						<Name>KPMGCommon_SalesPrintFormatsTitle</Name>
+						<Skip>Yes</Skip>
+						<Type>Group</Type>
+						<WidthMode>SizeToAvailable</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormStaticTextControl">
+								<Name>KPMGCommon_SalesPrintFormatsTitleText</Name>
+								<Skip>Yes</Skip>
+								<Type>StaticText</Type>
+								<WidthMode>SizeToAvailable</WidthMode>
+								<FormControlExtension
+									i:nil="true" />
+								<Style>MainInstruction</Style>
+								<Text>@KPMGCommon:SalesPrintFormats</Text>
+							</AxFormControl>
+						</Controls>
+						<AllowUserSetup>No</AllowUserSetup>
+						<FrameType>None</FrameType>
+						<Style>TOCTitleContainer</Style>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormTabControl">
+						<Name>KPMGCommon_SalesPrintFormatsTabs</Name>
+						<Type>Tab</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormTabPageControl">
+								<Name>KPMGCommon_SalesPrintFormats</Name>
+								<Pattern>FieldsFieldGroups</Pattern>
+								<PatternVersion>1.1</PatternVersion>
+								<Type>TabPage</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<Controls>
+									<AxFormControl xmlns=""
+										i:type="AxFormGroupControl">
+										<Name>KPMGCommon_SalesPrintFormats1</Name>
+										<Type>Group</Type>
+										<FormControlExtension
+											i:nil="true" />
+										<Controls>
+											<AxFormControl xmlns=""
+												i:type="AxFormReferenceGroupControl">
+												<Name>KPMGCommon_SalesPrintFormats1_KPMGCommon_ERFormatPackingListId</Name>
+												<Type>ReferenceGroup</Type>
+												<FormControlExtension
+													i:nil="true" />
+												<Controls />
+												<DataSource>SalesParameters</DataSource>
+												<ReferenceField>KPMGCommon_ERFormatPackingListId</ReferenceField>
+											</AxFormControl>
+											<AxFormControl xmlns=""
+												i:type="AxFormReferenceGroupControl">
+												<Name>KPMGCommon_SalesPrintFormats1_KPMGCommon_ERFormatWaybillId</Name>
+												<Type>ReferenceGroup</Type>
+												<FormControlExtension
+													i:nil="true" />
+												<Controls />
+												<DataSource>SalesParameters</DataSource>
+												<ReferenceField>KPMGCommon_ERFormatWaybillId</ReferenceField>
+											</AxFormControl>
+										</Controls>
+										<DataGroup>KPMGCommon_SalesPrintFormats</DataGroup>
+										<DataSource>SalesParameters</DataSource>
+									</AxFormControl>
+								</Controls>
+								<ColumnsMode>Fill</ColumnsMode>
+								<Caption>@SYS105419</Caption>
+							</AxFormControl>
+						</Controls>
+						<Style>FastTabs</Style>
+					</AxFormControl>
+				</Controls>
+				<Caption>@KPMGCommon:SalesPrintFormats</Caption>
+			</FormControl>
+			<Parent>Tab</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

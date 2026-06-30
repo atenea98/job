@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxMenuItemAction xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V1">
+	<Name>KPMGCommon_PrinterWHSLicensePlateLabels</Name>
+	<ConfigurationKey>WHSandTMS</ConfigurationKey>
+	<CreatePermissions>No</CreatePermissions>
+	<DeletePermissions>No</DeletePermissions>
+	<Label>@SYS920</Label>
+	<MaintainUserLicense>Universal</MaintainUserLicense>
+	<Object>KPMGCommon_PrinterWHSLicensePlateLabels</Object>
+	<ObjectType>Class</ObjectType>
+	<ReadPermissions>Yes</ReadPermissions>
+	<SubscriberAccessLevel>
+		<Read xmlns="">Allow</Read>
+	</SubscriberAccessLevel>
+</AxMenuItemAction>

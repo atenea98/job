@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>TMSAccessorialAssignment.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlk4k4xnya1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormCheckBoxControl">
+				<Name>TMSAccessorialAssignment_KPMGCommon_NegativeFuelOilPercentage</Name>
+				<AutoDeclaration>Yes</AutoDeclaration>
+				<Type>CheckBox</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_NegativeFuelOilPercentage</DataField>
+				<DataSource>TMSAccessorialAssignment</DataSource>
+			</FormControl>
+			<Parent>Calculation</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>TMSAccessorialAssignment_Percent</PreviousSibling>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

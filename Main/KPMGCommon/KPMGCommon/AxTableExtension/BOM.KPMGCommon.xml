@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTableExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>BOM.KPMGCommon</Name>
+	<FieldGroupExtensions>
+		<AxTableFieldGroupExtension>
+			<Name>Consumption</Name>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>KPMGCommon_PercentConsumption</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroupExtension>
+	</FieldGroupExtensions>
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>KPMGCommon_PercentConsumption</Name>
+			<ExtendedDataType>KPMGCommon_PercentConsumption</ExtendedDataType>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes />
+	<Mappings />
+	<PropertyModifications />
+	<RelationExtensions />
+	<RelationModifications />
+	<Relations />
+</AxTableExtension>

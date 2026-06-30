@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_TestTrazability</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class KPMGCommon_TestTrazability
+{
+
+    /// <summary>
+    /// Class entry point. The system will call this method when a designated menu 
+    /// is selected or when execution starts and this class is set as the startup class.
+    /// </summary>
+    /// <param name = "_args">The specified arguments.</param>
+    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        Dialog _dialog;
+        DialogField _field;
+        ProdId _prodId;
+        
+        _dialog = new Dialog("OF");
+        _field = _dialog.addField(extendedTypeStr(ProdId));
+
+        if(_dialog.run() && _dialog.closedOk())
+        {
+            _prodId = _field.value();
+            if(_prodId)
+            {
+                KPMGCommon_TestTrazability::findRecords(_prodId);
+            }
+;        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>findRecords</Name>
+				<Source><![CDATA[
+    public static void findRecords(ProdId _prodId)
+    {
+        ProdJournalTable prodJournalTable;
+        ProdJournalProd prodJournalProd;
+        ProdJournalProd prodJournalProdLast;
+        ProdJournalBOM prodJournalBOM;
+        ProdJournalTable prodJournalTableBOM;
+        InventTrans inventTrans;
+        InventTransOrigin inventTransOrigin;
+        InventDim inventDim;
+        ProdRouteTransExpanded prodRouteTransExpanded;
+        JournalId       journalId;
+
+        WHSLicensePlateId whsLicencePlateId;
+        InventBatchId inventBatchId;
+
+        while select prodJournalTable
+            order by JournalId desc
+            where prodJournalTable.JournalType == ProdJournalType::ReportFinished
+            && prodJournalTable.ProdId == _prodId
+        {
+            while select prodJournalProd
+                where prodJournalProd.JournalId     == prodJournalTable.JournalId
+                &&  prodJournalProd.ProdId  == _prodId
+                && prodJournalProd.QtyGood
+            {
+                if(!prodJournalProd.inventDim().LicensePlateId &&
+                    !KPMGCommon_TrazabilyItemsAllowed::exist(prodJournalProd.ItemId))
+                {
+                    continue;
+                }
+                
+                if(!journalid)
+                {
+                    journalId = prodJournalProd.JournalId;
+                }
+            
+                if(journalId != prodJournalProd.JournalId)
+                {
+                    //Buscamos diario de tipo Picklist debido a que no se han encontrado los Finished
+                    select firstonly prodJournalTableBOM
+                    order by JournalId desc
+                        where prodJournalTableBOM.ProdId == prodJournalProd.ProdId
+                    && prodJournalTableBOM.JournalType == ProdJournalType::Picklist
+                    && prodJournalTableBOM.JournalId < journalId;
+
+                    if(prodJournalTableBOM.RecId)
+                    {
+                        while select prodJournalBOM
+                        where prodJournalBOM.JournalId == prodJournalTableBOM.JournalId
+                        {
+                            select firstonly inventDim
+                            where inventDim.inventBatchId == prodJournalBOM.inventDim().inventBatchId
+                            join inventTrans
+                            where inventTrans.inventDimId == inventDim.inventDimId
+                            join inventTransOrigin
+                            where inventTransOrigin.RecId == inventTrans.InventTransOrigin
+                            && inventTransOrigin.ReferenceCategory == InventTransType::Purch;
+
+                            KPMGCommon_TestTrazability::insertData(
+                                        KPMGCommon_TrazabilityJournalType::Picklist,
+                                        1,
+                                        whsLicencePlateId,
+                                        prodRouteTransExpanded.WrkCtrId,
+                                        inventBatchId,
+                                        prodJournalBOM.TransDate,
+                                        prodJournalBOM.ItemId,
+                                        prodJournalBOM.BOMConsump,
+                                        prodJournalBOM.BOMUnitId,
+                                        prodJournalBOM.inventDim().InventSiteId,
+                                        prodJournalBOM.inventDim().InventLocationId,
+                                        prodJournalBOM.inventDim().inventBatchId,
+                                        PurchTable::find(inventTransOrigin.ReferenceId).OrderAccount,
+                                        prodJournalBOM.inventDim().wMSLocationId,
+                                        prodJournalBOM.inventDim().InventStatusId,
+                                        prodJournalBOM.inventDim().LicensePlateId,
+                                        "", //Pedido de venta
+                                        "", //Albaran
+                                        "", //Cliente
+                                        prodJournalBOM.JournalId,
+                                        prodJournalBOM.ProdId
+                                        );
+                        }
+                    }
+                    journalId = prodJournalProd.JournalId;
+                }
+                select firstonly prodRouteTransExpanded
+                    where prodRouteTransExpanded.ProdId == _prodId
+                    && prodRouteTransExpanded.OprPriority == RouteOprPriority::Primary;
+
+                KPMGCommon_TestTrazability::insertData(
+                                KPMGCommon_TrazabilityJournalType::ReportFinished,
+                                0,
+                                prodJournalProd.inventDim().LicensePlateId,
+                                prodRouteTransExpanded.WrkCtrId,
+                                prodJournalProd.inventDim().inventBatchId,
+                                prodJournalProd.TransDate,
+                                prodJournalProd.ItemId,
+                                prodJournalProd.QtyGood,
+                                "",//Unidad
+                                prodJournalProd.inventDim().InventSiteId,
+                                prodJournalProd.inventDim().InventLocationId,
+                                prodJournalProd.inventDim().inventBatchId,
+                                "",//Proveedor
+                                prodJournalProd.inventDim().wMSLocationId,
+                                prodJournalProd.inventDim().InventStatusId,
+                                prodJournalProd.inventDim().LicensePlateId,
+                                "", //Pedido de venta
+                                "", //Albaran
+                                "", //Cliente
+                                prodJournalProd.JournalId,
+                                prodJournalProd.ProdId
+                                );
+                whsLicencePlateId = prodJournalProd.inventDim().LicensePlateId;
+                inventBatchId = prodJournalProd.inventDim().inventBatchId;
+
+            }
+                   
+        }
+        //Cuando termina ul ultimo diario de notificado, tenemos que sacar los picking del ultimo
+        if(journalId)
+        {
+            select firstonly prodJournalTableBOM
+                    order by JournalId desc
+                        where prodJournalTableBOM.ProdId == _prodId
+                    && prodJournalTableBOM.JournalType == ProdJournalType::Picklist
+                    && prodJournalTableBOM.JournalId < journalId;
+
+            if(prodJournalTableBOM.RecId)
+            {
+                while select prodJournalBOM
+                        where prodJournalBOM.JournalId == prodJournalTableBOM.JournalId
+                {
+                    select firstonly inventDim
+                            where inventDim.inventBatchId == prodJournalBOM.inventDim().inventBatchId
+                            join inventTrans
+                            where inventTrans.inventDimId == inventDim.inventDimId
+                            join inventTransOrigin
+                            where inventTransOrigin.RecId == inventTrans.InventTransOrigin
+                            && inventTransOrigin.ReferenceCategory == InventTransType::Purch;
+
+                    KPMGCommon_TestTrazability::insertData(
+                                        KPMGCommon_TrazabilityJournalType::Picklist,
+                                        1,
+                                        whsLicencePlateId,
+                                        prodRouteTransExpanded.WrkCtrId,
+                                        inventBatchId,
+                                        prodJournalBOM.TransDate,
+                                        prodJournalBOM.ItemId,
+                                        prodJournalBOM.BOMConsump,
+                                        prodJournalBOM.BOMUnitId,
+                                        prodJournalBOM.inventDim().InventSiteId,
+                                        prodJournalBOM.inventDim().InventLocationId,
+                                        prodJournalBOM.inventDim().inventBatchId,
+                                        PurchTable::find(inventTransOrigin.ReferenceId).OrderAccount,
+                                        prodJournalBOM.inventDim().wMSLocationId,
+                                        prodJournalBOM.inventDim().InventStatusId,
+                                        prodJournalBOM.inventDim().LicensePlateId,
+                                        "", //Pedido de venta
+                                        "", //Albaran
+                                        "", //Cliente
+                                        prodJournalBOM.JournalId,
+                                        prodJournalBOM.ProdId
+                                        );
+                }
+            }
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>insertData</Name>
+				<Source><![CDATA[
+    public static void insertData (
+        KPMGCommon_TrazabilityJournalType _trazabilityJournalType,
+        int _level,
+        WHSLicensePlateId _producedLicensePlateId,
+        WrkCtrIdBase _productionMachine,
+        InventBatchId _producedInventBatchId,
+        DateTimeExecuted _dateTime,
+        ItemId _itemId,
+        Qty _qty,
+        UnitOfMeasureSymbol _unitId,
+        InventSiteId _inventSiteId,
+        InventLocationId _inventLocationId,
+        InventBatchId _inventBatchId,
+        VendAccount _vendAccount,
+        WMSLocationId _wmsLocationId,
+        WHSInventStatusId _whsInventStatusId,
+        WHSLicensePlateId _licensePlateId,
+        SalesId _salesId,
+        PackingSlipId _packingSlipdId,
+        CustAccount _custAccount,
+        JournalId _journalId,
+        ProdId _prodId
+        )
+    {
+        KPMGCommon_Trazability trazabilityTable;
+
+        trazabilityTable.clear();
+
+        trazabilityTable.TrazabilityJournalType = _trazabilityJournalType;
+        trazabilityTable.Level = _level;
+        trazabilityTable.ProducedLicensePlateId = _producedLicensePlateId;
+        trazabilityTable.ProductionMachine = _productionMachine;
+        trazabilityTable.ProducedInventBatchId = _producedInventBatchId;
+        trazabilityTable.DateTime = _dateTime;
+        trazabilityTable.ItemId = _itemId;
+        trazabilityTable.ItemName = InventTable::find(_itemId).itemName();
+        trazabilityTable.Qty = _qty;
+        trazabilityTable.UnitId = _unitId;
+        trazabilityTable.InventSiteId = _inventSiteId;
+        trazabilityTable.InventLocationId = _inventLocationId;
+        trazabilityTable.InventBatchId = _inventBatchId;
+        trazabilityTable.VendAccount = _vendAccount;
+        trazabilityTable.VendName = VendTable::find(_vendAccount).name();
+        trazabilityTable.WMSLocationId = _wmsLocationId;
+        trazabilityTable.WHSInventStatusId = _whsInventStatusId;
+        trazabilityTable.LicensePlateId = _licensePlateId;
+        trazabilityTable.SalesId = _salesId;
+        trazabilityTable.PackingSlipId = _packingSlipdId;
+        trazabilityTable.CustAccount = _custAccount;
+        trazabilityTable.JournalId = _journalId;
+        trazabilityTable.ProdId = _prodId;
+
+        trazabilityTable.insert();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

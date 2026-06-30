@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTableExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>CustParameters.KPMGCommon</Name>
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>FAS5Journal</Name>
+			<Label>@KPMGCommon:SalesInvoiceFas5Journal</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>PlasticTaxAccount</Name>
+			<Label>@KPMGCommon:SalesInvoiceFas5_PlasticTaxAccount</Label>
+			<StringSize>20</StringSize>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes />
+	<Mappings />
+	<PropertyModifications />
+	<RelationExtensions />
+	<RelationModifications />
+	<Relations>
+		<AxTableRelation>
+			<Name>KPMGCommon_LegderJournalName</Name>
+			<RelatedTable>LedgerJournalName</RelatedTable>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>FAS5Journal</Name>
+					<Field>FAS5Journal</Field>
+					<RelatedField>JournalName</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+		</AxTableRelation>
+		<AxTableRelation>
+			<Name>KPMGCommon_MainAccount</Name>
+			<RelatedTable>MainAccount</RelatedTable>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>PlasticTaxAccount</Name>
+					<Field>PlasticTaxAccount</Field>
+					<RelatedField>MainAccountId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+		</AxTableRelation>
+	</Relations>
+</AxTableExtension>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_JobUpdateInventTransIdReceptionJournalLinesKaytekIntegration</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class KPMGCommon_JobUpdateInventTransIdReceptionJournalLinesKaytekIntegration
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Class entry point. The system will call this method when a designated menu 
+    /// is selected or when execution starts and this class is set as the startup class.
+    /// </summary>
+    /// <param name = "_args">The specified arguments.</param>
+    public static void main(Args _args)
+    {
+        Dialog          dialog;
+        DialogField     fieldJournalId;
+        WMSJournalId    journalId;
+        WMSJournalTrans wmsJournalTrans;
+        PurchLine	    purchLine;
+        dialog = new Dialog("Diario de Recepción de Artículos Contabilizados - Modificar lineas sin InventTransId");
+        dialog.addTabPage('General');
+        dialog.addText("Selecciona Número de Diario de Recepción de articulos contabilizado:");
+        fieldJournalId = dialog.addField(extendedTypeStr(WMSJournalId));
+        dialog.run();
+        if (dialog.closedOk())
+        {
+            journalId = fieldJournalId.value();
+            WMSJournalTable wmsJournalTable = WMSJournalTable::find(journalId);
+            if (!wmsJournalTable)
+                throw error("Diario introducido no existe en recepción de articulos.");
+            
+            if (wmsJournalTable.InventTransType != InventTransType::Purch)
+                throw error("Diario introducido no es de recepción de artículos.");
+
+            if (!wmsJournalTable.Posted)
+                throw error("Diario introducido no esta Contabilizado.");
+
+            ttsbegin;
+            While select forupdate wmsJournalTrans
+            where wmsJournalTrans.JournalId == journalId
+                && wmsJournalTrans.InventTransRefId
+                && !wmsJournalTrans.InventTransId
+            {
+                Select firstonly purchLine
+                where purchLine.PurchId == wmsJournalTrans.InventTransRefId
+                    && purchLine.ItemID == wmsJournalTrans.ItemId;
+                if (purchLine)
+                {
+                    wmsJournalTrans.InventTransId = purchLine.InventTransId;
+                    wmsJournalTrans.doUpdate();
+                    info(strFmt("Línea %1 del diario se ha actulizado Id de lote interno por %2 relacionando con pedido de Compra %3 %4.", wmsJournalTrans.lineNum, purchLine.InventTransId, purchLine.PurchId, purchLine.LineNumber));
+                }
+                else
+                {
+                    warning(strFmt("Línea %1 del diario no esta relacionada con pedido de Compra %2 para artículo %3.", wmsJournalTrans.lineNum, wmsJournalTrans.InventTransRefId, wmsJournalTrans.ItemId));
+                }
+            }
+            ttscommit;
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

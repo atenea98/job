@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxDataEntityViewExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>WMSItemArrivalJournalHeaderV2Entity.KPMGCommon</Name>
+	<DataSources />
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>blockUserGroupId</Name>
+			<DataField>blockUserGroupId</DataField>
+			<DataSource>WMSJournalTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>systemBlocked</Name>
+			<DataField>systemBlocked</DataField>
+			<DataSource>WMSJournalTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>blockUserId</Name>
+			<DataField>blockUserId</DataField>
+			<DataSource>WMSJournalTable</DataSource>
+		</AxDataEntityViewField>
+	</Fields>
+	<Mappings />
+	<PropertyModifications />
+	<Relations />
+</AxDataEntityViewExtension>

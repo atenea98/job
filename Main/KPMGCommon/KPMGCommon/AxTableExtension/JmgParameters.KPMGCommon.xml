@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTableExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgParameters.KPMGCommon</Name>
+	<FieldGroupExtensions />
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>KPMGCommon_PrintLabel</Name>
+			<Label>@WAX2247</Label>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>KPMGCommon_PrintCoProductLabel</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>KPMGCommon_WarehouseEntityWHSLicensePlateId_OMT</Name>
+			<Label>@KPMGCommon:WarehouseEntityWHSLicensePlateId_OMT</Label>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>KPMGCommon_AssignmentIntelligentLicensePlateCode</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<FieldModifications />
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>KPMGCommon_PrintCoProductLabel</Name>
+			<ExtendedDataType>KPMGCommon_PrintCoProductLabel</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>KPMGCommon_AssignmentIntelligentLicensePlateCode</Name>
+			<ExtendedDataType>KPMGCommon_AssignmentIntelligentLicensePlateCode</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes />
+	<Mappings />
+	<PropertyModifications />
+	<RelationExtensions />
+	<RelationModifications />
+	<Relations />
+</AxTableExtension>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEnum xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_TrazabilityJournalType</Name>
+	<Label>@KPMGCommon:TrazabilityLedgerType</Label>
+	<UseEnumValue>No</UseEnumValue>
+	<EnumValues>
+		<AxEnumValue>
+			<Name>Blank</Name>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>ReportFinished</Name>
+			<Label>@SYS12772</Label>
+			<Value>2</Value>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>Picklist</Name>
+			<Label>@SYS77805</Label>
+			<Value>3</Value>
+		</AxEnumValue>
+	</EnumValues>
+	<IsExtensible>true</IsExtensible>
+</AxEnum>

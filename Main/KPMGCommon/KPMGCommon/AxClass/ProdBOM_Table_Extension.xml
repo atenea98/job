@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>ProdBOM_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(ProdBOM))]
+final class ProdBOM_Table_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>initFromBOM</Name>
+				<Source><![CDATA[
+    public void initFromBOM(BOM _bom)
+    {
+        next initFromBOM(_bom);
+
+        this.KPMGCommon_PercentConsumption = _bom.KPMGCommon_PercentConsumption;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxSecurityPrivilege xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_PrinterWHSLicensePlateLabelsView</Name>
+	<Label>@KPMGCommon:PrintInitialStockLabels_View</Label>
+	<DataEntityPermissions />
+	<DirectAccessPermissions />
+	<EntryPoints>
+		<AxSecurityEntryPointReference>
+			<Name>KPMGCommon_PrinterWHSLicensePlateLabels</Name>
+			<Grant>
+				<Read>Allow</Read>
+			</Grant>
+			<ObjectName>KPMGCommon_PrinterWHSLicensePlateLabels</ObjectName>
+			<ObjectType>MenuItemAction</ObjectType>
+			<Forms />
+		</AxSecurityEntryPointReference>
+	</EntryPoints>
+	<FormControlOverrides />
+</AxSecurityPrivilege>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>ProdBOM.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControll5mau3ms1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormCheckBoxControl">
+				<Name>ProdBOM_KPMGCommon_PercentConsumption</Name>
+				<Type>CheckBox</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_PercentConsumption</DataField>
+				<DataSource>ProdBOM</DataSource>
+			</FormControl>
+			<Parent>Grid</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>ProdBOM_PmfFormulaPct</PreviousSibling>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

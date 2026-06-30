@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>CustPostInvoiceJob_Class_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(CustPostInvoiceJob))]
+final class CustPostInvoiceJob_Class_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>KPMGCommon_initInvoiceObservation</Name>
+				<Source><![CDATA[
+    public void KPMGCommon_initInvoiceObservation(KPMGCommon_InvoiceObservation _invoiceObservation = "")
+    {
+        
+        QueryRun localQR = new QueryRun(this.queryRun().query());
+        CustInvoiceTable localInvoiceTable;
+        ;
+        while (localQR.next())
+        {
+            localInvoiceTable = localQR.get(tableNum(CustInvoiceTable));
+            localInvoiceTable.KPMGCommon_InvoiceObservation = _invoiceObservation;
+            this.UpdateInvoiceObservation(localInvoiceTable);
+         }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>UpdateInvoiceObservation</Name>
+				<Source><![CDATA[
+    public void UpdateInvoiceObservation(CustInvoiceTable custInvoiceTableObservation)
+    {
+        
+        ttsbegin;
+        custInvoiceTableObservation.selectForUpdate(true);
+        custInvoiceTableObservation.doupdate();
+        ttscommit;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>VendPurchOrderJour_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(VendPurchOrderJour))]
+final class VendPurchOrderJour_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>insert</Name>
+				<Source><![CDATA[
+    public void insert()
+    {
+        PurchTable purchTable;
+        purchTable = this.purchTable();
+        ttsbegin;
+        purchTable.KPMGCommon_PendienteActualizarKaytek = true;
+        purchTable.update();
+        ttscommit;
+
+        next insert();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

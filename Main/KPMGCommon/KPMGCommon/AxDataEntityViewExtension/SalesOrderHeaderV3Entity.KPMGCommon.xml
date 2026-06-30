@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxDataEntityViewExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>SalesOrderHeaderV3Entity.KPMGCommon</Name>
+	<DataSources />
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyAllowIndirectCreation</Name>
+			<DataField>InterCompanyAllowIndirectCreation</DataField>
+			<DataSource>SalesTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyAllowIndirectCreationOrig</Name>
+			<DataField>InterCompanyAllowIndirectCreationOrig</DataField>
+			<DataSource>SalesTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyAutoCreateOrders</Name>
+			<DataField>InterCompanyAutoCreateOrders</DataField>
+			<DataSource>SalesTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyCompanyId</Name>
+			<DataField>InterCompanyCompanyId</DataField>
+			<DataSource>SalesTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyDirectDelivery</Name>
+			<DataField>InterCompanyDirectDelivery</DataField>
+			<DataSource>SalesTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyDirectDeliveryOrig</Name>
+			<DataField>InterCompanyDirectDeliveryOrig</DataField>
+			<DataSource>SalesTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyOrder</Name>
+			<DataField>InterCompanyOrder</DataField>
+			<DataSource>SalesTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyOrigin</Name>
+			<DataField>InterCompanyOrigin</DataField>
+			<DataSource>SalesTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyOriginalCustAccount</Name>
+			<DataField>InterCompanyOriginalCustAccount</DataField>
+			<DataSource>SalesTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyOriginalSalesId</Name>
+			<DataField>InterCompanyOriginalSalesId</DataField>
+			<DataSource>SalesTable</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>InterCompanyPurchId</Name>
+			<DataField>InterCompanyPurchId</DataField>
+			<DataSource>SalesTable</DataSource>
+		</AxDataEntityViewField>
+	</Fields>
+	<Mappings />
+	<PropertyModifications />
+	<Relations />
+</AxDataEntityViewExtension>

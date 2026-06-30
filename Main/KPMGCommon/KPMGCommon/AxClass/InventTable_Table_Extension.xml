@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>InventTable_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(InventTable))]
+final class InventTable_Table_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>IsWMSLocationReceiptRequired</Name>
+				<Source><![CDATA[
+    public static boolean IsWMSLocationReceiptRequired(ItemId _itemId)
+    {
+        InventDimGroupFieldSetup inventDimGroupFieldSetup = EcoResDimensionGroupSetup::getFieldSetupForItem(_itemId, fieldNum(InventDim, WMSLocationId));
+    
+        if (!inventDimGroupFieldSetup.dimFieldId()
+         || !inventDimGroupFieldSetup.isActive()
+         ||  inventDimGroupFieldSetup.isAllowBlankReceiptEnabled())
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

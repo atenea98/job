@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgTermJob_Prod_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(JmgTermJob_Prod))]
+final class JmgTermJob_Prod_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>getWMSLocationId</Name>
+				<Source><![CDATA[
+        /// <summary>
+    ///    Retrieves a <c>WMSLocationId</c>, associated with the production order of this job.
+    /// </summary>
+    /// <returns>
+    ///    The <c>WMSLocationId</c> associated with the job.
+    /// </returns>
+    internal WMSLocationId getWMSLocationId()
+    {
+        WMSLocationId wMSLocationId;
+        ProdTable prodTable = ProdTable::find(this.JobRef());
+
+        if (prodTable)
+        {
+            wMSLocationId = InventDim::find(prodTable.InventDimId).wMSLocationId;
+        }
+
+        return wMSLocationId;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

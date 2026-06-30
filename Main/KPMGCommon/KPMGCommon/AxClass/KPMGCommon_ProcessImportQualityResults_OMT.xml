@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_ProcessImportQualityResults_OMT</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+using System.IO;
+using OfficeOpenXml;
+using OfficeOpenXml.ExcelPackage;
+using OfficeOpenXml.ExcelRange;
+
+final class KPMGCommon_ProcessImportQualityResults_OMT extends RunBaseBatch
+{
+    Filename        filename;
+    //HcmWorkerRecId  worker;
+    //boolean         acceptError;
+
+    DialogField     dialogFilename;
+ 
+    //DialogField     fieldWorker;
+    //DialogField     fieldAcceptError;
+
+    System.IO.Stream    stream;
+    FileUploadTemporaryStorageResult fileUploadResult;
+    OfficeOpenXml.ExcelRange    range;
+    CommaTextStreamIo   commaIo;
+    RecordInsertList    rsl;
+    boolean             newIteration;
+    int                 line,
+                        lineimported,lineerror, lineskipped;
+    Counter             loop;
+    FileUploadBuild     dialogFileUpload;
+    FileUpload          fileUpload;
+    DialogRunbase       dialog;
+    container           conTestId;
+    int                 totalTest;
+    ErrorMsg            errormessage;
+ 
+ 
+    #define.CurrentVersion(1)
+    #define.Version1(1)
+    #localmacro.CurrentList
+    /*
+        fileName,
+        worker,
+        acceptError
+    */
+        fileName
+    #endmacro
+ 
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>validateData</Name>
+				<Source><![CDATA[
+    void validateData(int row, int cells)
+    {
+        int     i;
+
+        for (i = 2; i<= cells; i++)
+        {
+            this.validateHeader(i);
+        }
+        if (conLen(conTestId) > 0)
+            totalTest = conLen(conTestId);
+
+        for (i = 2; i<= row; i++)
+        {
+            this.validateLine(i);
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateHeader</Name>
+				<Source><![CDATA[
+    void validateHeader(int col)
+    {
+        InventTestId    headerValue = range.get_Item(1, col).Value;
+        InventTestId    realTestId;
+        InventTestTable tbl;
+        str             normHeader, normTbl;
+
+        normHeader = strLwr(KPMGCommon_ProcessImportQualityResults_OMT::removeAccents(headerValue));
+
+        if (InventTestTable::exist(headerValue))
+        {
+            realTestId = headerValue;
+        }
+        else
+        {
+            while select tbl
+            {
+                normTbl = strLwr(KPMGCommon_ProcessImportQualityResults_OMT::removeAccents(tbl.TestId));
+                if (normTbl == normHeader)
+                {
+                    realTestId = tbl.TestId;
+                    break;
+                }
+            }
+        }
+
+        conTestId = conIns(conTestId, col - 1, realTestId);
+
+        if (!realTestId)
+        {
+            if (errormessage)
+                errormessage += "\n";
+            errormessage += strFmt("@KPMGCommon:InterfaceImportingQualityResultsErrorHeader", headerValue);
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>removeAccents</Name>
+				<Source><![CDATA[
+    public static str removeAccents(str input)
+    {
+        str s = input;
+        s = strReplace(s, 'á', 'a'); s = strReplace(s, 'Á', 'A');
+        s = strReplace(s, 'é', 'e'); s = strReplace(s, 'É', 'E');
+        s = strReplace(s, 'í', 'i'); s = strReplace(s, 'Í', 'I');
+        s = strReplace(s, 'ó', 'o'); s = strReplace(s, 'Ó', 'O');
+        s = strReplace(s, 'ú', 'u'); s = strReplace(s, 'Ú', 'U');
+        s = strReplace(s, 'ñ', 'n'); s = strReplace(s, 'Ñ', 'N');
+        return s;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateLine</Name>
+				<Source><![CDATA[
+    void validateLine(int row)
+    {
+        InventQualityOrderId    inventQualityOrderId;
+        InventQualityOrderTable inventQualityOrderTable;
+        InventQualityOrderLine  inventQualityOrderLine;
+        int                     i;
+
+        inventQualityOrderId = range.get_Item(row, 1).Value;
+        inventQualityOrderTable = InventQualityOrderTable::find(inventQualityOrderId);
+        if (!inventQualityOrderTable)
+        {
+            if (errormessage)
+                errormessage += " /n";
+                
+            errormessage += strFmt("@KPMGCommon:InterfaceImportingQualityResultsErrorLine1", row, inventQualityOrderId); //Lìnea %1 - Pedido de Calidad %2 no existe.
+        }
+        else if(inventQualityOrderTaBle && inventQualityOrderTable.OrderStatus != InventTestOrderStatus::Open)
+        {
+            if (errormessage)
+                errormessage += " /n";
+                
+            errormessage += strFmt("@KPMGCommon:InterfaceImportingQualityResultsErrorLine2", row, inventQualityOrderId); //Línea %1 - Pedido de Calidad %2 no está Abierto.
+        }
+
+
+        for (i = 1; i<= totalTest; i++)
+        {
+            select firstonly inventQualityOrderLine
+            where inventQualityOrderLine.QualityOrderId == inventQualityOrderId
+               && inventQualityOrderLine.TestId == conPeek(conTestId, i);
+            if (!inventQualityOrderLine)
+            {
+                if (errormessage)
+                    errormessage += " /n";
+                
+                errormessage += strFmt("@KPMGCommon:InterfaceImportingQualityResultsErrorLine3", row, inventQualityOrderId, conPeek(conTestId, i)); //Línea %1 - Pedido de Calidad %2 no existe línea para prueba %3.
+            }
+        }
+
+        if (errormessage)
+            lineerror++;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>create</Name>
+				<Source><![CDATA[
+    void create(int row)
+    {
+        InventTestId                inventTestId;
+        InventQualityOrderId        inventQualityOrderId;
+        InventQualityOrderTable     inventQualityOrderTable;
+        InventQualityOrderValidate  inventQualityOrderValidate = InventQualityOrderValidate::construct();
+        int                         column, i;
+        Args                        args = new Args();
+        MenuFunction                menuFunction;
+
+        inventQualityOrderId = range.get_Item(row, 1).Value;
+
+        try
+        {
+            inventQualityOrderTable = InventQualityOrderTable::find(inventQualityOrderId);
+            for (i = 1; i<= totalTest; i++)
+            {
+                column = i + 1;
+                inventTestId = conPeek(conTestId, i);
+
+                this.createResults(row, column, inventQualityOrderTable, inventTestId);
+            }
+
+            /*
+            inventQualityOrderValidate.initFromQualityOrderTable(inventQualityOrderTable);
+            inventQualityOrderValidate.parmQualityOrderId(inventQualityOrderTable.QualityOrderId);
+            inventQualityOrderValidate.parmWorker(fieldWorker.value());
+            inventQualityOrderValidate.parmAcceptError(fieldAcceptError.value());
+            inventQualityOrderValidate.run();
+            */
+ 
+            this.ValidateQualityId(inventQualityOrderTable);
+        }
+        catch
+        {
+            lineerror++;
+            ttsAbort;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ValidateQualityId</Name>
+				<Source><![CDATA[
+    void ValidateQualityId(InventQualityOrderTable     inventQualityOrderTable)
+    {
+        Args            args = new Args();
+        MenuFunction    menuFunction;
+
+        args.record(inventQualityOrderTable);
+        menuFunction = new MenuFunction(menuitemActionStr(InventQualityOrderValidate), MenuItemType::Action);
+
+        if (menuFunction && menuFunction.checkAccessRights())
+            menuFunction.run(args);
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createResults</Name>
+				<Source><![CDATA[
+    void createResults(int row, int column, InventQualityOrderTable _InventQualityOrderTable, InventTestId _InventTestId)
+    {
+        InventQualityOrderLineResultReal    testResultValueReal;
+        InventTestVariableOutcomeId         testResultValueOutcome;
+        InventQualityOrderLine              inventQualityOrderLine;
+        InventQualityOrderLineResults       inventQualityOrderLineResults, inventQualityOrderLineResultsExists;
+
+        if (InventTestTable::find(_InventTestId).TestType == InventTestType::Option)
+        {
+            testResultValueOutcome = range.get_Item(row, column).Value;
+        }
+        else
+        {
+            testResultValueReal = range.get_Item(row, column).Value;
+        }
+
+        ttsbegin;
+        select firstonly forupdate inventQualityOrderLine
+            where inventQualityOrderLine.QualityOrderId == _InventQualityOrderTable.QualityOrderId
+               && inventQualityOrderLine.TestId == _InventTestId;
+        if (inventQualityOrderLine)
+        {
+            select firstonly forupdate inventQualityOrderLineResultsExists
+                where inventQualityOrderLineResultsExists.QualityOrderId == inventQualityOrderLine.QualityOrderId
+                   && inventQualityOrderLineResultsExists.TestSequence == inventQualityOrderLine.TestSequence
+                   && inventQualityOrderLineResultsExists.TestId == inventQualityOrderLine.TestId;
+            if (inventQualityOrderLineResultsExists)
+            {
+                inventQualityOrderLineResultsExists.TestResultValueReal = testResultValueReal;
+                inventQualityOrderLineResultsExists.TestResultValueOutcome = TestResultValueOutcome;
+                inventQualityOrderLineResultsExists.TestResultQuantity = _InventQualityOrderTable.Qty;
+                inventQualityOrderLineResultsExists.PdsCWTestResultQuantity = _InventQualityOrderTable.PdsCWQty;
+                inventQualityOrderLineResultsExists.setTestResult(inventQualityOrderLine, false);
+                inventQualityOrderLineResultsExists.update();
+            }
+            else
+            {
+                inventQualityOrderLineResults.clear();
+                inventQualityOrderLineResults.initValue();
+                inventQualityOrderLineResults.initFromInventQualityOrderLine(inventQualityOrderLine);
+                inventQualityOrderLineResults.TestResultValueReal = testResultValueReal;
+                inventQualityOrderLineResults.TestResultValueOutcome = TestResultValueOutcome;
+                inventQualityOrderLineResults.TestResultQuantity = _InventQualityOrderTable.Qty;
+                inventQualityOrderLineResults.PdsCWTestResultQuantity = _InventQualityOrderTable.PdsCWQty;
+                inventQualityOrderLineResults.setTestResult(inventQualityOrderLine, false);
+                inventQualityOrderLineResults.insert();
+            }
+
+            inventQualityOrderLine.setTestResult();
+            inventQualityOrderLine.update();
+        }
+        ttscommit;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>import</Name>
+				<Source><![CDATA[
+    void import()
+    {
+        Container               con;
+        ;
+
+        setPrefix("@KPMGCommon:ImportQualityResultsOMT"); //Importación de Resultados de Calidad para OMT
+         
+        if (this.openFile())
+        {
+            using (ExcelPackage Package = new ExcelPackage(stream))
+            {
+                int                         rowCount, i, endRow, startRow, cellsCount, endCells, startCells;
+                Package.Load(stream);
+                ExcelWorksheet  worksheet   = package.get_Workbook().get_Worksheets().get_Item(1);
+                range       = worksheet.Cells;
+                endRow      = worksheet.Dimension.End.Row;
+                startRow    = worksheet.Dimension.Start.Row;
+                rowCount    = endRow - startRow + 1;
+                endCells   = worksheet.Dimension.End.Column;
+                startCells    = worksheet.Dimension.Start.Column;
+                cellsCount    = endCells - startCells + 1;
+
+                try
+                {
+                    this.validateData(rowCount, cellsCount);
+
+                    if (!errormessage)
+                    {
+                        for (i = 2; i<= rowCount; i++)
+                        {
+                            setPrefix(strFmt("Line %1", i));
+                            this.create(i);
+                            lineimported++;
+                        }
+                    }
+                    else
+                    {
+                        throw error(strFmt("Errores: %1", errormessage));
+                    }
+                }
+                catch
+                {
+                    throw error("Error - Import template");
+                }
+            }
+        }
+ 
+        info(strfmt("%1 record(s) imported", lineimported));
+        info(strfmt("%1 record(s) fail", lineerror));
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>openFile</Name>
+				<Source><![CDATA[
+    boolean openFile()
+    {
+        boolean ret = false;
+ 
+        if (fileUploadResult != null && fileUploadResult.getUploadStatus())
+        {
+            stream = fileUploadResult.openResult();
+            ret = true;
+        }
+        else
+        {
+            throw error(strfmt("@SYS62207",filename));
+        }
+ 
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>dialog</Name>
+				<Source><![CDATA[
+    public Object dialog()
+    {
+        dialog = super();
+         
+        DialogGroup dialogGroup = dialog.addGroup("@SYS309953");
+ 
+        FormBuildControl formBuildControl = dialog.formBuildDesign().control(dialogGroup.name());
+        dialogFileUpload = formBuildControl.addControlEx(classstr(FileUpload), 'FileUpload');
+        dialogFileUpload.style(FileUploadStyle::MinimalWithFilename);
+        dialogFileUpload.fileNameLabel("@SYS308842");
+        dialogFileUpload.fileTypesAccepted(".xlsx");
+        /*
+        dialogGroup = dialog.addGroup("@SYS113886");
+        fieldWorker = dialog.addFieldValue(extendedTypeStr(HcmWorkerRecId), worker, "@SYS113827", "@SYS319492");
+        fieldWorker.value(hcmWorker::userId2Worker(curUserId()));
+        fieldAcceptError = dialog.addFieldValue(enumStr(NoYes), acceptError, "@SYS14646", "@SYS113891");
+        fieldAcceptError.registerOverrideMethod(
+            methodStr(FormCheckBoxControl, modified),
+            methodStr(InventQualityOrderValidate, acceptError_modified),
+            this);
+        */
+        return dialog;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>dialogPostRun</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Disables the dialog Ok button until the file upload is complete.
+    /// </summary>
+    /// <param name="_dialog">The <c>Runbase</c> dialog object.</param>
+    public void dialogPostRun(DialogRunbase _dialog)
+    {
+        fileUpload = _dialog.formRun().control(_dialog.formRun().controlId('FileUpload'));
+        fileUpload.notifyUploadCompleted += eventhandler(this.uploadCompleted);
+        this.setDialogOkButtonEnabled(_dialog, false);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>uploadCompleted</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// After the file has been uploaded, the Ok button is enabled.
+    /// </summary>
+    public void uploadCompleted()
+    {
+        filename = fileUpload.fileName();
+ 
+        this.setDialogOkButtonEnabled(dialog, true);
+         
+        fileUploadResult = fileUpload.getFileUploadResult();
+ 
+        fileUpload.notifyUploadCompleted -= eventhandler(this.UploadCompleted);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>setDialogOkButtonEnabled</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Enables or disables the dialog Ok button.
+    /// </summary>
+    /// <param name = "_dialog">The <c>Runbase</c> dialog object.</param>
+    /// <param name = "_isEnabled">Indicates to enable or disable the Ok button.</param>
+    protected void setDialogOkButtonEnabled(DialogRunbase _dialog, boolean _isEnabled)
+    {
+        FormControl okButtonControl = _dialog.formRun().control(_dialog.formRun().controlId('OkButton'));
+ 
+        if (okButtonControl)
+        {
+            okButtonControl.enabled(_isEnabled);
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>pack</Name>
+				<Source><![CDATA[
+    public container pack()
+    {
+        return [#CurrentVersion,#CurrentList];
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>unpack</Name>
+				<Source><![CDATA[
+    public boolean unpack(container packedClass)
+    {
+        Version version = runbase::getVersion(packedClass);
+        ;
+        switch (version)
+        {
+            case #CurrentVersion:
+                [version,#CurrentList] = packedClass;
+                break;
+            default:
+                return false;
+        }
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    public void run()
+    {
+        this.import();
+        super();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    static void main(Args _args)
+    {
+        KPMGCommon_ProcessImportQualityResults_OMT   import = new KPMGCommon_ProcessImportQualityResults_OMT();
+        FormRun formRun;
+        Args    args;
+        ;
+     
+        if (import.prompt())
+        {
+            import.run();
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>caption</Name>
+				<Source><![CDATA[
+    public ClassDescription caption()
+    {
+        return "@KPMGCommon:ImportQualityResultsOMT"; //Importación de Resultados de Calidad para OMT
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEnum xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_ResponseStatusCode</Name>
+	<UseEnumValue>No</UseEnumValue>
+	<EnumValues>
+		<AxEnumValue>
+			<Name>Error</Name>
+			<Label>@SYS36230</Label>
+		</AxEnumValue>
+		<AxEnumValue>
+			<Name>OK</Name>
+			<Label>@SYS301992</Label>
+			<Value>1</Value>
+		</AxEnumValue>
+	</EnumValues>
+	<IsExtensible>true</IsExtensible>
+</AxEnum>

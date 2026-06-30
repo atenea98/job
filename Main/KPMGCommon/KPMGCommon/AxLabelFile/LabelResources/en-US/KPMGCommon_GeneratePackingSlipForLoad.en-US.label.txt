@@ -1,0 +1,7 @@
+﻿ErrorPostPackingSlip=Packing slip is not generated.
+LoadError=Load %1 does not exist.
+LoadLoadedStatusError=Load %1 must be in the “Loaded” status.
+NewLabel0=Label files created on 12/03/2025 08:10:18 for label file Id KPMGCommon_GeneratePackingSlipForLoad and language en-US
+ ;Label file comment - see above label
+PropertyIsMandatoryError=The property %1 is mandatory.
+ValidateCompanyError=Company does not exist for legal entity %1.

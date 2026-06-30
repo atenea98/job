@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>CustTable_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(CustTable))]
+final class CustTable_Table_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>KPMGCommon_ExisteCredito_Caucion</Name>
+				<Source><![CDATA[
+    [SysClientCacheDataMethod]
+    public static boolean KPMGCommon_ExisteCredito_Caucion(CustAccount _AccounNum, TransDate _InvoiceDate)
+    {
+        CredManCustGuaranteeInsurance custGuaranteeInsurance;
+        CredManCreditMaxMST creditMax;
+        boolean             existeCreditoCaucion = false;
+        date                todaysDate = DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone());
+        
+        while select CreditLimitPercent, CurrencyCode, Value, IncludeInExposure from custGuaranteeInsurance
+            where custGuaranteeInsurance.CustAccount == _AccounNum &&
+                  custGuaranteeInsurance.ValidFrom <= _InvoiceDate &&
+                  (!custGuaranteeInsurance.ValidTo || custGuaranteeInsurance.ValidTo >= _InvoiceDate)
+        {
+            creditMax += CurrencyExchangeHelper::mstAmount(custGuaranteeInsurance.CreditLimitPercent * custGuaranteeInsurance.Value / 100, custGuaranteeInsurance.CurrencyCode);
+            if (custGuaranteeInsurance.IncludeInExposure == NoYes::Yes)
+            {
+                creditMax -= CurrencyExchangeHelper::mstAmount(custGuaranteeInsurance.Value, custGuaranteeInsurance.CurrencyCode);
+            }
+        }
+
+        if (creditMax != 0)
+            existeCreditoCaucion = true;
+
+        return existeCreditoCaucion;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

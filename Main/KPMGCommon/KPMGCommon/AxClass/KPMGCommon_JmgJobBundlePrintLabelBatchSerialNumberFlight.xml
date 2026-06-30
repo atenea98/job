@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_JmgJobBundlePrintLabelBatchSerialNumberFlight</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+final class KPMGCommon_JmgJobBundlePrintLabelBatchSerialNumberFlight extends Flight
+{
+    static public KPMGCommon_JmgJobBundlePrintLabelBatchSerialNumberFlight singleton = new KPMGCommon_JmgJobBundlePrintLabelBatchSerialNumberFlight();
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>isEnabledByDefault</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    protected boolean isEnabledByDefault()
+    {
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>instance</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    public static KPMGCommon_JmgJobBundlePrintLabelBatchSerialNumberFlight instance()
+    {
+        return singleton;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

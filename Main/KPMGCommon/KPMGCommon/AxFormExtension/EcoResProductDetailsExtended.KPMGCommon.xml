@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>EcoResProductDetailsExtended.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControl4qs2nuyy1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormCheckBoxControl">
+				<Name>InventTable_KPMGCommon_PendienteActualizarKaytek</Name>
+				<AllowEdit>No</AllowEdit>
+				<Type>CheckBox</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_PendienteActualizarKaytek</DataField>
+				<DataSource>InventTable</DataSource>
+			</FormControl>
+			<Parent>GeneralAdministration</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>InventTableInventCountingReasonCodePolicy_CountingReasonCodePolicy</PreviousSibling>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControl0uvc0mls1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormStringControl">
+				<Name>InventTable_KPMGCommon_LocProfileId</Name>
+				<Type>String</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_LocProfileId</DataField>
+				<DataSource>InventTable</DataSource>
+			</FormControl>
+			<Parent>GeneralAdministration</Parent>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlcccexsqh1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormCheckBoxControl">
+				<Name>InventTable_KPMGCommon_AssignmentIntelligentLicensePlateCode</Name>
+				<Type>CheckBox</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataField>KPMGCommon_AssignmentIntelligentLicensePlateCode</DataField>
+				<DataSource>InventTable</DataSource>
+			</FormControl>
+			<Parent>GeneralFurtherIdentificationFormGroup</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

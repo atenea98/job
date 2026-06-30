@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>FormLetterContract_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(FormLetterContract))]
+final class FormLetterContract_KPMGCommon_Extension
+{
+    public NoYes           KPMGCommon_PrintFormLetterPackingList,
+                           KPMGCommon_PrintFormLetterWayBill, KPMGCommon_PrintDeclarationOfConformityCert, KPMGCommon_GroupProductLines;
+    #define.CurrentVersion(1)
+    #LOCALMACRO.CurrentList
+        KPMGCommon_PrintFormLetterPackingList
+        ,KPMGCommon_PrintFormLetterWayBill
+        ,KPMGCommon_PrintDeclarationOfConformityCert
+        ,KPMGCommon_GroupProductLines
+    #ENDMACRO
+
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>pack</Name>
+				<Source><![CDATA[
+    public container pack()
+    {
+
+        container packedClass = next pack();
+        return SysPackExtensions::appendExtension(packedClass, classStr(FormLetterContract_KPMGCommon_Extension), this.myPack());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>myUnpack</Name>
+				<Source><![CDATA[
+    private boolean myUnpack(container packedClass)
+    {
+        Integer version = RunBase::getVersion(packedClass);
+        switch (version)
+        {
+            case #CurrentVersion:
+                [version, #CurrentList] = packedClass;
+                break;
+            default:
+                return false;
+        }
+        return true;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>myPack</Name>
+				<Source><![CDATA[
+    private container myPack()
+    {
+        return [#CurrentVersion, #CurrentList];
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>unpack</Name>
+				<Source><![CDATA[
+    public boolean unpack(container _packedClass)
+    {
+        boolean result = next unpack(_packedClass);
+
+        if (result)
+        {
+            container axmState = SysPackExtensions::findExtension(_packedClass, classStr(FormLetterContract_KPMGCommon_Extension));
+            //Also unpack the extension
+            if (!this.myUnpack(axmState))
+            {
+                result = false;
+            }
+        }
+
+        return result;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_parmPrintFormLetterPackingList</Name>
+				<Source><![CDATA[
+    [DataMember]
+    public NoYes KPMGCommon_parmPrintFormLetterPackingList(NoYes _KPMGCommon_PrintFormLetterPackingList = KPMGCommon_PrintFormLetterPackingList)
+    {
+        KPMGCommon_PrintFormLetterPackingList = _KPMGCommon_PrintFormLetterPackingList;
+        return KPMGCommon_PrintFormLetterPackingList;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_parmPrintFormLetterWayBill</Name>
+				<Source><![CDATA[
+    [DataMember]
+    public NoYes KPMGCommon_parmPrintFormLetterWayBill(NoYes _KPMGCommon_PrintFormLetterWayBill = KPMGCommon_PrintFormLetterWayBill)
+    {
+        KPMGCommon_PrintFormLetterWayBill = _KPMGCommon_PrintFormLetterWayBill;
+        return KPMGCommon_PrintFormLetterWayBill;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_parmPrintDeclarationOfConformityCert</Name>
+				<Source><![CDATA[
+    [DataMember]
+    public NoYes KPMGCommon_parmPrintDeclarationOfConformityCert(NoYes _KPMGCommon_PrintDeclarationOfConformityCert = KPMGCommon_PrintDeclarationOfConformityCert)
+    {
+        KPMGCommon_PrintDeclarationOfConformityCert = _KPMGCommon_PrintDeclarationOfConformityCert;
+        return KPMGCommon_PrintDeclarationOfConformityCert;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_parmGroupProductLines</Name>
+				<Source><![CDATA[
+    [DataMember]
+    public NoYes KPMGCommon_parmGroupProductLines(NoYes _KPMGCommon_GroupProductLines = KPMGCommon_GroupProductLines)
+    {
+        KPMGCommon_GroupProductLines = _KPMGCommon_GroupProductLines;
+        return KPMGCommon_GroupProductLines;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

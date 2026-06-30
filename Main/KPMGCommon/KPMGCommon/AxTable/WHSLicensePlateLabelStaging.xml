@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTable xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>WHSLicensePlateLabelStaging</Name>
+	<SourceCode>
+		<Methods />
+	</SourceCode>
+	<ConfigurationKey>WHSandTMS</ConfigurationKey>
+	<DeveloperDocumentation>@DMF:StagingDeveloperDocumentation</DeveloperDocumentation>
+	<Label>@WAX915</Label>
+	<TableGroup>Staging</TableGroup>
+	<TitleField1>LabelId</TitleField1>
+	<TitleField2>WorkId</TitleField2>
+	<PrimaryIndex>StagingIdx</PrimaryIndex>
+	<ReplacementKey>StagingIdx</ReplacementKey>
+	<SaveDataPerCompany>No</SaveDataPerCompany>
+	<DeleteActions />
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>ExtensionList</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@DMF:StagingExtensionGroup</Label>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>DefinitionGroup</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>IsSelected</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>TransferStatus</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>ExecutionId</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>DefinitionGroup</Name>
+			<AllowEdit>No</AllowEdit>
+			<ExtendedDataType>DMFDefinitionGroupName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Mandatory>Yes</Mandatory>
+			<StringSize>60</StringSize>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ExecutionId</Name>
+			<AllowEdit>No</AllowEdit>
+			<ExtendedDataType>DMFExecutionId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Mandatory>Yes</Mandatory>
+			<StringSize>90</StringSize>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>IsSelected</Name>
+			<ExtendedDataType>DMFIsSelected</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>TransferStatus</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<EnumType>DMFTransferStatus</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>AccountName</Name>
+			<ExtendedDataType>AccountName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>AccountNum</Name>
+			<ExtendedDataType>CustVendAC</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>AddressCityFrom</Name>
+			<ExtendedDataType>LogisticsAddressCityName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX3290</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>AddressCityTo</Name>
+			<ExtendedDataType>LogisticsAddressCityName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX3289</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>AddressStateIdFrom</Name>
+			<ExtendedDataType>LogisticsAddressStateId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX3292</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>AddressStateIdTo</Name>
+			<ExtendedDataType>LogisticsAddressStateId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX3291</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>AddressStreetFrom</Name>
+			<ExtendedDataType>LogisticsAddressStreet</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX3288</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>AddressStreetTo</Name>
+			<ExtendedDataType>LogisticsAddressStreet</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX3287</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>AddressZipCodeIdFrom</Name>
+			<ExtendedDataType>LogisticsAddressZipCodeId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@SYP4861421</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>AddressZipCodeIdTo</Name>
+			<ExtendedDataType>LogisticsAddressZipCodeId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@SYP4861422</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>BillOfLadingId</Name>
+			<ExtendedDataType>WHSBillOfLadingId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>CarrierCode</Name>
+			<ExtendedDataType>WHSCarrierCode</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ConfigId</Name>
+			<ExtendedDataType>EcoResItemConfigurationName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ContainerId</Name>
+			<ExtendedDataType>WHSContainerId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>CustPurchaseOrder</Name>
+			<ExtendedDataType>CustPurchaseOrder</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>FromName</Name>
+			<ExtendedDataType>WHSFromName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventBatchId</Name>
+			<ExtendedDataType>InventBatchId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventColorId</Name>
+			<ExtendedDataType>EcoResItemColorName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventGtdId_RU</Name>
+			<ExtendedDataType>InventGTDId_RU</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventLocationId</Name>
+			<ExtendedDataType>InventLocationId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventOwnerId_RU</Name>
+			<ExtendedDataType>InventOwnerId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventProfileId_RU</Name>
+			<ExtendedDataType>InventProfileId_RU</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>InventQty</Name>
+			<ExtendedDataType>InventQty</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX:HandlingQuantity</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventSerialId</Name>
+			<ExtendedDataType>InventSerialId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventSiteId</Name>
+			<ExtendedDataType>InventSiteId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventSizeId</Name>
+			<ExtendedDataType>EcoResItemSizeName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventStyleId</Name>
+			<ExtendedDataType>EcoResStyleName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventVersionId</Name>
+			<ExtendedDataType>EcoResVersionName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventUnitId</Name>
+			<ExtendedDataType>InventUnitId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX:HandlingUnit</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ItemId</Name>
+			<ExtendedDataType>ItemId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ItemName</Name>
+			<ExtendedDataType>ItemName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>LabelFormat</Name>
+			<ExtendedDataType>WHSLabelFormat</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>LabelId</Name>
+			<AllowEdit>No</AllowEdit>
+			<ExtendedDataType>WHSLabelId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>LabelReportName</Name>
+			<ExtendedDataType>WHSLabelReportName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>LicensePlateId</Name>
+			<ExtendedDataType>WHSLicensePlateId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>LineNum</Name>
+			<ExtendedDataType>LineNum</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>OrderedQty</Name>
+			<ExtendedDataType>WHSOrderedQty</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>OrderNum</Name>
+			<ExtendedDataType>WHSOrderNum</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>PackingQty</Name>
+			<ExtendedDataType>WHSPackingQty</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldDate">
+			<Name>PrintedDate</Name>
+			<ExtendedDataType>TransDate</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX987</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldContainer">
+			<Name>PrintSettings</Name>
+			<ExtendedDataType>WHSPrintSettings</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ProNum</Name>
+			<ExtendedDataType>WHSProNum</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>Qty</Name>
+			<ExtendedDataType>ProductQuantity</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX1195</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>RemainingQty</Name>
+			<ExtendedDataType>WHSRemainingQty</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ReportFileName</Name>
+			<ExtendedDataType>WHSReportFileName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ShipmentId</Name>
+			<ExtendedDataType>WHSShipmentId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ToName</Name>
+			<ExtendedDataType>WHSToName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>UCCCompanyPrefix</Name>
+			<ExtendedDataType>WHSUCCCompanyPrefix</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>UnitID</Name>
+			<ExtendedDataType>UnitOfMeasureSymbol</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>UserId</Name>
+			<ExtendedDataType>WHSUserId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>Weight</Name>
+			<ExtendedDataType>Weight</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>WMSLocationIdFrom</Name>
+			<ExtendedDataType>WMSLocationId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX1306</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>WMSLocationIdTo</Name>
+			<ExtendedDataType>WMSLocationId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX1211</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>WorkCenterLocationId</Name>
+			<ExtendedDataType>WMSLocationId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX3294</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>WorkId</Name>
+			<ExtendedDataType>WHSWorkId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>WorkTemplateCode</Name>
+			<ExtendedDataType>WHSWorkTemplateCode</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>WorkTransType</Name>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<EnumType>WHSWorkTransType</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ZoneIdFrom</Name>
+			<ExtendedDataType>WHSZoneIdFrom</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ZoneIdTo</Name>
+			<ExtendedDataType>WHSZoneIdTo</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>WrkCtrId</Name>
+			<ExtendedDataType>WrkCtrIdBase</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ShipmentToName</Name>
+			<ExtendedDataType>WHSToName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ShipmentAddressStreetTo</Name>
+			<ExtendedDataType>LogisticsAddressStreet</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX3287</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ShipmentAddressZipCodeIdTo</Name>
+			<ExtendedDataType>LogisticsAddressZipCodeId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@SYP4861422</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ShipmentAddressCityTo</Name>
+			<ExtendedDataType>LogisticsAddressCityName</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX3289</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ShipmentAddressStateIdTo</Name>
+			<ExtendedDataType>LogisticsAddressStateId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX3291</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>CountryRegionIdTo</Name>
+			<ExtendedDataType>LogisticsAddressCountryRegionId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX:CountryRegionTo</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ShipmentCountryRegionIdTo</Name>
+			<ExtendedDataType>LogisticsAddressCountryRegionId</ExtendedDataType>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Label>@WAX:CountryRegionTo</Label>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>LabelExceptionType</Name>
+			<AllowEdit>No</AllowEdit>
+			<AllowEditOnCreate>No</AllowEditOnCreate>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<EnumType>WHSLicensePlateLabelExceptionType</EnumType>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes>
+		<AxTableIndex>
+			<Name>StagingIdx</Name>
+			<AlternateKey>Yes</AlternateKey>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<Fields>
+				<AxTableIndexField>
+					<DataField>DefinitionGroup</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>ExecutionId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>LabelId</DataField>
+				</AxTableIndexField>
+			</Fields>
+		</AxTableIndex>
+	</Indexes>
+	<Mappings />
+	<Relations>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>DataEntity</Name>
+			<Cardinality>ExactlyOne</Cardinality>
+			<EntityRelationshipRole>@DMF:StagingToDataEntityRelationshipRole</EntityRelationshipRole>
+			<IsSystemGenerated>Yes</IsSystemGenerated>
+			<RelatedTable>WHSLicensePlateLabelEntity</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<RelationshipType>Link</RelationshipType>
+			<Validate>No</Validate>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>LabelId</Name>
+					<Field>LabelId</Field>
+					<RelatedField>LabelId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+		</AxTableRelation>
+	</Relations>
+	<StateMachines />
+</AxTable>

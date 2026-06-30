@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>CustPostInvoice_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(CustPostInvoice))]
+final class CustPostInvoice_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>initCustInvoiceJourFromCustInvoiceTable</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Initializes the <c>CustInvoiceJour</c> record based on <c>CustInvoiceTable</c> and whether it is a credit note.
+    /// </summary>
+    /// <param name = "_custInvoiceJour">The <c>CustInvoiceJour</c> record to initialize.</param>
+    /// <param name = "_custInvoiceTable">The <c>CustInvoiceTable</c> record.</param>
+    /// <param name = "_creditNote">Whether this is a credit note or not.</param>
+    protected void initCustInvoiceJourFromCustInvoiceTable(CustInvoiceJour _custInvoiceJour, CustInvoiceTable _custInvoiceTable, NoYes _creditNote)
+    {
+        BankAccountTable    bankAccountTable = BankAccountTable::find(_custInvoiceTable.custTable_InvoiceAccount().KPMGCommon_CompanyBankAccountIdPay);
+        CustTable           custTable_InvoiceAccount = _custInvoiceTable.custTable_InvoiceAccount();
+
+        _custInvoiceJour.KPMGCommon_InvoiceObservation = _custInvoiceTable.KPMGCommon_InvoiceObservation;
+        
+        // CompanyBankAccountPay
+        if (CustPaymModeTable::find(_custInvoiceTable.PaymMode).KPMGCommon_TransferPayment && custTable_InvoiceAccount.KPMGCommon_CompanyBankAccountIdPay)
+            _custInvoiceJour.KPMGCommon_BankAccountCompanyPay = strFmt("%1 %2 %3", bankAccountTable.Name, bankAccountTable.IBAN, bankAccountTable.SWIFTNo);
+        
+        //
+        _custInvoiceJour.KPMGCommon_LIVAArticle = this.KPMGCommon_ReturnTextLIVAArticle(_custInvoiceTable);
+
+        next initCustInvoiceJourFromCustInvoiceTable(_custInvoiceJour, _custInvoiceTable, _creditNote);
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_ReturnTextLIVAArticle</Name>
+				<Source><![CDATA[
+    public KPMGCommon_LIVAArticle KPMGCommon_ReturnTextLIVAArticle(CustInvoiceTable _custInvoiceTable)
+    {
+        TmpTaxWorkTrans tmpTaxWorkTrans;
+        TaxTable        taxTable;
+        TaxOnItem       TaxOnItem;
+        TaxGroupData    TaxGroupData;
+
+        KPMGCommon_LIVAArticle  lIVAArticle;
+        
+        tmpTaxWorkTrans = this.tax().tmpTaxWorkTrans();
+        
+        while select TaxCode from tmpTaxWorkTrans
+                group by TaxCode
+        {
+            if (lIVAArticle)
+                continue;
+
+            taxTable = TaxTable::find(tmpTaxWorkTrans.TaxCode);
+            if (!lIVAArticle && (taxTable.KPMGCommon_LIVAArticle_ES || taxTable.KPMGCommon_LIVAArticle_EN))
+            {
+                if (_custInvoiceTable.LanguageId == CompanyInfo::find().LanguageId)
+                {
+                    lIVAArticle = taxTable.KPMGCommon_LIVAArticle_ES;
+                }
+                else
+                {
+                    lIVAArticle = taxTable.KPMGCommon_LIVAArticle_EN;
+                }
+            }
+        }
+        
+        return lIVAArticle;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

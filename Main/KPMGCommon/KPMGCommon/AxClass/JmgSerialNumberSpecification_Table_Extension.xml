@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgSerialNumberSpecification_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(JmgSerialNumberSpecification))]
+final class JmgSerialNumberSpecification_Table_Extension
+{
+    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>KPMGCommon_existsByParmIdItemIdProdId</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Checks if there is a <c>JmgSerialNumberSpecification</c> based on the parm ID, item ID and prod ID.
+    /// </summary>
+    /// <param name = "_parmId"> The Parm ID. </param>
+    /// <param name = "_itemId"> The Item ID. </param>
+    /// <param name = "_prodId"> The Prod ID. </param>
+    /// <returns>true if <c>JmgSerialNumberSpecification</c> records exists; otherwise false.</returns>
+    [Hookable(false)]
+    public static boolean KPMGCommon_existsByParmIdItemIdProdId(ParmId _parmId, ItemId _itemId, ProdId _prodId)
+    {
+        JmgSerialNumberSpecification JmgSerialNumberSpecification;
+        select firstonly RecId from JmgSerialNumberSpecification
+            where JmgSerialNumberSpecification.ParmId == _parmId &&
+                  JmgSerialNumberSpecification.ItemId == _itemId &&
+                  JmgSerialNumberSpecification.ProdId == _prodId;
+
+        return JmgSerialNumberSpecification.RecId != 0;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

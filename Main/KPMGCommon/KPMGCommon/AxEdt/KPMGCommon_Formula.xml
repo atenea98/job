@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxEdt xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxEdtString">
+	<Name>KPMGCommon_Formula</Name>
+	<ConfigurationKey>BOM</ConfigurationKey>
+	<Label>@PRO101</Label>
+	<ReferenceTable>BOMTable</ReferenceTable>
+	<ArrayElements />
+	<Relations />
+	<TableReferences>
+		<AxEdtTableReference>
+			<RelatedField>BOMId</RelatedField>
+			<Table>BOMTable</Table>
+			<Tags>BOMTable</Tags>
+		</AxEdtTableReference>
+		<AxEdtTableReference xmlns=""
+			i:type="AxEdtTableReferenceFilter">
+			<RelatedField>PmfBOMFormula</RelatedField>
+			<Table>BOMTable</Table>
+			<Value>1</Value>
+		</AxEdtTableReference>
+	</TableReferences>
+	<StringSize>20</StringSize>
+</AxEdt>

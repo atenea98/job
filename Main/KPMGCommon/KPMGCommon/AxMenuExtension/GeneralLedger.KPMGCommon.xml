@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxMenuExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V1">
+	<Name>GeneralLedger.KPMGCommon</Name>
+	<Customizations />
+	<Elements>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>InquiriesReports</Parent>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementSubMenu">
+				<Name>InvoiceInterface</Name>
+				<Label>@KPMGCommon:InvoiceInterfaceMenu</Label>
+				<Elements>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>KPMGCommon_SalesInvoiceFas5</Name>
+						<MenuItemName>KPMGCommon_SalesInvoiceFas5</MenuItemName>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>KPMGCommon_SalesInvoiceFas5Error</Name>
+						<MenuItemName>KPMGCommon_SalesInvoiceFas5Error</MenuItemName>
+					</AxMenuElement>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>KPMGCommon_SalesInvoiceFas5Delete</Name>
+						<MenuItemName>KPMGCommon_SalesInvoiceFas5Delete</MenuItemName>
+					</AxMenuElement>
+				</Elements>
+			</MenuElement>
+		</AxMenuExtensionElement>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>PeriodicTasks</Parent>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementSubMenu">
+				<Name>InvoicesInterface</Name>
+				<Label>@KPMGCommon:InvoiceInterfaceMenu</Label>
+				<Elements>
+					<AxMenuElement xmlns=""
+						i:type="AxMenuElementMenuItem">
+						<Name>KPMGCommon_ProcessNonTreatedRecords</Name>
+						<MenuItemName>KPMGCommon_ProcessNonTreatedRecords</MenuItemName>
+						<MenuItemType>Action</MenuItemType>
+					</AxMenuElement>
+				</Elements>
+			</MenuElement>
+		</AxMenuExtensionElement>
+	</Elements>
+	<MenuElementModifications />
+	<PropertyModifications />
+</AxMenuExtension>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgProductionFloorExecutionReportProgress_WMSLocationDataField_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(formDataFieldStr(JmgProductionFloorExecutionReportProgress, JmgTmpJobBundleProdFeedback, KPMGCommon_WMSlocation))]
+final class JmgProductionFloorExecutionReportProgress_WMSLocationDataField_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>validate</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    public boolean validate()
+    {
+        boolean ret;
+        ret = next Validate();
+        ret = element.validateWMSLocationNumber();
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>lookup</Name>
+				<Source><![CDATA[
+    [Hookable(false)]
+    public void lookup(FormControl _formControl, str _filterStr)
+    {
+        next lookup(_formControl, _filterStr);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

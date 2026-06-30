@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>JmgProductionFloorExecutionReportCoByProduct.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlyfv3hr0w1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormMenuFunctionButtonControl">
+				<Name>KPMGCommon_PercentConsumptionProduction</Name>
+				<Type>MenuFunctionButton</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<ButtonDisplay>TextWithImageLeft</ButtonDisplay>
+				<DataSource>JmgTmpJobBundleProdFeedback</DataSource>
+				<MenuItemName>KPMGCommon_PercentConsumptionProduction</MenuItemName>
+				<MultiSelect>No</MultiSelect>
+				<NormalImage>Products</NormalImage>
+			</FormControl>
+			<Parent>VariationButtonGroup</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

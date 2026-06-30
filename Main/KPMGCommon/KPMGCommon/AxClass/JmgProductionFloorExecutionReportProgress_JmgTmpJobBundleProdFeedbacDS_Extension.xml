@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgProductionFloorExecutionReportProgress_JmgTmpJobBundleProdFeedbacDS_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(formDataSourceStr(JmgProductionFloorExecutionReportProgress, JmgTmpJobBundleProdFeedback))]
+final class JmgProductionFloorExecutionReportProgress_JmgTmpJobBundleProdFeedbacDS_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>selectionChanged</Name>
+				<Source><![CDATA[
+    public void selectionChanged()
+    {
+        JmgTmpJobBundleProdFeedback jmgTmpJobBundleProdFeedback = this.cursor();
+
+        element.KPMGCommon_initializeControlsProperties();
+        element.setWMSLocationId(jmgTmpJobBundleProdFeedback.KPMGCommon_WMSlocation);
+        element.KPMGCommon_setWhsLicensePlateId_AssignmentIntelligentLicensePlateCode();
+
+        next selectionChanged();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

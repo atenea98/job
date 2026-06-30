@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>FormLetterServiceController_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(FormLetterServiceController))]
+final class FormLetterServiceController_KPMGCommon_Extension
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>KPMGCommon_PrintFormLetterPackingList</Name>
+				<Source><![CDATA[
+    boolean  KPMGCommon_PrintFormLetterPackingList(boolean  _KPMGCommon_PrintFormLetterPackingList = contract.KPMGCommon_parmPrintFormLetterPackingList())
+    {
+        return contract.KPMGCommon_parmPrintFormLetterPackingList(_KPMGCommon_PrintFormLetterPackingList);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_PrintFormLetterWayBill</Name>
+				<Source><![CDATA[
+    boolean  KPMGCommon_PrintFormLetterWayBill(boolean  _KPMGCommon_PrintFormLetterWayBill = contract.KPMGCommon_parmPrintFormLetterWayBill())
+    {
+        return contract.KPMGCommon_parmPrintFormLetterWayBill(_KPMGCommon_PrintFormLetterWayBill);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_PrintDeclarationOfConformityCert</Name>
+				<Source><![CDATA[
+    boolean  KPMGCommon_PrintDeclarationOfConformityCert(boolean  _KPMGCommon_PrintDeclarationOfConformityCert = contract.KPMGCommon_parmPrintDeclarationOfConformityCert())
+    {
+        return contract.KPMGCommon_parmPrintDeclarationOfConformityCert(_KPMGCommon_PrintDeclarationOfConformityCert);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_GroupProductLines</Name>
+				<Source><![CDATA[
+    boolean  KPMGCommon_GroupProductLines(boolean  _KPMGCommon_GroupProductLines = contract.KPMGCommon_parmGroupProductLines())
+    {
+        return contract.KPMGCommon_parmGroupProductLines(_KPMGCommon_GroupProductLines);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

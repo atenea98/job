@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>ProdParmReportFinished_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(ProdParmReportFinished))]
+final class ProdParmReportFinished_Table_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>setWMSLocationId</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Updates this record's inventory dimensions with the given inventory location ID.
+    /// </summary>
+    /// <param name="_wMSLocationId">
+    /// The location number ID to set.
+    /// </param>
+    [Hookable(false)]
+    internal void setWMSLocationId(WMSLocationId _wMSLocationId)
+    {
+        InventDim inventDim = InventDim::find(this.InventDimId);
+
+        if (inventDim.WMSLocationId != _wMSLocationId)
+        {
+            WMSLocation jobWMSLocation = WMSLocation::find(_wMSLocationId, inventDim.InventLocationId);
+
+            inventDim.WMSLocationId = jobWMSLocation.WMSLocationId;
+            this.InventDimId = InventDim::findOrCreate(inventDim).inventDimId;
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

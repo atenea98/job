@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_ReturnFooter_DocumentType</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class KPMGCommon_ReturnFooter_DocumentType
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>ReturnFooter_NodeTypeSales</Name>
+				<Source><![CDATA[
+    static public PrintMgmtIdentificationTxt ReturnFooter_NodeTypeSales(PrintMgmtDocumentType _PrintMgmtDocumentType, LanguageId _LanguageId)
+    {
+        PrintMgmtDocInstance        printMgmtDocInstance;
+        PrintMgmtSettings           printMgmtSettings;
+        PrintMgmtIdentificationText printMgmtIdentificationText;
+
+        Select printMgmtDocInstance
+            where printMgmtDocInstance.DocumentType == _PrintMgmtDocumentType
+               && printMgmtDocInstance.NodeType == PrintMgmtNodeType::Sales
+               && printMgmtDocInstance.PrintType == PrintMgmtDocInstanceType::Original
+            join printMgmtSettings
+            where printMgmtSettings.ParentId == printMgmtDocInstance.RecId
+            join printMgmtIdentificationText
+            where printMgmtIdentificationText.ParentId == printMgmtSettings.ParentId
+            && printMgmtIdentificationText.LanguageId == _LanguageId;
+
+        return printMgmtIdentificationText.IdentificationText;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ReturnFooter_NodeTypePurch</Name>
+				<Source><![CDATA[
+    static public PrintMgmtIdentificationTxt ReturnFooter_NodeTypePurch(PrintMgmtDocumentType _PrintMgmtDocumentType, LanguageId _LanguageId)
+    {
+        PrintMgmtDocInstance        printMgmtDocInstance;
+        PrintMgmtSettings           printMgmtSettings;
+        PrintMgmtIdentificationText printMgmtIdentificationText;
+
+        Select printMgmtDocInstance
+            where printMgmtDocInstance.DocumentType == _PrintMgmtDocumentType
+               && printMgmtDocInstance.NodeType == PrintMgmtNodeType::Purch
+               && printMgmtDocInstance.PrintType == PrintMgmtDocInstanceType::Original
+            join printMgmtSettings
+            where printMgmtSettings.ParentId == printMgmtDocInstance.RecId
+            join printMgmtIdentificationText
+            where printMgmtIdentificationText.ParentId == printMgmtSettings.ParentId
+            && printMgmtIdentificationText.LanguageId == _LanguageId;
+
+        return printMgmtIdentificationText.IdentificationText;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgProdMultiReportFinished_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(JmgProdMultiReportFinished))]
+final class JmgProdMultiReportFinished_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>initProdParmReportFinishedInventDim_Location</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Initializes <c>InventDim</c> for production order parameter with license plate and batch number.
+    /// The license plate and batch number will be created if they are not in the system.
+    /// </summary>
+    /// <param name = "_itemId">
+    /// The reported item Id.
+    /// </param>
+    /// <param name = "_prodParmReportFinishedInventDimId">
+    /// Default <c>inventDimId</c> on the <c>ProdParmReportFinished</c> object.
+    /// </param>
+    /// <param name = "_whsLicensePlateId">
+    /// The reported license plate.
+    /// </param>
+    /// <param name = "_inventBatchId">
+    /// The reported batch number
+    /// </param>
+    /// </param>
+    /// <param name = "_wmsLocationId">
+    /// The reported WMSLocation
+    /// </param>
+    /// <returns>
+    /// An <c>InventDim</c> object to be used for reported production order parameter.
+    /// </returns>
+    [Hookable(false)]
+    internal static InventDim initProdParmReportFinishedInventDim_Location(ItemId _itemId, InventDimId _prodParmReportFinishedInventDimId, WHSLicensePlateId _whsLicensePlateId, InventBatchId _inventBatchId,
+                                                                  WMSLocationId _wmsLocationId)
+    {
+        InventDim prodParmReportFinishedInventDim = InventDim::find(_prodParmReportFinishedInventDimId);
+        InventBatch prodParmReportFinishedInventBatch;
+
+        if (_whsLicensePlateId)
+        {
+            // create new license plate, if it doesn't exist
+            WHSLicensePlate::createLicensePlate(_whsLicensePlateId);
+        }
+
+        if (_inventBatchId)
+        {
+            prodParmReportFinishedInventBatch = InventBatch::findOrCreateWithProdDate(_inventBatchId, _itemId, DateTimeUtil::getToday(DateTimeUtil::getUserPreferredTimeZone()));
+        }
+
+        prodParmReportFinishedInventDim.LicensePlateId = _whsLicensePlateId;
+        prodParmReportFinishedInventDim.inventBatchId = prodParmReportFinishedInventBatch.inventBatchId;
+        prodParmReportFinishedInventDim.WMSLocationId = _wmsLocationId;
+
+        prodParmReportFinishedInventDim = InventDim::findOrCreate(prodParmReportFinishedInventDim);
+
+        return prodParmReportFinishedInventDim;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initializeProdParmReportFinishFromJmgTmpJobBundleProdFeedback</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Initializes production order parameters for the reporting co/by products from Jmg interface.
+    /// </summary>
+    /// <param name = "_coByParmBuffer">
+    /// The current <c>ProdParmReportFinished</c> record for a co/by item.
+    /// </param>
+    /// <param name = "_coByProductFeedback">
+    /// The current <c>JmgTmpJobBundleProdFeedback</c> co/by product feedback based on which
+    /// the <c>ProdParmReportFinished</c> record for a co/by item should be created.
+    /// </param>
+    /// <param name = "_initFromParmBuffer">
+    /// Indicates if the co/by product buffer should be initialized from the main buffer.
+    /// </param>
+    /// <param name = "_prodEndJob">
+    ///  true if the production job is being reported as finished; otherwise, false.
+    /// </param>
+    protected void initializeProdParmReportFinishFromJmgTmpJobBundleProdFeedback(
+        ProdParmReportFinished      _coByParmBuffer,
+        JmgTmpJobBundleProdFeedback _coByProductFeedback,
+        boolean                     _initFromParmBuffer,
+        ProdEndJob                  _prodEndJob)
+    {
+        next initializeProdParmReportFinishFromJmgTmpJobBundleProdFeedback(_coByParmBuffer,
+                                                                           _coByProductFeedback,
+                                                                           _initFromParmBuffer,
+                                                                           _prodEndJob);
+
+        InventDim parmReportFinishedInventDim = JmgProdMultiReportFinished::initProdParmReportFinishedInventDim_Location(
+                    _coByProductFeedback.ItemId,
+                    _coByParmBuffer.InventDimId,
+                    _coByProductFeedback.WHSLicensePlate,
+                    _coByProductFeedback.InventBatch, _coByProductFeedback.KPMGCommon_WMSlocation);
+
+        _coByParmBuffer.InventDimId = parmReportFinishedInventDim.inventDimId;
+
+        _coByParmBuffer.update();
+
+        //this.initializeProdParmReportFinishedWithSerialNumber(_coByParmBuffer, _coByProductFeedback.JobId, _prodEndJob);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>reportFinishedProductionOrder</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Performs reports a single production order as finished.
+    /// </summary>
+    /// <param name = "_prodParmReportFinished">Report as finished parameters.</param>
+    [Replaceable]
+    protected void reportFinishedProductionOrder(ProdParmReportFinished _prodParmReportFinished)
+    {
+        next reportFinishedProductionOrder(_prodParmReportFinished);
+
+        this.KPMGCommon_AssignmentIntelligentLicensePlateCode(_prodParmReportFinished);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_AssignmentIntelligentLicensePlateCode</Name>
+				<Source><![CDATA[
+    private void KPMGCommon_AssignmentIntelligentLicensePlateCode(ProdParmReportFinished _prodParmReportFinished)
+    {
+        ProdParmReportFinished  prodParmReportFinished;
+        InventTable             inventTable;
+
+        if (JmgParameters::find().KPMGCommon_AssignmentIntelligentLicensePlateCode)
+        {
+            while select prodParmReportFinished
+            where prodParmReportFinished.ParmId == _prodParmReportFinished.ParmId
+               && prodParmReportFinished.ProdId == _prodParmReportFinished.ProdId
+               && prodParmReportFinished.QtyGood || prodParmReportFinished.QtyError
+            join inventTable
+            where inventTable.ItemId == prodParmReportFinished.ItemId
+               && inventTable.KPMGCommon_AssignmentIntelligentLicensePlateCode
+            {
+                ttsbegin;
+                ProdTable _prodTable = prodParmReportFinished.prodTable(true);
+                _prodTable.KPMGCommon_WHSLicensePlateIdNumberSack = _prodTable.KPMGCommon_WHSLicensePlateIdNumberSack + 1;
+                _prodTable.doUpdate();
+                ttscommit;
+            }
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxDataEntityViewExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>ITMPurchaseLinesEntity.KPMGCommon</Name>
+	<DataSources>
+		<AxQueryExtensionEmbeddedDataSource>
+			<Parent>ITMLine</Parent>
+			<DataSource>
+				<Name>ITMGoodsInTransitOrder</Name>
+				<DynamicFields>Yes</DynamicFields>
+				<IsReadOnly>Yes</IsReadOnly>
+				<Table>ITMGoodsInTransitOrder</Table>
+				<DataSources />
+				<DerivedDataSources />
+				<Fields />
+				<Ranges />
+				<JoinMode>OuterJoin</JoinMode>
+				<Relations>
+					<AxQuerySimpleDataSourceRelation>
+						<Name>QueryDataSourceRelation1</Name>
+						<Field>InventTransId</Field>
+						<JoinDataSource>ITMLine</JoinDataSource>
+						<RelatedField>InventTransIdRef</RelatedField>
+					</AxQuerySimpleDataSourceRelation>
+				</Relations>
+			</DataSource>
+		</AxQueryExtensionEmbeddedDataSource>
+	</DataSources>
+	<FieldGroupExtensions />
+	<FieldGroups />
+	<FieldModifications />
+	<Fields>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>KPMG_InventTransId</Name>
+			<DataField>InventTransId</DataField>
+			<DataSource>ITMGoodsInTransitOrder</DataSource>
+		</AxDataEntityViewField>
+		<AxDataEntityViewField xmlns=""
+			i:type="AxDataEntityViewMappedField">
+			<Name>KPMG_GITId</Name>
+			<DataField>GITId</DataField>
+			<DataSource>ITMGoodsInTransitOrder</DataSource>
+		</AxDataEntityViewField>
+	</Fields>
+	<Mappings />
+	<PropertyModifications>
+		<AxPropertyModification>
+			<Name>SupportsSetBasedSqlOperations</Name>
+			<Value>No</Value>
+		</AxPropertyModification>
+	</PropertyModifications>
+	<Relations />
+</AxDataEntityViewExtension>

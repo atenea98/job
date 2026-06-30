@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>InventParameters.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlbo501npm1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormGroupControl">
+				<Name>KPMGCommon_AnalysisCertificate</Name>
+				<Type>Group</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormReferenceGroupControl">
+						<Name>KPMGCommon_AnalysisCeertificate_KPMGCommon_ERFormatAnalysisCertificateId</Name>
+						<Type>ReferenceGroup</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls />
+						<DataSource>InventParameters</DataSource>
+						<ReferenceField>KPMGCommon_ERFormatAnalysisCertificateId</ReferenceField>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_AnalysisCeertificate_KPMGCommon_InstrumentsEmployed_ES</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>KPMGCommon_InstrumentsEmployed_ES</DataField>
+						<DataSource>InventParameters</DataSource>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>KPMGCommon_AnalysisCeertificate_KPMGCommon_InstrumentsEmployed_EN</Name>
+						<Type>String</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<DataField>KPMGCommon_InstrumentsEmployed_EN</DataField>
+						<DataSource>InventParameters</DataSource>
+					</AxFormControl>
+				</Controls>
+				<DataGroup>KPMGCommon_AnalysisCertificate</DataGroup>
+				<DataSource>InventParameters</DataSource>
+			</FormControl>
+			<Parent>FormGroupControl1</Parent>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlxyjktjbj1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormMenuFunctionButtonControl">
+				<Name>KPMGCommon_CertificateAnalysisLogo</Name>
+				<Type>MenuFunctionButton</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<MenuItemName>KPMGCommon_CertificateAnalysisLogo</MenuItemName>
+			</FormControl>
+			<Parent>QualityMgmtButtonGroup</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

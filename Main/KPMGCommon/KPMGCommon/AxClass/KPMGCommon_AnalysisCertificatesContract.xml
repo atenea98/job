@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_AnalysisCertificatesContract</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[DataContractAttribute]
+public class KPMGCommon_AnalysisCertificatesContract
+{
+    private PackingSlipId   packingSlipId;
+    private SalesShippingDate   deliveryDate;
+
+}
+
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>parmPackingSlipId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute]
+    public PackingSlipId parmPackingSlipId(PackingSlipId _packingSlipId = packingSlipId)
+    {
+        packingSlipId = _packingSlipId;
+        return packingSlipId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmDeliveryDate</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute]
+    public SalesShippingDate parmDeliveryDate(SalesShippingDate _deliveryDate = deliveryDate)
+    {
+        deliveryDate = _deliveryDate;
+        return deliveryDate;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

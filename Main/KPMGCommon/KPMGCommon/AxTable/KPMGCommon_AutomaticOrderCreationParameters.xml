@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTable xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_AutomaticOrderCreationParameters</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public class KPMGCommon_AutomaticOrderCreationParameters extends common
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>modifiedField</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name = "_fieldId"></param>
+    public void modifiedField(FieldId _fieldId)
+    {
+        inventDim InventDim;
+
+        super(_fieldId);
+
+        switch (_fieldId)
+        {
+            case fieldNum(KPMGCommon_AutomaticOrderCreationParameters, ItemId):
+            {
+                inventDim.initFromInventTable(InventTable::find(this.ItemId),
+                                      InventItemOrderSetupType::Invent,
+                                      null);
+
+                this.FormulaId = this.FormulaId ? this.FormulaId : InventTable::find(this.ItemId).bomId(systemDateGet(), this.QtySched, InventDim);
+                this.RouteId = this.RouteId ? this.RouteId : InventTable::find(this.ItemId).routeId(systemDateGet(), this.QtySched, InventDim);
+                break;
+            }
+       }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initValue</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    public void initValue()
+    {
+        this.ProdStatus = ProdStatus::Released;
+        this.PreviousClosing = NoYes::Yes;
+
+        super();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateField</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name = "_fieldIdToCheck"></param>
+    /// <returns></returns>
+    public boolean validateField(FieldId _fieldIdToCheck)
+    {
+        boolean         ret;
+        InventTable     inventTable = InventTable::find(this.itemId);
+        BOMVersion      bomVersion;
+        RouteVersion    routeVersion;
+    
+        ret = super(_fieldIdToCheck);
+    
+        switch (_fieldIdToCheck)
+        {
+            case fieldNum(KPMGCommon_AutomaticOrderCreationParameters, ItemId):
+                {
+                    if (inventTable.isFormulaAllowed())
+                    break;
+                }
+            case fieldNum(KPMGCommon_AutomaticOrderCreationParameters, FormulaId):
+            {
+                select bomVersion
+                    where bomVersion.ItemId == this.ItemId
+                        && bomVersion.BOMId == this.FormulaId
+                        && bomVersion.Active
+                        && bomVersion.Approved;
+                if (!bomVersion)
+                {
+                    if (inventTable.isFormulaAllowed())
+                    {
+                        ret = Checkfailed(strFmt("@KPMGCommon:NoExistFormulaForItem", this.ItemId,
+                                                                                      this.FormulaId));
+                    }
+                    else
+                    {
+                        ret = Checkfailed(strFmt("@SYS69982", this.ItemId,
+                                                              this.FormulaId));
+                    }
+                }
+                break;
+            }
+            case fieldNum(KPMGCommon_AutomaticOrderCreationParameters, RouteId):
+            {
+                select routeVersion
+                    where routeVersion.ItemId == this.ItemId
+                        && routeVersion.RouteId == this.RouteId
+                        && routeVersion.Approved;
+                if (!routeVersion)
+                    ret = Checkfailed(strFmt("@SYS69981", this.ItemId,
+                                                          this.RouteId));
+                break;
+            }
+    }
+       return ret;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>inventTable</Name>
+				<Source><![CDATA[
+    public InventTable inventTable(boolean _forUpdate = false)
+    {
+        InventTable inventTable = InventTable::find(this.ItemId, _forUpdate);
+
+        return inventTable;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateWrite</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public boolean validateWrite()
+    {
+        boolean ret;
+    
+        ret = super();
+
+        if (ret)
+        {
+            if ((this.QtySched && this.PdsCWBatchSched) || 
+                (!this.QtySched && !this.PdsCWBatchSched))
+                ret = checkFailed("@KPMGCommon:AutomaticOrderCreationParametersErrorQty"); //Solo se debe introducir Cantidad o Cantidad PC, según sea Peso Capturado o no.
+            
+            if (ret)
+            {
+                if (this.inventTable().pdsCWItem())
+                {
+                    if (this.QtySched && !this.PdsCWBatchSched)
+                        ret = checkFailed("@KPMGCommon:AutomaticOrderCreationParametersErrorQtyPC"); //Para artículo con Peso Capturado introducir Cantidad PC y no Cantidad.
+                }
+                else
+                {
+                    if (!this.QtySched && this.PdsCWBatchSched)
+                        ret = checkFailed("@KPMGCommon:AutomaticOrderCreationParametersErrorQtyNotPC"); //Para artículo sin Peso Capturado introducir Cantidad y no Cantidad PC.
+                }
+            }
+        }
+    
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<ConfigurationKey>Prod</ConfigurationKey>
+	<Label>@KPMGCommon:AutomaticOrderCreationParameters</Label>
+	<SubscriberAccessLevel>
+		<Read>Allow</Read>
+	</SubscriberAccessLevel>
+	<TableGroup>Parameter</TableGroup>
+	<TitleField1>ItemId</TitleField1>
+	<TitleField2>FormulaId</TitleField2>
+	<AllowRowVersionChangeTracking>Yes</AllowRowVersionChangeTracking>
+	<ClusteredIndex>AutomaticOrderCreationIdx</ClusteredIndex>
+	<CreatedBy>Yes</CreatedBy>
+	<CreatedDateTime>Yes</CreatedDateTime>
+	<ModifiedBy>Yes</ModifiedBy>
+	<ModifiedDateTime>Yes</ModifiedDateTime>
+	<Modules>ProductionControl</Modules>
+	<PrimaryIndex>AutomaticOrderCreationIdx</PrimaryIndex>
+	<DeleteActions />
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>AutoReport</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoLookup</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoIdentification</Name>
+			<AutoPopulate>Yes</AutoPopulate>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoSummary</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>AutoBrowse</Name>
+			<Fields />
+		</AxTableFieldGroup>
+		<AxTableFieldGroup>
+			<Name>General</Name>
+			<Label>@SYS35893</Label>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>ItemId</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>FormulaId</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>RouteId</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>QtySched</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>PdsCWBatchSched</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>InventLocationId</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>ProdStatus</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>PreviousClosing</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>ItemId</Name>
+			<AllowEdit>No</AllowEdit>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>ItemIdProduction</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>RouteId</Name>
+			<AllowEdit>No</AllowEdit>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>RouteId</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Mandatory>Yes</Mandatory>
+			<RelationContext>RouteVersion</RelationContext>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>QtySched</Name>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>ProdQtySched</ExtendedDataType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>InventLocationId</Name>
+			<ExtendedDataType>InventLocationId</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>ProdStatus</Name>
+			<AllowEdit>No</AllowEdit>
+			<AllowEditOnCreate>No</AllowEditOnCreate>
+			<AssetClassification>Customer Content</AssetClassification>
+			<EnumType>ProdStatus</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldEnum">
+			<Name>PreviousClosing</Name>
+			<ExtendedDataType>KPMGCommon_PreviousClosing</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+			<EnumType>NoYes</EnumType>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>FormulaId</Name>
+			<AllowEdit>No</AllowEdit>
+			<ExtendedDataType>KPMGCommon_Formula</ExtendedDataType>
+			<Mandatory>Yes</Mandatory>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldReal">
+			<Name>PdsCWBatchSched</Name>
+			<AssetClassification>Customer Content</AssetClassification>
+			<ExtendedDataType>PdsCWBatchSched</ExtendedDataType>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes>
+		<AxTableIndex>
+			<Name>AutomaticOrderCreationIdx</Name>
+			<Fields>
+				<AxTableIndexField>
+					<DataField>ItemId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>FormulaId</DataField>
+				</AxTableIndexField>
+				<AxTableIndexField>
+					<DataField>RouteId</DataField>
+				</AxTableIndexField>
+			</Fields>
+		</AxTableIndex>
+	</Indexes>
+	<Mappings />
+	<Relations>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>InventTable</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>InventTable</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<RelationshipType>Association</RelationshipType>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>ItemId</Name>
+					<Field>ItemId</Field>
+					<RelatedField>ItemId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+			<Index>ItemIdx</Index>
+		</AxTableRelation>
+		<AxTableRelation xmlns=""
+			i:type="AxTableRelationForeignKey">
+			<Name>InventLocation</Name>
+			<Cardinality>ZeroMore</Cardinality>
+			<RelatedTable>InventLocation</RelatedTable>
+			<RelatedTableCardinality>ZeroOne</RelatedTableCardinality>
+			<RelationshipType>Association</RelationshipType>
+			<Constraints>
+				<AxTableRelationConstraint xmlns=""
+					i:type="AxTableRelationConstraintField">
+					<Name>InventLocationId</Name>
+					<Field>InventLocationId</Field>
+					<RelatedField>InventLocationId</RelatedField>
+				</AxTableRelationConstraint>
+			</Constraints>
+			<Index>InventLocationIdx</Index>
+		</AxTableRelation>
+	</Relations>
+	<StateMachines />
+</AxTable>

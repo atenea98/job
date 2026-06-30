@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>CustTable_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(CustTable))]
+final class CustTable_KPMGCommon_Extension
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>insert</Name>
+				<Source><![CDATA[
+    void insert(DirPartyType _partyType, Name _name ,boolean _updateCRM)
+    {
+        this.KPMGCommon_PendienteActualizarKaytek = true;
+        next insert(_partyType,_name,_updateCRM);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>update</Name>
+				<Source><![CDATA[
+    void update(boolean _updateSmmBusRelTable, boolean _updateParty)
+    {
+        CustTable custTable = this.orig();
+
+        if (custTable.KPMGCommon_PendienteActualizarKaytek == false)
+        {
+            this.KPMGCommon_PendienteActualizarKaytek = true;
+        }
+        next update(_updateSmmBusRelTable,_updateParty);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>InventTestGroupMember_Table_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(InventTestGroupMember))]
+final class InventTestGroupMember_Table_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>initFromInventTestTable</Name>
+				<Source><![CDATA[
+    /// <summary>
+    ///    Initializes the record based on the specified <c>InventTestTable</c> record.
+    /// </summary>
+    /// <param name="_inventTestTable">
+    ///    The <c>InventTestTable</c> record from which to initialize.
+    /// </param>
+    public void initFromInventTestTable(InventTestTable _inventTestTable)
+    {
+        next initFromInventTestTable(_inventTestTable);
+
+        if (_inventTestTable)
+        {
+            this.KPMGCommon_CertOfAnalysisTestUnit  = _inventTestTable.KPMGCommon_CertOfAnalysisTestUnit;
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

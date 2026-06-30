@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>SalesFormLetter_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(SalesFormLetter))]
+final class SalesFormLetter_KPMGCommon_Extension
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>KPMGCommon_initParameter_KPMGCommon_PrintFormLetterPackingList</Name>
+				<Source><![CDATA[
+    public void  KPMGCommon_initParameter_KPMGCommon_PrintFormLetterPackingList(
+        NoYes              _KPMGCommon_PrintFormLetterPackingList    = this.KPMGCommon_PrintFormLetterPackingList()
+        )
+    {
+        this.KPMGCommon_PrintFormLetterPackingList(_KPMGCommon_PrintFormLetterPackingList);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_initParameter_KPMGCommon_PrintFormLetterWayBill</Name>
+				<Source><![CDATA[
+    public void  KPMGCommon_initParameter_KPMGCommon_PrintFormLetterWayBill(
+        NoYes              _KPMGCommon_PrintFormLetterWayBill    = this.KPMGCommon_PrintFormLetterWayBill()
+        )
+    {
+        this.KPMGCommon_PrintFormLetterWayBill(_KPMGCommon_PrintFormLetterWayBill);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_initParameter_KPMGCommon_PrintDeclarationOfConformityCert</Name>
+				<Source><![CDATA[
+    public void  KPMGCommon_initParameter_KPMGCommon_PrintDeclarationOfConformityCert(
+        NoYes              _KPMGCommon_PrintDeclarationOfConformityCert    = this.KPMGCommon_PrintDeclarationOfConformityCert()
+        )
+    {
+        this.KPMGCommon_PrintDeclarationOfConformityCert(_KPMGCommon_PrintDeclarationOfConformityCert);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

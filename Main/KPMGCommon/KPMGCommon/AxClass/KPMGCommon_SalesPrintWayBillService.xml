@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_SalesPrintWayBillService</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class KPMGCommon_SalesPrintWayBillService
+{
+    CustPackingSlipJour custPackingSlipJour;
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>process</Name>
+				<Source><![CDATA[
+    public void process(KPMGCommon_SalesPrintWayBillContract  _contract)
+    {
+
+        custPackingSlipJour = _contract.parmCustPackingSlipJour();
+        this.ReportSalesWayBill();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ReportSalesWayBill</Name>
+				<Source><![CDATA[
+    public void ReportSalesWayBill()
+    {   
+        SalesParameters    salesParameters = SalesParameters::find();
+
+        if(!salesParameters.KPMGCommon_ERFormatWaybillId)
+        {
+            warning("@KPMGCommon:ERFormatWayBillNoExist");
+        }
+        else
+        {
+            ERModelDefinitionInputParametersAction  obj = new ERModelDefinitionInputParametersAction();
+            obj.addParameter('model/$PackingSlipId', custPackingSlipJour.PackingSlipId);
+            obj.addParameter('model/$DeliveryDate', custPackingSlipJour.DeliveryDate);
+            ERObjectsFactory::createFormatMappingRunByFormatMappingId(salesParameters.KPMGCommon_ERFormatWaybillId,"").withParameter(obj).run();
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

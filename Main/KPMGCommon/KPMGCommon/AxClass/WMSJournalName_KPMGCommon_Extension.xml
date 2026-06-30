@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>WMSJournalName_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(WMSJournalName))]
+final class WMSJournalName_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>validateWrite</Name>
+				<Source><![CDATA[
+    public boolean validateWrite()
+    {
+        boolean ret = next validateWrite();
+        if (!ret)
+        {
+            return false;
+        }
+
+        if (this.KPMGCommon_KaytekIntegration == NoYes::Yes)
+        {
+            WMSJournalName existingRec;
+
+            select firstonly existingRec
+                where existingRec.JournalType               == this.JournalType
+                   && existingRec.KPMGCommon_KaytekIntegration == NoYes::Yes
+                   && existingRec.RecId                      != this.RecId;
+
+            if (existingRec.RecId)
+            {
+                throw error(strFmt("@KPMGCommon:KaytekIntegrationLimitField"));
+                return false;
+            }
+        }
+        return true;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

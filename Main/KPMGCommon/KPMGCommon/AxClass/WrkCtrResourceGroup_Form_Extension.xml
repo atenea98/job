@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>WrkCtrResourceGroup_Form_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(FormStr(WrkCtrResourceGroup))]
+final class WrkCtrResourceGroup_Form_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>canClose</Name>
+				<Source><![CDATA[
+    public boolean canClose()
+    {
+        boolean ret;
+        KPMGCommon_PercentConsumptionByResource percentConsumptionByResourceExists, percentConsumptionByResourceGroupType, 
+                                                percentConsumptionByResourceGroupMouthDryer, _TotalpercentConsumptionByResourceMouthDryer,
+                                                percentConsumptionByResourceGroupHooper, _TotalpercentConsumptionByResourceHopper;
+        Percent     typePercent = 0, TotalDryerPercent = 0;
+        ErrorMsg    errormessage;
+        ret = next canClose();
+    
+        Select firstonly percentConsumptionByResourceExists
+                group by WrkCtrId
+            where percentConsumptionByResourceExists.WrkCtrId == WrkCtrTable.WrkCtrId;
+        if (percentConsumptionByResourceExists)
+        {
+            while select percentConsumptionByResourceGroupType                  
+                group by WrkCtrId, TypeId, TypePercent
+                where percentConsumptionByResourceGroupType.WrkCtrId == WrkCtrTable.WrkCtrId
+            {
+                typePercent = typePercent + percentConsumptionByResourceGroupType.TypePercent;
+            }
+
+            if (typePercent != 100)
+            {
+                if (errormessage)
+                        errormessage += "/n";
+
+                errormessage += strFmt("@KPMGCommon:ErrorTypePercentageConsumption", typePercent); //El porcentaje Tipo total de consumo debe ser 100% y no %1.
+            }
+
+            while select percentConsumptionByResourceGroupMouthDryer
+                        group by WrkCtrId, typeId, ResourceMouth
+                        where percentConsumptionByResourceGroupMouthDryer.WrkCtrId == WrkCtrTable.WrkCtrId
+            {
+                TotalDryerPercent = 0;
+                while select _TotalpercentConsumptionByResourceMouthDryer
+                    group by WrkCtrId, typeId, ResourceMouth, ResourceDryer, DryerPercent
+                    where _TotalpercentConsumptionByResourceMouthDryer.WrkCtrId == percentConsumptionByResourceGroupMouthDryer.WrkCtrId
+                        && _TotalpercentConsumptionByResourceMouthDryer.TypeId == percentConsumptionByResourceGroupMouthDryer.TypeId
+                        && _TotalpercentConsumptionByResourceMouthDryer.ResourceMouth   == percentConsumptionByResourceGroupMouthDryer.ResourceMouth
+                {
+                    TotalDryerPercent = TotalDryerPercent + _TotalpercentConsumptionByResourceMouthDryer.DryerPercent;
+                }
+
+                if (TotalDryerPercent != 100)
+                {
+                    if (errormessage)
+                                errormessage += "/n";
+
+                    errormessage += strFmt("@KPMGCommon:ErrorDryerForMouthPercentageConsumption", percentConsumptionByResourceGroupMouthDryer.ResourceMouth,
+                                                                                                  TotalDryerPercent); //El Total porcentaje secador para boca %1 debe ser 100% y no %2.
+                }
+            }
+           
+            while select percentConsumptionByResourceGroupHooper
+                group by WrkCtrId, TypeId, ResourceMouth, ResourceDryer, InventLocationId
+                where percentConsumptionByResourceGroupHooper.WrkCtrId == WrkCtrTable.WrkCtrId
+            {
+                select sum(percent) from _TotalpercentConsumptionByResourceHopper
+                where _TotalpercentConsumptionByResourceHopper.WrkCtrId         == percentConsumptionByResourceGroupHooper.WrkCtrId
+                   && _TotalpercentConsumptionByResourceHopper.TypeId           == percentConsumptionByResourceGroupHooper.TypeId
+                   && _TotalpercentConsumptionByResourceHopper.ResourceMouth    == percentConsumptionByResourceGroupHooper.ResourceMouth
+                   && _TotalpercentConsumptionByResourceHopper.ResourceDryer    == percentConsumptionByResourceGroupHooper.ResourceDryer
+                   && _TotalpercentConsumptionByResourceHopper.InventLocationId == percentConsumptionByResourceGroupHooper.InventLocationId;
+                if (_TotalpercentConsumptionByResourceHopper.Percent != 100)
+                {
+                    if (errormessage)
+                        errormessage += "/n";
+
+                    errormessage += strFmt("@KPMGCommon:ErrorWarehouseHopperPercentageConsumption", percentConsumptionByResourceGroupHooper.InventLocationId,
+                                                                                                    _TotalpercentConsumptionByResourceHopper.Percent); //El porcentaje total de Tolva para almacén %1 debe ser 100% y no %2.
+                }
+            }
+            if (errormessage)
+                ret = checkFailed(errormessage);
+        }
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

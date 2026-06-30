@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgRegistrationParameters_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(JmgRegistrationParameters))]
+final class JmgRegistrationParameters_KPMGCommon_Extension
+{
+    public WMSLocationId   wMSLocationId;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>parmWMSLocationId</Name>
+				<Source><![CDATA[
+    [Hookable(false), DataMember('WMSLocationId')]
+    public WMSLocationId parmWMSLocationId(WMSLocationId _wMSLocationId = wMSLocationId)
+    {
+        wMSLocationId = _wMSLocationId;
+        return wMSLocationId;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

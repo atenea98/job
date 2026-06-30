@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_ProdLicensePlateLabelBuild</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public final class KPMGCommon_ProdLicensePlateLabelBuild
+{
+    public WHSLicensePlateLabel   label;
+    public WHSWorkTransType       workTransType;
+    public ProdParmReportFinished prodParmReportFinished;
+    public JmgJobId               jobId;
+
+    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    public void new(ProdParmReportFinished _prodParmReportFinished, WHSWorkTransType _workTransType)
+    {
+        if (!_prodParmReportFinished)
+        {
+            throw error(Error::wrongUseOfFunction(funcName()));
+        }
+
+        workTransType = _workTransType;
+        prodParmReportFinished = _prodParmReportFinished;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmJmgJobId</Name>
+				<Source><![CDATA[
+    public JmgJobId parmJmgJobId(JmgJobId _jobId = jobId)
+    {
+        jobId = _jobId;
+        return jobId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>buildLicensePlateLabel</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Builds license plate labels.
+    /// </summary>
+    /// <param name = "_inventDimId">The reported <c>InventDimId</c>.</param>
+    /// <param name = "_reportedQty">The reported quantity for this <c>InventDimId</c>.</param>
+    /// <returns>
+    /// The created license plate label Id.
+    /// </returns>
+    public WHSLabelId buildLicensePlateLabel(InventDimId _inventDimId = null, InventQty _reportedQty = prodParmReportFinished.QtyGood)
+    {
+        if (prodParmReportFinished.PmfProductType == PmfProductType::Co_Product)
+        {
+            this.initLabel_CoProduct(_inventDimId, _reportedQty);
+        }
+        else
+        {
+            this.initLabel(_inventDimId, _reportedQty);
+        }
+
+        label.insert();
+
+        return label.LabelId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>printLicensePlateLabel</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Prints license plate label using document routing.
+    /// </summary>
+    public void printLicensePlateLabel(WHSLabelId _labelId)
+    {
+        WHSDocumentRouting documentRouting = WHSDocumentRouting::construct();
+        WHSLicensePlateLabel labelForPrint = WHSLicensePlateLabel::find(_labelId, true);
+
+        labelForPrint.PrintedDate = DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone());
+
+        if (this.canUpdateLicensePlateLabel(labelForPrint))
+        {
+            labelForPrint.update();
+        }
+
+        documentRouting.printDocument(labelForPrint.WorkTransType, labelForPrint);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>canUpdateLicensePlateLabel</Name>
+				<Source><![CDATA[
+    [Wrappable(true)]
+    public boolean canUpdateLicensePlateLabel(WHSLicensePlateLabel _licensePlateLabel)
+    {
+        return true; // Used as an extension point.
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initLabel</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Initializes the label.
+    /// </summary>
+    /// <param name = "_inventDimId">The reported <c>InventDimId</c>.</param>
+    /// <param name = "_reportedQty">The reported quantity for this <c>InventDimId</c>.</param>
+    public void initLabel(InventDimId _inventDimId, InventQty _reportedQty)
+    {
+        this.initLabelFromProdTable(prodParmReportFinished.InventTransId);
+        InventDim inventDim = this.initLabelFromInventDim(_inventDimId ? _inventDimId : prodParmReportFinished.InventDimId);
+        this.initLabelInventQtyUnitId(_reportedQty);
+        this.initLabelWrkCtrId();
+        this.setAddressFrom(inventDim.wmsLocationId);
+        
+        label.setLabelId();
+        label.WorkTransType    = workTransType;
+        label.ItemName         = InventTable::find(label.ItemId).defaultProductName();
+        label.Weight           = InventTable::find(label.ItemId).grossWeight() * label.InventQty;
+        label.UCCCompanyPrefix = WHSParameters::find().UCCCompanyPrefix;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initLabel_CoProduct</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Initializes the label.
+    /// </summary>
+    /// <param name = "_inventDimId">The reported <c>InventDimId</c>.</param>
+    /// <param name = "_reportedQty">The reported quantity for this <c>InventDimId</c>.</param>
+    public void initLabel_CoProduct(InventDimId _inventDimId, InventQty _reportedQty)
+    {
+        this.initLabelFromProdTable_CoProduct(prodParmReportFinished.InventTransId);
+        InventDim inventDim = this.initLabelFromInventDim(_inventDimId ? _inventDimId : prodParmReportFinished.InventDimId);
+        this.initLabelInventQtyUnitId(_reportedQty);
+        this.initLabelWrkCtrId();
+        this.setAddressFrom(inventDim.wmsLocationId);
+        
+        label.setLabelId();
+        label.WorkTransType    = workTransType;
+        label.ItemName         = InventTable::find(label.ItemId).defaultProductName();
+        label.Weight           = InventTable::find(label.ItemId).grossWeight() * label.InventQty;
+        label.UCCCompanyPrefix = WHSParameters::find().UCCCompanyPrefix;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initLabelInventQtyUnitId</Name>
+				<Source><![CDATA[
+    public void initLabelInventQtyUnitId(InventQty _reportedQty)
+    {
+        label.Qty                 = _reportedQty;
+        label.InventUnitId        =  WHSCatchWeightHelper::inventHandlingUnitId(label.ItemId);
+        label.UnitID              = label.InventUnitId;
+        label.InventQty           = label.Qty;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initLabelFromProdTable</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Initializes the label fields from the <c>InventTransId</c> value.
+    /// </summary>
+    /// <param name = "_inventTransId">
+    /// The current <c>InventTransId</c>.
+    /// </param>
+    public void initLabelFromProdTable(InventTransId _inventTransId)
+    {
+        ProdTable  prodTable = ProdTable::findTransId(_inventTransId);
+        label.ItemId              = prodTable.ItemId;
+        label.OrderNum            = prodTable.ProdId;
+        [label.OrderedQty, label.RemainingQty] = this.findOrderedAndRemainQty(prodTable);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initLabelFromProdTable_CoProduct</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Initializes the label fields from the <c>InventTransId</c> value.
+    /// </summary>
+    /// <param name = "_inventTransId">
+    /// The current <c>InventTransId</c>.
+    /// </param>
+    public void initLabelFromProdTable_CoProduct(InventTransId _inventTransId)
+    {
+        PmfProdCoBy  pmfProdCoBy = PmfProdCoBy::findTransId(_inventTransId);
+        label.ItemId              = pmfProdCoBy.itemId;
+        label.OrderNum            = pmfProdCoBy.ProdId;
+        [label.OrderedQty, label.RemainingQty] = this.findOrderedAndRemainQty_CoProduct(pmfProdCoBy);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initLabelFromInventDim</Name>
+				<Source><![CDATA[
+    public InventDim initLabelFromInventDim(InventDimId _inventDimId)
+    {
+        InventDim inventDim = InventDim::find(_inventDimId);
+
+        InventDimParm inventDimParm;
+        inventDimParm.setAllProductDimensions();
+        inventDimParm.setAllTrackingDimensions();
+        inventDimParm.setAllStorageDimensions();
+        label.KPMGCommon_initLabelFromInventDimParm(inventDim, inventDimParm);
+
+        return inventDim;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initLabelWrkCtrId</Name>
+				<Source><![CDATA[
+    public void initLabelWrkCtrId()
+    {
+        if (this.parmJmgJobId())
+        {
+            JmgJobTable jobTable       = JmgJobTable::find(jobId);
+            label.WrkCtrId             = jobTable.WrkCtrId;
+            label.WorkCenterLocationId = WrkCtrTable::find(jobTable.WrkCtrId).inputWMSLocation(DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone())).wmsLocationId;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>setAddressFrom</Name>
+				<Source><![CDATA[
+    public void setAddressFrom(WmsLocationId _wmsLocationId)
+    {
+        label.FromName              = InventLocation::find(label.InventLocationId).Name;
+        label.wmsLocationIdFrom     = _wmsLocationId;
+        label.ZoneIdFrom            = WMSLocation::find(label.wmsLocationIdFrom, label.InventLocationId).ZoneId;
+        label.KPMGCoomon_initFromAddressFromInventSite(label.InventSiteId);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>findOrderedAndRemainQty</Name>
+				<Source><![CDATA[
+    public container findOrderedAndRemainQty(ProdTable _prodTable)
+    {
+        if (_prodTable.RecId && PdsGlobal::pdsIsCWItem(_prodTable.ItemId))
+        {
+            return [_prodTable.PdsCWBatchSched, _prodTable.PdsCWRemainInventPhysical];
+        }
+
+        return [_prodTable.QtySched, _prodTable.RemainInventPhysical];
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>findOrderedAndRemainQty_CoProduct</Name>
+				<Source><![CDATA[
+    public container findOrderedAndRemainQty_CoProduct(PmfProdCoBy _pmfProdCoBy)
+    {
+        if (_pmfProdCoBy.RecId && PdsGlobal::pdsIsCWItem(_pmfProdCoBy.ItemId))
+        {
+            return [_pmfProdCoBy.PdsCWInventCalc, _pmfProdCoBy.PdsCWRemainPhysical];
+        }
+
+        return [_pmfProdCoBy.QtyCoByCalc, _pmfProdCoBy.RemainCoByPhysical];
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

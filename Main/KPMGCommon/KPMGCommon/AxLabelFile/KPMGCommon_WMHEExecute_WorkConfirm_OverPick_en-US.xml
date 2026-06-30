@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxLabelFile xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_WMHEExecute_WorkConfirm_OverPick_en-US</Name>
+	<LabelContentFileName>KPMGCommon_WMHEExecute_WorkConfirm_OverPick.en-US.label.txt</LabelContentFileName>
+	<LabelFileId>KPMGCommon_WMHEExecute_WorkConfirm_OverPick</LabelFileId>
+	<RelativeUriInModelStore>KPMGCommon\KPMGCommon\AxLabelFile\LabelResources\en-US\KPMGCommon_WMHEExecute_WorkConfirm_OverPick.en-US.label.txt</RelativeUriInModelStore>
+</AxLabelFile>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxMenuItemAction xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V1">
+	<Name>KPMGCommon_ProcessImportQualityResults_OMT</Name>
+	<ConfigurationKey>InventQualityManagement</ConfigurationKey>
+	<Label>@KPMGCommon:ImportQualityResultsOMT</Label>
+	<MaintainUserLicense>Enterprise</MaintainUserLicense>
+	<Object>KPMGCommon_ProcessImportQualityResults_OMT</Object>
+	<ObjectType>Class</ObjectType>
+	<ViewUserLicense>Universal</ViewUserLicense>
+</AxMenuItemAction>

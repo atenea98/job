@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>TmsProcessXML_Base_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(TmsProcessXML_Base))]
+final class TmsProcessXML_Base_KPMGCommon_Extension
+{
+    #TMSXML
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>createFreightBillDetail</Name>
+				<Source><![CDATA[
+       public void createFreightBillDetail(TMSRouteRateDetail _detail, XmlNode _xmlNode)
+    {
+        WHSLoadTable                    loadTable       = WHSLoadTable::find(id);
+        TMSRouteSegment                 routeSegment    = TMSRouteSegment::find(_detail.RouteCode, _detail.Sequence);
+    
+        _detail = this.KPMGCommon_initializeNegativeFuelOil(_detail, _xmlNode);
+        //_xmlNode = this.KPMGCommon_initializeXmlNodeNegativeFuelOil(_detail, _xmlNode);
+
+        //Info(strfmt("TotalRate %1", any2real(this.returnNamedNode(_xmlNode, #totalRate))));
+        //Info(strfmt("UnitRate  %1", any2real(this.returnNamedNode(_xmlNode, #unitRate))));
+
+
+        next createFreightBillDetail(_detail, _xmlNode);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_initializeNegativeFuelOil</Name>
+				<Source><![CDATA[
+    public TMSRouteRateDetail KPMGCommon_initializeNegativeFuelOil(TMSRouteRateDetail _detail, XmlNode _xmlNode)
+    {
+        if (_detail.RateType == TMSRateType::Accessorial)
+        {
+            TMSParameters               tMSParameters   = TMSParameters::find();
+            WHSLoadTable                wHSLoadTable    = WHSLoadTable::find(Id);
+            TMSRouteSegment             tMSRouteSegment = TMSRouteSegment::find(_detail.RouteCode, _detail.Sequence, true);
+            TMSAccessorialAssignment    tMSAccessorialAssignment;
+            TMSDeliveryUTCDateTime      unspecifiedDateTime = tMSRouteSegment.SailUTCDateTime;
+            TMSDeliveryUTCDateTime      effectiveDateTime = tMSRouteSegment.ScheduledShipUTCDateTime;
+
+            select firstonly tMSAccessorialAssignment
+            where tMSAccessorialAssignment.CarrierCode == this.CarrierCode
+               && (tMSAccessorialAssignment.CarrierServiceCode == '' ||tMSAccessorialAssignment.CarrierServiceCode == _detail.CarrierServiceCode)
+               && tMSAccessorialAssignment.CarrierAccessorialId == tMSParameters.KPMGCommon_CarrierAccessorialNegativeId
+               && tMSAccessorialAssignment.AccessorialAssignmentLevel == TMSAccessorialAssignmentLevel::Shipment
+               && (tMSAccessorialAssignment.EffectiveUTCDateTimeFrom <= effectiveDateTime || tMSAccessorialAssignment.EffectiveUTCDateTimeFrom == unspecifiedDateTime)
+               && (tMSAccessorialAssignment.EffectiveUTCDateTimeTo >= effectiveDateTime || tMSAccessorialAssignment.EffectiveUTCDateTimeTo == unspecifiedDateTime)
+               && tMSAccessorialAssignment.FeeType == TMSFeeType::Percent
+               && (tMSAccessorialAssignment.CurrencyCode == '' ||tMSAccessorialAssignment.CurrencyCode == _detail.CurrencyCode)
+               && (tMSAccessorialAssignment.InventSiteId == '' || tMSAccessorialAssignment.InventSiteId == wHSLoadTable.InventSiteId )
+               && (tMSAccessorialAssignment.InventLocationId == '' || tMSAccessorialAssignment.InventLocationId == wHSLoadTable.InventLocationId)
+               && (tMSAccessorialAssignment.State == '' || tMSAccessorialAssignment.State == tMSRouteSegment.originPostalAddress().State)
+               && (tMSAccessorialAssignment.PostalCodeLow == '' || tMSAccessorialAssignment.PostalCodeLow <= tMSRouteSegment.originPostalAddress().ZipCode)
+               && (tMSAccessorialAssignment.PostalCodeHigh == '' || tMSAccessorialAssignment.PostalCodeHigh >= tMSRouteSegment.destinationPostalAddress().ZipCode)
+
+               && (tMSAccessorialAssignment.CountryRegion == '' || tMSAccessorialAssignment.CountryRegion == tMSRouteSegment.originPostalAddress().CountryRegionId);
+
+            if (tMSAccessorialAssignment.KPMGCommon_NegativeFuelOilPercentage)
+            {
+                ttsbegin;
+                _detail.RateCur        = -_detail.RateCur;
+                _detail.RateUnitRate   = -_detail.RateUnitRate;
+                _detail.ShipperRate    = -_detail.ShipperRate;
+                _detail.selectForUpdate(true);
+                _detail.update();
+
+                tMSRouteSegment.CustomerRate = tMSRouteSegment.CustomerRate + (_detail.RateCur * 2);
+                tMSRouteSegment.ShipperRate  = tMSRouteSegment.ShipperRate + (_detail.ShipperRate * 2);
+                tMSRouteSegment.RateCur      = tMSRouteSegment.RateCur + (_detail.RateCur * 2);
+                tMSRouteSegment.update();
+                ttscommit;
+            }
+        }
+
+        return _detail;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_initializeXmlNodeNegativeFuelOil</Name>
+				<Source><![CDATA[
+    public XmlNode KPMGCommon_initializeXmlNodeNegativeFuelOil(TMSRouteRateDetail _detail, XmlNode _xmlNode)
+    {
+        if (_detail.RateType == TMSRateType::Accessorial && _detail.RateCur < 0)
+        {
+            this.writeNode(_xmlNode, #totalRate, num2str(_detail.RateCur,10,4,2,0));
+            this.writeNode(_xmlNode, #unitRate, num2str(_detail.RateUnitRate,10,4,2,0));
+        }
+
+        return _xmlNode;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>readAppSalesLine</Name>
+				<Source><![CDATA[
+    public void readAppSalesLine(XmlNode _xmlNode, SalesLine _salesLine)
+    {
+        SalesLine                   salesLine = _salesLine;
+        MarkupTrans                 markupTrans;
+        MarkupTable                 markupTable;
+        XmlNodeList                 appList;
+        XmlNode                     appNode;
+        XmlNodeList                 rateList;
+        XmlNode                     rateNode;
+        TMSRateType                 rateType;
+        TMSId                       code;
+        DlvTerm                     dlvTerm;
+        RefRecId                    freightBillRecId;
+        TMSFreightBillDetail        freightBillDetail;
+
+        appList         = _xmlNode.selectNodes(#apportionment);
+        appNode         = appList.nextNode();
+        dlvTerm         = DlvTerm::find(freightTerm);
+
+        if (appNode)
+        {
+            rateList    = appNode.selectNodes(#rate);
+            rateNode    = rateList.nextNode();
+
+            while (rateNode)
+            {
+                rateType            = str2int(this.returnNamedNode(rateNode, #rateType));
+                code                = this.returnNamedNode(rateNode, #code);
+                freightBillRecId    = str2int64(this.returnNamedNode(rateNode, #objectId));
+                str rateTotalTXT = num2str(TMSFreightBillDetail::find(freightBillRecId).RateCur,10,4,1,0);
+                if (TMSFreightBillDetail::find(freightBillRecId).RateCur != any2real(this.returnNamedNode(rateNode, #totalRate)))
+                    this.writeNode(rateNode, #totalRate, rateTotalTXT);
+
+                rateNode = rateList.nextNode();
+            }
+        }
+
+        next readAppSalesLine(_xmlNode, _salesLine);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

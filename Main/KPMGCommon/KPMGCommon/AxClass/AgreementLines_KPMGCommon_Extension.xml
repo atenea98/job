@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>AgreementLines_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(AgreementLine))]
+final class AgreementLines_KPMGCommon_Extension
+{
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>KPMGCommon_calcTaxItemGroup</Name>
+				<Source><![CDATA[
+    public display TaxItemGroup KPMGCommon_calcTaxItemGroup()
+    {
+        InventTableModule    inventTableModule;
+       
+        select * from inventTableModule
+            where inventTableModule.ItemId == this.ItemId
+            && inventTableModule.ModuleType == 2;
+        
+        
+        return inventTableModule.TaxItemGroupId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_calcSupplierTaxGroup</Name>
+				<Source><![CDATA[
+    public display TaxGroup KPMGCommon_calcSupplierTaxGroup()
+    {
+        AgreementHeader agreementHeader;
+        PurchAgreementHeader purchAgreementHeader;
+        VendTable VendTable;
+        RecId agreementRecId;
+        VendAccount vendAccount;
+
+        select firstonly  agreementHeader
+            where agreementHeader.RecId == this.Agreement;
+        
+        agreementRecId = agreementHeader.RecId;
+
+
+        select firstonly purchAgreementHeader
+            where purchAgreementHeader.RecId == agreementRecId;
+
+        vendAccount = purchAgreementHeader.VendAccount;
+
+        select firstonly vendTable
+            where vendTable.AccountNum == vendAccount;
+
+        return vendTable.TaxGroup;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_calcFinalTaxCode</Name>
+				<Source><![CDATA[
+    public display /*TaxCode*/container KPMGCommon_calcFinalTaxCode()
+    {
+        TaxGroupData   taxGroupData;
+        TaxOnItem      taxOnItem;
+        TaxCode        resultTaxCode;
+        TaxGroup       supplierTaxGroup = this.KPMGCommon_calcSupplierTaxGroup();
+        TaxItemGroup itemTaxGroupId = this.KPMGCommon_calcTaxItemGroup();
+        container      contTax;
+
+        while select TaxCode from taxGroupData
+        where taxGroupData.TaxGroup == supplierTaxGroup
+        join TaxCode from taxOnItem
+            where taxOnItem.TaxItemGroup == itemTaxGroupId
+            && taxOnItem.TaxCode == taxGroupData.TaxCode
+        {
+            //resultTaxCode = taxGroupData.TaxCode;
+            contTax += [taxGroupData.TaxCode];
+           // break;
+        }
+
+        return contTax;//resultTaxCode;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_calcFinalTaxPercentage</Name>
+				<Source><![CDATA[
+    public display real KPMGCommon_calcFinalTaxPercentage()
+    {
+        TaxData   taxData;
+        container contTax = this.KPMGCommon_calcFinalTaxCode();
+        TaxValue  retTaxValue;
+        TaxCode   taxCode;
+        Percent   sumPercent;
+
+        while(contTax)
+        {
+            taxCode = conPeek(contTax,1);
+
+
+            select firstonly taxData
+                where taxData.TaxCode == TaxCode;
+
+            sumPercent += taxData.TaxValue;
+
+            contTax = conDel(contTax,1,1);
+        }
+        /*select firstonly taxData
+            where taxData.TaxCode == this.calcFinalTaxCode();
+        return taxData.TaxValue;*/
+        return sumPercent;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

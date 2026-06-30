@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_ImportSacks</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class KPMGCommon_ImportSacks
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        AsciiStreamIo                       file;
+        FileUploadTemporaryStorageResult    fileUpload;
+        WMSJournalTable                     jourTable;
+
+        select firstonly forupdate * from jourTable where jourTable.RecId == _args.record().RecId;
+
+        try
+        {
+            fileUpload  = File::GetFileFromUser() as FileUploadTemporaryStorageResult;
+            if (fileUpload != null)
+            {
+                file        = AsciiStreamIo::constructForRead(fileUpload.openResult());
+                if (file)
+                {
+                    if (file.status())
+                    {
+                        throw error("@SYS52680");
+                    }
+                    file.inFieldDelimiter(';');
+                    file.inRecordDelimiter('\r\n');
+                }
+
+                if (jourTable.InventTransType == InventTransType::ITMGIT)
+                {
+                    if (KPMGCommon_ImportSacks::validateTransit(file, jourTable))
+                    {
+                        throw Global::error("@KPMGCommon:ErrorOperation");
+                    }
+                    KPMGCommon_ImportSacks::createTransit(fileUpload, jourTable);
+                }
+                else
+                {
+                    if(KPMGCommon_ImportSacks::validate(file, jourTable))
+                    {
+                        throw Global::error("@KPMGCommon:ErrorOperation");
+                    }
+                    KPMGCommon_ImportSacks::create(fileUpload, jourTable);
+                }
+                info("@KPMGCommon:SuccesOperation");
+            }
+        }
+        catch (Exception::Deadlock)
+        {
+            retry;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validate</Name>
+				<Source><![CDATA[
+    public static boolean validate(AsciiStreamIo _file, WMSJournalTable _jourTable)
+    {
+        boolean errors = false;
+        str purchaseOrder, product;
+        container rec;
+        int counter = 0, reg = 0;
+        PurchTable  purchTable;
+        PurchLine   purchLineExternalItemId, purchLineItemId;
+
+
+        while (!_file.status())
+        {
+            rec = _file.read();
+            reg++;
+
+            if (reg == 1)
+                continue;
+
+            if (conLen(rec))
+            {
+                str errorLine   = "";
+
+                counter++;
+                purchaseOrder   = conPeek(rec,1);
+                product         = conPeek(rec,2);
+
+                if(_jourTable.inventTransRefId != purchaseOrder)
+                {
+                    select firstonly purchTable
+                        where purchTable.PurchOrderFormNum == purchaseOrder
+                           && purchTable.PurchStatus       == PurchStatus::Backorder;
+                    if (purchTable)
+                        purchaseOrder = purchTable.PurchId;
+
+                    if(_jourTable.inventTransRefId != purchaseOrder)
+                    {
+                        info(strFmt("@KPMGCommon:ErrorSalesOrder", counter));
+                        errors = true;
+                    }
+                }
+                else
+                {
+                    select firstonly * from purchLineExternalItemId
+                        where purchLineExternalItemId.PurchId == purchaseOrder
+                        && purchLineExternalItemId.ExternalItemId == product
+                        && purchLineExternalItemId.PurchStatus == PurchStatus::Backorder;
+
+                    if(!purchLineExternalItemId)
+                    {
+                        select firstonly purchLineItemId
+                            where purchLineItemId.PurchId       == purchaseOrder
+                               && purchLineItemId.ItemId        == product
+                               && purchLineItemId.PurchStatus   == PurchStatus::Backorder;
+
+                        if(!purchLineItemId)
+                        {
+                            info(strFmt("@KPMGCommon:ErrorProduct", counter, product));
+                            errors = true;
+                        }
+                    }
+                }
+                
+            }
+        }
+        return errors;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>create</Name>
+				<Source><![CDATA[
+    public static void create(FileUploadTemporaryStorageResult _fileUpload, WMSJournalTable _jourTable)
+    {
+        container   rec;
+        int         reg = 0;
+        AsciiStreamIo file = AsciiStreamIo::constructForRead(_fileUpload.openResult());
+        if (file)
+        {
+            if (file.status())
+            {
+                throw error("@SYS52680");
+            }
+            file.inFieldDelimiter(';');
+            file.inRecordDelimiter('\r\n');
+        }
+
+        while (!file.status())
+        {
+            rec = file.read();
+            reg++;
+            if (reg == 1)
+                continue;
+            
+            if (conLen(rec))
+            {
+                WMSJournalTrans jourTrans;
+                WHSLicensePlate licensePlate;
+                InventDim       inventDim;
+                InventBatch     inventBatch;
+                str             purchaseOrder, product, licensePlateId, qty, batchId;
+                PurchLine purchLine;
+
+                purchaseOrder   = conPeek(rec,1);
+                product         = conPeek(rec,2);
+                licensePlateId  = conPeek(rec,4);
+                qty             = conPeek(rec,5);
+                batchId         = conPeek(rec,6);
+
+                jourTrans.journalId = _jourTable.journalId;
+
+                purchaseOrder = KPMGCommon_ImportSacks::ReturnPurchaseOrder(purchaseOrder);
+
+                select firstonly * from licensePlate
+                    where licensePlate.LicensePlateId == licensePlateId;
+                /*
+                select firstonly * from purchLine
+                    where purchLine.PurchId == purchaseOrder
+                    && purchLine.ExternalItemId == product
+                    && purchLine.PurchStatus == PurchStatus::Backorder;
+                */
+                purchLine = KPMGCommon_ImportSacks::ReturnPurchLine(purchaseOrder, product);
+
+                select firstonly * from inventBatch
+                    where inventBatch.ItemId == purchLine.ItemId
+                    && inventBatch.inventBatchId == batchId;
+
+                ttsbegin;
+                if(licensePlate.RecId == 0)
+                {
+                    licensePlate.LicensePlateId = licensePlateId;
+                    licensePlate.insert();
+                }
+
+                if(inventBatch.RecId == 0)
+                {
+                    inventBatch.ItemId = purchLine.ItemId;
+                    inventBatch.inventBatchId = batchId;
+                    inventBatch.insert();
+                }
+
+                inventDim = InventDim::find(jourTrans.inventDimId, true);
+                inventDim.InventSiteId = purchLine.inventDim().InventSiteId;
+                inventDim.InventLocationId = purchLine.inventDim().InventLocationId;
+                inventDim.wMSLocationId = purchLine.inventDim().wMSLocationId ? purchLine.inventDim().wMSLocationId : InventLocation::find(purchLine.inventDim().InventLocationId).WMSLocationIdDefaultReceipt;
+                inventDim.inventBatchId  = batchId;
+                inventDim.InventStatusId = purchLine.inventDim().InventStatusId;
+                inventDim.LicensePlateId = licensePlateId;
+                inventDim = InventDim::findOrCreate(inventDim);
+
+                jourTrans.inventTransType = InventTransType::Purch;
+                jourTrans.inventTransRefId = purchaseOrder;
+                jourTrans.inventDimId = inventDim.inventDimId;
+                jourTrans.inventTransId = purchLine.InventTransId;
+                jourTrans.transDate = today();
+                jourTrans.itemId = purchLine.ItemId;
+                jourTrans.lineNum = WMSJournalTrans::lastLineNum(_jourTable.journalId) + 1;
+                jourTrans.qty = any2Real(qty);
+                jourTrans.insert();
+
+                ttscommit;
+            }
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateTransit</Name>
+				<Source><![CDATA[
+    public static boolean validateTransit(AsciiStreamIo _file, WMSJournalTable _jourTable)
+    {
+        boolean                   errors     = false;
+        container                 rec;
+        int                       lineNumber = 0;
+        str                       csvNumRefId, product;
+
+        ITMTable tripHeader;
+        select firstonly tripHeader
+        where tripHeader.ShipId == _jourTable.ITMId;
+        if(!tripHeader)
+            throw error("@KPMGCommon:ErrorShipNotFound");
+
+        ITMGoodsInTransitOrder transitOrder;
+        select firstonly transitOrder
+        where transitOrder.GitId == _jourTable.inventTransRefId;
+        if (!transitOrder)
+            throw error("@KPMGCommon:ErrorNotOrderForTransit");
+
+        if (transitOrder.Status != ITMGoodsInTransitStatus::InTransit)
+            throw error("@KPMGCommon:ErrorOrderNotInTransit");
+
+        str itmNumRefId = transitOrder.GitId;
+
+        while (!_file.status())
+        {
+            rec = _file.read();
+            lineNumber++;
+            if (lineNumber == 1)
+                continue;
+            if (!conLen(rec))
+                continue;
+
+            csvNumRefId = conPeek(rec, 1);
+            product  = conPeek(rec, 2);
+
+            if (csvNumRefId != itmNumRefId)
+            {
+                throw error(strFmt("@KPMGCommon:ErrorNumRefTrip"));
+                errors = true;
+                continue;
+            }
+
+            ITMLine shipLine;
+            select firstonly shipLine
+            where shipLine.ShipId       == _jourTable.ITMId
+               && shipLine.TransRefId   == transitOrder.TransRefId
+               && (shipLine.ShipItemId  == product);
+            if (!shipLine)
+            {
+                throw error(strFmt("@KPMGCommon:ErrorLine",lineNumber, product, _jourTable.ITMId));
+                errors = true;
+            }
+        }
+
+        return errors;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createTransit</Name>
+				<Source><![CDATA[
+    public static void createTransit(FileUploadTemporaryStorageResult _fileUpload, WMSJournalTable _jourTable)
+    {
+        AsciiStreamIo    file       = AsciiStreamIo::constructForRead(_fileUpload.openResult());
+        container        rec;
+        int              lineNumber = 0;
+
+        ITMGoodsInTransitOrder transitOrder;
+        select firstonly transitOrder
+        where transitOrder.GitId == _jourTable.InventTransRefId;
+        if (!transitOrder)
+            throw error("@KPMGCommon:ErrorNotOrderForTransit");
+        if (transitOrder.Status != ITMGoodsInTransitStatus::InTransit)
+            throw error("@KPMGCommon:ErrorOrderNotInTransit");
+
+        str itmNumRefId = transitOrder.GitId;
+
+        if (!file || file.status())
+            throw error("@SYS52680");
+        file.inFieldDelimiter(';');
+        file.inRecordDelimiter('\r\n');
+
+        while (!file.status())
+        {
+            rec = file.read();
+            lineNumber++;
+            if (lineNumber == 1 || !conLen(rec))
+                continue;
+
+            str csvNumRefId    = conPeek(rec, 1);
+            str product        = conPeek(rec, 2);
+            str licensePlateId = conPeek(rec, 4);
+            str qtyStr         = conPeek(rec, 5);
+            str batchId        = conPeek(rec, 6);
+
+            if (csvNumRefId != itmNumRefId)
+                throw error("@KPMGCommon:ErrorNumRefTrip");
+
+            ITMLine shipLine;
+            select firstonly shipLine
+            where shipLine.ShipId     == _jourTable.ITMId
+               && shipLine.TransRefId == transitOrder.TransRefId
+               && shipLine.ShipItemId  == product;
+            if (!shipLine)
+                throw error(strFmt("@KPMGCommon:ErrorLine", lineNumber, product, _jourTable.ITMId));
+
+            ttsBegin;
+
+            WHSLicensePlate lp;
+            select forupdate lp
+                where lp.LicensePlateId == licensePlateId;
+            if (lp.RecId == 0)
+            {
+                lp.LicensePlateId = licensePlateId;
+                lp.insert();
+            }
+
+            InventBatch batch;
+            select firstonly batch
+                where batch.ItemId       == shipLine.ShipItemId
+                   && batch.InventBatchId == batchId;
+            if (batch.RecId == 0)
+            {
+                batch.ItemId        = shipLine.ShipItemId;
+                batch.InventBatchId = batchId;
+                batch.insert();
+            }
+
+            InventDim inventDim = InventDim::find(transitOrder.InventDimId, true);
+            inventDim.InventSiteId     = shipLine.inventDim().InventSiteId;
+            inventDim.InventLocationId = shipLine.inventDim().InventLocationId;
+            inventDim.WMSLocationId    = shipLine.inventDim().WMSLocationId ? shipLine.inventDim().WMSLocationId
+                                                                            : InventLocation::find(shipLine.inventDim().InventLocationId).WMSLocationIdDefaultReceipt;
+            inventDim.InventBatchId    = batchId;
+            inventDim.InventStatusId   = shipLine.inventDim().InventStatusId;
+            inventDim.LicensePlateId   = licensePlateId;
+            inventDim = InventDim::findOrCreate(inventDim);
+
+
+            WMSJournalTrans jourTrans;
+            jourTrans.JournalId        = _jourTable.JournalId;
+            jourTrans.InventTransType  = _jourTable.InventTransType;
+            jourTrans.InventTransRefId = itmNumRefId;
+            jourTrans.InventTransId    = transitOrder.InventTransId;
+            jourTrans.InventDimId      = inventDim.InventDimId;
+            jourTrans.TransDate        = today();
+            jourTrans.ItemId           = shipLine.ShipItemId;
+            jourTrans.LineNum          = WMSJournalTrans::lastLineNum(_jourTable.JournalId) + 1;
+            jourTrans.Qty              = any2Real(qtyStr);
+            jourTrans.insert();
+
+            ttsCommit;
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ReturnPurchaseOrder</Name>
+				<Source><![CDATA[
+    public static str ReturnPurchaseOrder(str purchaseOrder)
+    {
+        PurchTable  purchTable, purchTablePurchOrderFormNum;
+
+        select firstonly purchTable
+            where purchTable.PurchId        == purchaseOrder
+                && purchTable.PurchStatus   == PurchStatus::Backorder;
+        if (purchTable)
+        {
+            purchaseOrder = purchTable.PurchId;
+        }
+        else
+        {
+            select firstonly purchTablePurchOrderFormNum
+                where purchTablePurchOrderFormNum.PurchOrderFormNum == purchaseOrder
+                   && purchTablePurchOrderFormNum.PurchStatus       == PurchStatus::Backorder;
+            if (purchTablePurchOrderFormNum)
+            {
+                purchaseOrder = purchTablePurchOrderFormNum.PurchId;
+            }
+        }
+
+        return purchaseOrder;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ReturnPurchLine</Name>
+				<Source><![CDATA[
+    public static PurchLine ReturnPurchLine(str purchaseOrder, str product)
+    {
+        PurchLine purchLine, purchLineItemId, purchLineExternalItemId;
+
+        select firstonly purchLineExternalItemId
+            where purchLineExternalItemId.PurchId == purchaseOrder
+               && purchLineExternalItemId.ExternalItemId == product
+               && purchLineExternalItemId.PurchStatus == PurchStatus::Backorder;
+        if (purchLineExternalItemId)
+        {
+            purchLine = purchLineExternalItemId;
+        }
+        else
+        {
+            select firstonly purchLineItemId
+                            where purchLineItemId.PurchId       == purchaseOrder
+                               && purchLineItemId.ItemId        == product
+                               && purchLineItemId.PurchStatus   == PurchStatus::Backorder;
+
+            if(purchLineItemId)
+            {
+                purchLine = purchLineItemId;
+            }
+        }
+
+        return purchLine;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_SalesInvoiceFas5LoadController</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class KPMGCommon_SalesInvoiceFas5LoadController extends SysOperationServiceController
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>new</Name>
+				<Source><![CDATA[
+    protected void new()
+    {
+        super(classStr(KPMGCommon_SalesInvoiceFas5LoadService), methodStr(KPMGCommon_SalesInvoiceFas5LoadService, process), SysOperationExecutionMode::Synchronous);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>defaultCaption</Name>
+				<Source><![CDATA[
+    public ClassDescription defaultCaption()
+    {
+        return "@KPMGCommon:SalesInvoiceFas5";
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static KPMGCommon_SalesInvoiceFas5LoadController construct(SysOperationExecutionMode _executionMode = SysOperationExecutionMode::Synchronous)
+    {
+        KPMGCommon_SalesInvoiceFas5LoadController controller;
+        controller = new KPMGCommon_SalesInvoiceFas5LoadController();
+        controller.parmExecutionMode(_executionMode);
+        return controller;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        KPMGCommon_SalesInvoiceFas5LoadController controller;
+        controller = KPMGCommon_SalesInvoiceFas5LoadController::construct();
+        controller.parmArgs(_args);
+        controller.startOperation();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

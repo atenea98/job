@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxSecurityDuty xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_AutomaticOrderCreationDuties</Name>
+	<Label>@KPMGCommon:ProcessAutomaticOrderCreation</Label>
+	<Privileges>
+		<AxSecurityPrivilegeReference>
+			<Name>KPMGCommon_AutomaticOrderCreationView</Name>
+		</AxSecurityPrivilegeReference>
+		<AxSecurityPrivilegeReference>
+			<Name>KPMGCommon_AutomaticOrderCreationMaintain</Name>
+		</AxSecurityPrivilegeReference>
+	</Privileges>
+</AxSecurityDuty>

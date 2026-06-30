@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>CustPackingSlipJournal.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControllzsbcul51</Name>
+			<FormControl xmlns=""
+				i:type="AxFormMenuFunctionButtonControl">
+				<Name>KPMGCommon_PrintAnalysisCretificate</Name>
+				<Type>MenuFunctionButton</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataSource>CustPackingSlipJour</DataSource>
+				<MenuItemName>KPMGCommon_PrintAnalysisCretificate</MenuItemName>
+				<MenuItemType>Action</MenuItemType>
+				<MultiSelect>No</MultiSelect>
+			</FormControl>
+			<Parent>SalesPackingSlipShow</Parent>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlir3cwyw21</Name>
+			<FormControl xmlns=""
+				i:type="AxFormMenuFunctionButtonControl">
+				<Name>KPMGCommon_SalesPrintPackingList</Name>
+				<Type>MenuFunctionButton</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataSource>CustPackingSlipJour</DataSource>
+				<MenuItemName>KPMGCommon_SalesPrintPackingList</MenuItemName>
+				<MenuItemType>Action</MenuItemType>
+				<MultiSelect>No</MultiSelect>
+			</FormControl>
+			<Parent>SalesPackingSlipShow</Parent>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlftypj2sa1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormMenuFunctionButtonControl">
+				<Name>KPMGCommon_SalesPrintWayBill</Name>
+				<Type>MenuFunctionButton</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<DataSource>CustPackingSlipJour</DataSource>
+				<MenuItemName>KPMGCommon_SalesPrintWayBill</MenuItemName>
+				<MenuItemType>Action</MenuItemType>
+				<MultiSelect>No</MultiSelect>
+			</FormControl>
+			<Parent>SalesPackingSlipShow</Parent>
+		</AxFormExtensionControl>
+		<AxFormExtensionControl xmlns="">
+			<Name>FormExtensionControlfgcwzhwk1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormMenuFunctionButtonControl">
+				<Name>KPMGCommon_PrintDeclarationOfConformityCert</Name>
+				<Type>MenuFunctionButton</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<MenuItemName>KPMGCommon_PrintDeclarationOfConformityCert</MenuItemName>
+				<MenuItemType>Action</MenuItemType>
+				<Text>@KPMGCommon:CertificateOfConformity</Text>
+			</FormControl>
+			<Parent>SalesPackingSlipShow</Parent>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

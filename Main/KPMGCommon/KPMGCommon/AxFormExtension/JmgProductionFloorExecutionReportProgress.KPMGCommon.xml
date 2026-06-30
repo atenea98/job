@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxFormExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>JmgProductionFloorExecutionReportProgress.KPMGCommon</Name>
+	<ControlModifications />
+	<Controls>
+		<AxFormExtensionControl xmlns="">
+			<Name>Copypuybhrjf1</Name>
+			<FormControl xmlns=""
+				i:type="AxFormTabPageControl">
+				<Name>WMSLocationNumberTab</Name>
+				<AutoDeclaration>Yes</AutoDeclaration>
+				<Type>TabPage</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormGroupControl">
+						<Name>WMSLocationNumberGroup</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>Group</Type>
+						<WidthMode>SizeToAvailable</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormStringControl">
+								<Name>WMSLocationId</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
+								<EnableFormRef>No</EnableFormRef>
+								<Type>String</Type>
+								<WidthMode>SizeToAvailable</WidthMode>
+								<FormControlExtension
+									i:nil="true" />
+								<DataField>KPMGCommon_WMSlocation</DataField>
+								<DataSource>JmgTmpJobBundleProdFeedback</DataSource>
+								<LabelPosition>Above</LabelPosition>
+								<LookupButton>Never</LookupButton>
+								<ShowLabel>No</ShowLabel>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormCommandButtonControl">
+								<Name>ClearButtonWMSLocation</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
+								<ElementPosition>1610612734</ElementPosition>
+								<FilterExpression>%1</FilterExpression>
+								<Height>60</Height>
+								<Type>CommandButton</Type>
+								<VerticalSpacing>-1</VerticalSpacing>
+								<Width>120</Width>
+								<FormControlExtension
+									i:nil="true" />
+								<ButtonDisplay>ImageOnly</ButtonDisplay>
+								<Command>Clear</Command>
+								<NormalImage>Cancel</NormalImage>
+								<SaveRecord>No</SaveRecord>
+								<Text>@SYS60541</Text>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>SearchButtonWMSLocation</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<ButtonDisplay>ImageOnly</ButtonDisplay>
+								<NormalImage>Zoom</NormalImage>
+								<Text>@SYS3340</Text>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormCommandButtonControl">
+								<Name>ContinueWMSLocationNumberTabButton</Name>
+								<AutoDeclaration>Yes</AutoDeclaration>
+								<Height>70</Height>
+								<Type>CommandButton</Type>
+								<Width>140</Width>
+								<FormControlExtension
+									i:nil="true" />
+								<Big>Yes</Big>
+								<ButtonDisplay>ImageOnly</ButtonDisplay>
+								<Command>Enter</Command>
+								<DefaultButton>Yes</DefaultButton>
+								<NormalImage>Forward</NormalImage>
+								<Text>@SYS18701</Text>
+							</AxFormControl>
+						</Controls>
+						<ArrangeMethod>HorizontalLeft</ArrangeMethod>
+						<Columns>4</Columns>
+					</AxFormControl>
+				</Controls>
+				<Caption>@SYS3794</Caption>
+			</FormControl>
+			<Parent>FormTabs</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>GoodQuantityTabPage</PreviousSibling>
+		</AxFormExtensionControl>
+	</Controls>
+	<DataSourceModifications />
+	<DataSourceReferences />
+	<DataSources />
+	<Parts />
+	<PropertyModifications />
+</AxFormExtension>

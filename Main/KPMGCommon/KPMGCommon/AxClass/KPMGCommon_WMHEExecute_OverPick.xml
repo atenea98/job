@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_WMHEExecute_OverPick</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+/// <summary>
+/// The <c>KPMGCommon_WMHEExecute_OverPick</c> class is used to execute inbound transactions of type Over Pick.
+/// </summary>
+[WMHEExecuteAttribute(WMHEInboundTransType::OverPick)]
+public class KPMGCommon_WMHEExecute_OverPick extends WMHEExecute_WorkConfirm
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>execute</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Abstract method that holds the processing logic
+    /// for inbound execution.
+    /// Peforms a Over pick of a workLine.
+    /// </summary>
+    public void execute()
+    {
+        try
+        {
+            using (var activityContext = this.KPMGCommon_instrumentationLogger().inboundAction().executeAction(this.parmInboundQueue().InboundTransType))
+            {
+                ttsBegin;
+
+                boolean validInboundAction = this.validateInputData();
+
+                if (validInboundAction)
+                {
+                    this.executeOverPick();
+                    this.updateInboundStatus();
+                }
+                else
+                {
+                    this.parmInboundQueue().updateAsErrored();
+                }
+    
+                ttsCommit;
+
+                this.KPMGCommon_instrumentationLogger().inboundAction().executedAction(activityContext, validInboundAction);
+            }
+        }
+        catch
+        {
+            this.catchFailedExecute();
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>executeOverPick</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Performs a over pick based on the inbound queue data.
+    /// </summary>
+    /// <exception cref="Exception::Error">
+    /// If no location is specified on the work line to be executed then an error is thrown.
+    /// </exception>
+    private void executeOverPick()
+    {
+        WMSLocation             wmsLocation;
+        //WHSLicensePlateId       lpToPick                =   this.parmInboundQueue().data03;  // WMHEData3
+        Qty                     qtyToPick               =   str2num(this.parmInboundQueue().data04); // WMHEData4
+        //WHSWorkExceptionCode    overPickExceptionCode   =   this.parmInboundQueue().data05; // WMHEData5
+        
+        ttsBegin;
+    
+        workTable   = WHSWorkTable::find(this.parmWorkLine().WorkId);
+        wmsLocation = WMSLocation::find(this.parmWorkLine().wmsLocationId, workTable.InventLocationId);
+    
+        if (wmsLocation)
+        {
+            workExecute = new WHSWorkExecute();
+            /*
+            // Don't pass in lp to pick from since we cannot rely on method until after short pick has been executed.
+            this.determineTargetLP(this.parmInboundQueue().data06);
+            
+            if (wmsLocation.whsLocationIsLPControlled())
+            {*/
+                // Pick license plate.
+            boolean executeOverPick = workExecute.executeOverPick(this.parmWorkLine(),
+                                                                    workTable,
+                                                                    qtyToPick,
+                                                                    this.parmWorkLine().UnitId,
+                                                                    this.parmUserId(),
+                                                                    '');//Falta por pasar el parametro WHSMenuItemName _menuItemName
+            if (!executeOverPick)
+                throw error("@SYS93835");
+
+            /*}
+            else
+            {
+                workExecute.executeShortPick(
+                    this.parmWorkLine().WorkId,
+                    this.parmWorkLine().LineNum,
+                    shortPickExceptionCode,
+                    qtyToPick,
+                    this.parmWorkLine().UnitId,
+                    this.parmUserId(),
+                    '',
+                    false);
+            }*/
+        }
+        else
+        {
+            throw error("@WMHE:WMHE173");
+        }
+    
+        ttsCommit;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateInputData</Name>
+				<Source><![CDATA[
+    public boolean validateInputData()
+    {
+        boolean             ret;
+
+        ret = super();
+    
+        if (ret)
+        {
+            WHSWorkLine         workLineValidate = this.parmWorkLine();
+            WHSWorkTable        workTableValidate  = WHSWorkTable::find(workLineValidate.WorkId);
+            WHSLicensePlateId   lpToPick =   this.parmInboundQueue().data03;  // WMHEData3
+            Qty                 qtyToPick = str2num(this.parmInboundQueue().data04); // WMHEData4
+
+            if (!this.parmInboundQueue().data04)
+            {
+                ret = checkFailed(strFmt("@WMHE:WMHE177", this.parmInboundQueue().InboundTransType));
+            }
+    
+            if (workLineValidate.WorkType != WHSWorkType::Pick)
+            {
+                ret = checkFailed("@KPMGCommon_WMHEExecute_WorkConfirm_OverPick:WorklineTypePick_OverPick_Error");
+            }
+
+            if (workLineValidate.WorkType == WHSWorkType::Pick)
+            {
+                InventDim inventDim = workLineValidate.inventDim();
+                inventDim.WMSLocationId = workLineValidate.WMSLocationId;
+                inventDim.LicensePlateId = lpToPick;
+                inventDim = InventDim::findOrCreate(inventDim);
+                InventDimParm           inventDimParm;
+                inventDimParm.initFromInventDim(inventDim);
+                InventOnHand            inventOnHand = InventOnhand::newParameters(workLineValidate.ItemId, inventDim, inventDimParm);
+                InventQtyAvailPhysical  availPhysical = inventOnHand.availPhysical();
+                InventQty               physicalInvent = inventOnHand.physicalInvent();
+
+                /*if (qtyToPick > availPhysical)
+                {
+                    ret = checkFailed(strFmt('%1, %2:%3.', "@WAX2497", "@SYS2364", availPhysical));
+                }*/
+
+                if (qtyToPick > physicalInvent)
+                    ret = checkFailed(strFmt('%1, %2:%3.', "@WAX2497", "@WAX:WHSPhysicalInventQuantity", physicalInvent));
+            }
+
+            if (workLineValidate.WorkType == WHSWorkType::Pick)
+            {
+                WHSLoadStatus loadStatus = WHSLoadTable::find(workLineValidate.LoadId).LoadStatus;
+                if (loadStatus != WHSLoadStatus::Open &&
+                    LoadStatus != WHSLoadStatus::InProcess &&
+                    LoadStatus != WHSLoadStatus::Waved)
+                {
+                    ret = checkFailed(strFmt("@KPMGCommon_WMHEExecute_WorkConfirm_OverPick:LoadNotSupportUpdates_Error", workLineValidate.LoadId));
+                }
+            }
+
+            if (workLineValidate.WorkType == WHSWorkType::Pick)
+            {
+                WHSLockedUser workLockedUser = workTableValidate.LockedUser;
+                if (this.parmUserId() &&
+                    workLockedUser &&
+                    this.parmUserId() != workLockedUser)
+                {
+                    ret = checkFailed(strFmt("@KPMGCommon_WMHEExecute_WorkConfirm_OverPick:AnotherUserLockingWork", workLockedUser, workLineValidate.WorkId));
+                }
+            }
+        }
+    
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

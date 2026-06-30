@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxTableExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>TaxTable.KPMGCommon</Name>
+	<FieldGroupExtensions />
+	<FieldGroups>
+		<AxTableFieldGroup>
+			<Name>KPMGCommon_SalesInvoicceExemptionTable</Name>
+			<Label>@KPMGCommon:TaxSalesServiceInvoicceExemptionTable</Label>
+			<Fields>
+				<AxTableFieldGroupField>
+					<DataField>KPMGCommon_LIVAArticle_ES</DataField>
+				</AxTableFieldGroupField>
+				<AxTableFieldGroupField>
+					<DataField>KPMGCommon_LIVAArticle_EN</DataField>
+				</AxTableFieldGroupField>
+			</Fields>
+		</AxTableFieldGroup>
+	</FieldGroups>
+	<FieldModifications />
+	<Fields>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>KPMGCommon_LIVAArticle_ES</Name>
+			<ExtendedDataType>KPMGCommon_LIVAArticle_ES</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+		<AxTableField xmlns=""
+			i:type="AxTableFieldString">
+			<Name>KPMGCommon_LIVAArticle_EN</Name>
+			<ExtendedDataType>KPMGCommon_LIVAArticle_EN</ExtendedDataType>
+			<IgnoreEDTRelation>Yes</IgnoreEDTRelation>
+		</AxTableField>
+	</Fields>
+	<FullTextIndexes />
+	<Indexes />
+	<Mappings />
+	<PropertyModifications />
+	<RelationExtensions />
+	<RelationModifications />
+	<Relations />
+</AxTableExtension>

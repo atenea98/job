@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgPostStandardSystem_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(classStr(JmgPostStandardSystem))]
+final class JmgPostStandardSystem_KPMGCommon_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>initializeProdParmReportFinished</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Initialize production order parameters for the reporting.
+    /// </summary>
+    /// <param name = "_prodParmReportFinished">The buffer for parameters to report a production order as finished.</param>
+    /// <param name = "_jmgProdParametersDim">The buffer of parameters for manufacturing execution</param>
+    /// <param name = "_feedback">Registration parameters in shop floor control.</param>
+    /// <param name = "_prodJob">Represents production type jobs.</param>
+    /// <returns>Instance of <c>ProdParmReportFinished</c>.</returns>
+    protected ProdParmReportFinished initializeProdParmReportFinished(
+        ProdParmReportFinished _prodParmReportFinished,
+        JmgProdParametersDim _jmgProdParametersDim,
+        JmgRegistrationParameters _feedback,
+        JmgTermJob_Prod _prodJob)
+    {
+        _prodParmReportFinished = next initializeProdParmReportFinished(_prodParmReportFinished, _jmgProdParametersDim, _feedback, _prodJob);
+
+        if (this.isOperationsReportedAsFinished(_jmgProdParametersDim))
+        {
+            _prodParmReportFinished.setWMSLocationId(_feedback.parmWMSLocationId());
+        }
+
+        return _prodParmReportFinished;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

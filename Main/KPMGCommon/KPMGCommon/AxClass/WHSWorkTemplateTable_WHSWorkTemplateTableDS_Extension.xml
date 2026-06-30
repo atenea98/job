@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>WHSWorkTemplateTable_WHSWorkTemplateTableDS_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(formDataSourceStr(WHSWorkTemplateTable, WHSWorkTemplateTable))]
+final class WHSWorkTemplateTable_WHSWorkTemplateTableDS_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>active</Name>
+				<Source><![CDATA[
+    int  active()
+    {
+        int ret;
+        FormDataSource fds = this;
+        WHSWorkTemplateTable wHSWorkTemplateTable;
+
+        ret = next active();
+
+        wHSWorkTemplateTable = fds.formRun().dataSource(formDataSourceStr(WHSWorkTemplateTable, WHSWorkTemplateTable)).cursor();
+
+        fds.object(fieldNum(WHSWorkTemplateTable, KPMGCommon_RearrangeProductionOrderLabel)).visible(false);
+        if (wHSWorkTemplateTable.WorkTransType == WHSWorkTransType::Invent)
+            fds.object(fieldNum(WHSWorkTemplateTable, KPMGCommon_RearrangeProductionOrderLabel)).visible(true);
+
+        return ret;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

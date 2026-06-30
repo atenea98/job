@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>WHSWorkLine_Table_KPMGCommon_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(tableStr(WHSWorkLine))]
+final class WHSWorkLine_Table_KPMGCommon_Extension
+{
+    
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>insert</Name>
+				<Source><![CDATA[
+    public void insert()
+    {
+        next insert();
+
+        this.KPMGCommon_InitializeBatchHopperEntryDate();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>KPMGCommon_InitializeBatchHopperEntryDate</Name>
+				<Source><![CDATA[
+    public void KPMGCommon_InitializeBatchHopperEntryDate()
+    {
+        whsLocationProfile  whsLocationProfile = wMSLocation::find(this.wMSLocationId, this.inventDim().inventLocationId).whsLocationProfile();
+        InventBatch         inventBatch = InventBatch::find(this.inventDim().inventBatchId, this.ItemId, true);
+        if (this.whsWorkTable().WorkTransType == WHSWorkTransType::Invent &&
+            this.WorkType == WHSWorkType::Put &&
+            whsLocationProfile.KPMGCommon_EntryHopper &&
+            !inventBatch.KPMGCommon_DateEntryHopper)
+        {
+            ttsbegin;
+            inventBatch.KPMGCommon_DateEntryHopper = systemDateGet();
+            inventBatch.Update();
+            ttscommit;
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>JmgProductionFloorExecutionReportProgress_SearchButtonWMSLocation_Extension</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[ExtensionOf(formControlStr(JmgProductionFloorExecutionReportProgress, SearchButtonWMSLocation))]
+final class JmgProductionFloorExecutionReportProgress_SearchButtonWMSLocation_Extension
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>clicked</Name>
+				<Source><![CDATA[
+    public void clicked()
+    {
+        JmgTmpJobBundleProdFeedback jmgTmpJobBundleProdFeedback = this.formRun().dataSource(formDataSourceStr(JmgProductionFloorExecutionReportProgress, JmgTmpJobBundleProdFeedback)).cursor();
+        
+        next clicked();
+
+        FormRun WMSLocationFormRun = this.initFormRun(element,
+                formstr(JmgProductionFloorExecutionWMSLocationLookup),
+                menuItemDisplayStr(JmgProductionFloorExecutionWMSLocationLookup));
+        WMSLocationFormRun.parmProdId(jmgTmpJobBundleProdFeedback.JobRef);
+        WMSLocationFormRun.parmItemId(jmgTmpJobBundleProdFeedback.ItemId);
+        WMSLocationFormRun.parmInventTransId(jmgTmpJobBundleProdFeedback.InventTransId);
+
+        this.runFormRun(WMSLocationFormRun);
+
+        //ContinueWMSLocationNumberTabButton.setFocus();
+        FormControl _ContinueWMSLocationNumberTabButton = this.formRun().control(this.formRun().controlId('ContinueWMSLocationNumberTabButton'));
+        _ContinueWMSLocationNumberTabButton.setFocus();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initFormRun</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Initializes form to run from parameters.
+    /// </summary>
+    /// <param name = "_callerForm">The caller form. </param>
+    /// <param name = "_formName">The form name that must be run. </param>
+    /// <param name = "_menuName">The menu name of the form that must be run.</param>
+    /// <returns>The instance of the form to be run. </returns>
+    [Hookable(false)]
+    public FormRun initFormRun(Object _callerForm, str _formName, str _menuName)
+    {
+        Args args = new Args();
+        args.name(_formName);
+        args.menuItemName(_menuName);
+        args.caller(_callerForm);
+
+        FormRun formRun = classfactory.formRunClass(args);
+        return formRun;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>runFormRun</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Runs a form.
+    /// </summary>
+    /// <param name = "_formRun">The <c>FormRun</c> object to be run. </param>
+    [Hookable(false)]
+    public void runFormRun(FormRun _formRun)
+    {
+        _formRun.init();
+        _formRun.run();
+        _formRun.wait();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

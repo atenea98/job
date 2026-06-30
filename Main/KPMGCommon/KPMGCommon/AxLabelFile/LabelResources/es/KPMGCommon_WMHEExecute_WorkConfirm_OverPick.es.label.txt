@@ -1,0 +1,6 @@
+﻿AnotherUserLockingWork=Otro usuario %1 está bloqueando el trabajo %1.
+EnableAvailableStockExcessSelections=Habilitar stock disponible selecciones en exceso
+LoadNotSupportUpdates_Error=La carga %1 no admite actualizaciones.
+NewLabel0=Label files created on 01/12/2026 15:15:46 for label file Id KPMGCommon_WMHEExecute_WorkConfirm_OverPick and language es
+ ;Label file comment - see above label
+WorklineTypePick_OverPick_Error=Solo las líneas de trabajo de tipo picking pueden ser seleccionadas en exceso.

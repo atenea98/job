@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>KPMGCommon_ProcessAutomaticOrderCreationService</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+class KPMGCommon_ProcessAutomaticOrderCreationService
+{
+    KPMGCommon_AutomaticOrderCreationParameters     _AutomaticOrderCreationParameters;
+    ProdParameters                                  _ProdParameters;
+    ProdTable                                       _ProdTable, _ProdTableNoExist;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>process</Name>
+				<Source><![CDATA[
+    public void process(KPMGCommon_ProcessAutomaticOrderCreationContract  _contract)
+    {
+        _ProdParameters = ProdParameters::find();
+
+        this.validate();
+
+        this.GenerateProcess();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validate</Name>
+				<Source><![CDATA[
+    public void validate()
+    {
+        if (!_ProdParameters.KPMGCommon_AutomaticOrderCreation)
+            throw error ("@KPMGCommon:ValidateActiveProcessAutomaticOrderCreation"); //No se puede lanzar el proceso porque no esta activo la creación de ordenes automáticas.
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>GenerateProcess</Name>
+				<Source><![CDATA[
+    public void GenerateProcess()
+    {
+
+        while select _AutomaticOrderCreationParameters
+            notexists join _ProdTableNoExist
+                where _ProdTableNoExist.ItemId == _AutomaticOrderCreationParameters.ItemId
+                   && _ProdTableNoExist.BOMId == _AutomaticOrderCreationParameters.FormulaId
+                   && _ProdTableNoExist.RouteId == _AutomaticOrderCreationParameters.RouteId
+                   && _ProdTableNoExist.QtySched == _AutomaticOrderCreationParameters.QtySched
+                   && _ProdTableNoExist.DlvDate == systemDateGet()
+        {
+            try
+            {
+                ttsbegin;
+                this.CreateOrder();
+                this.ChangeStatusOrder();
+                ttscommit;
+            }
+            catch
+            {
+            }           
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>CreateOrder</Name>
+				<Source><![CDATA[
+    public void CreateOrder()
+    {
+        InventDim   inventDim;
+        _ProdTable.clear();
+        _ProdTable.initValue();
+        _ProdTable.initFromInventTable(InventTable::find(_AutomaticOrderCreationParameters.ItemId));
+        _ProdTable.initReleasedProductSpecificDefaulting(InventTable::find(_AutomaticOrderCreationParameters.ItemId));
+        _ProdTable.ItemId                = _AutomaticOrderCreationParameters.ItemId;
+        _ProdTable.initFromItemId();
+        _ProdTable.DlvDate               = systemDateGet();
+        if (_ProdTable.inventTable().isFormulaAllowed())
+        {
+            if (_AutomaticOrderCreationParameters.QtySched)
+            {
+                _ProdTable.ProdType                  = ProdType::Process;
+                _ProdTable.QtySched                   = _AutomaticOrderCreationParameters.QtySched;
+                _ProdTable.RemainInventPhysical      = _ProdTable.QtySched;
+            }
+            else if (_AutomaticOrderCreationParameters.PdsCWBatchSched)
+            {
+                _ProdTable.ProdType                  = ProdType::Process;
+                _ProdTable.PdsCWBatchSched           = _AutomaticOrderCreationParameters.PdsCWBatchSched;
+                _ProdTable.PdsCWRemainInventPhysical = _ProdTable.PdsCWBatchSched;
+                _ProdTable.QtySched                  = PdsCatchWeight::inventQty(_ProdTable.ItemId, _ProdTable.PdsCWBatchSched);
+                _ProdTable.RemainInventPhysical      = _ProdTable.QtySched;
+            }
+        }
+        else
+        {
+            if (_AutomaticOrderCreationParameters.QtySched)
+            {
+                _ProdTable.ProdType                  = ProdType::Standard;
+                _ProdTable.QtySched                   = _AutomaticOrderCreationParameters.QtySched;
+                _ProdTable.RemainInventPhysical      = _ProdTable.QtySched;
+            }
+            else if (_AutomaticOrderCreationParameters.PdsCWBatchSched)
+            {
+                _ProdTable.ProdType                  = ProdType::Standard;
+                _ProdTable.QtySched                   = _AutomaticOrderCreationParameters.PdsCWBatchSched;
+                _ProdTable.RemainInventPhysical      = _ProdTable.QtySched;
+                _ProdTable.PdsCWBatchSched           = PdsCatchWeight::cwQty(_ProdTable.ItemId,_ProdTable.QtySched);
+                _ProdTable.PdsCWRemainInventPhysical = _ProdTable.PdsCWBatchSched;
+            }
+        }
+        _ProdTable.BOMId                 = _AutomaticOrderCreationParameters.FormulaId;
+        _ProdTable.RouteId               = _AutomaticOrderCreationParameters.RouteId;
+        _ProdTable.initBOMVersion();
+        _ProdTable.initRouteVersion();
+
+        inventDim =_ProdTable.inventDim();
+        inventDim.InventLocationId = _AutomaticOrderCreationParameters.InventLocationId;
+        _ProdTable.InventDimId = InventDim::findOrCreate(inventDim).inventDimId;
+
+        _ProdTable.insert();
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ChangeStatusOrder</Name>
+				<Source><![CDATA[
+    public void ChangeStatusOrder()
+    {
+        switch (_AutomaticOrderCreationParameters.ProdStatus)
+        {
+            case ProdStatus::CostEstimated :
+            {
+                ProdMultiCostEstimation ProdMultiCostEstimation;
+   
+                ProdMultiCostEstimation = ProdMultiCostEstimation::construct(new args());
+                RunBaseMultiParm::initParm(ProdMultiCostEstimation);
+                ProdMultiCostEstimation.insert(_ProdTable, ProdMultiCostEstimation.defaultParmBuffer());
+                ProdMultiCostEstimation.run();
+
+                break;
+            }
+            case ProdStatus::Released :
+            {
+                ProdMultiRelease prodMultiRelease;
+
+                prodMultiRelease = ProdMultiRelease::construct(new Args());
+                RunBaseMultiParm::initParm(prodMultiRelease);
+                prodMultiRelease.insert(_ProdTable, prodMultiRelease.defaultParmBuffer());
+
+                prodMultiRelease.run();
+                break;
+            }
+
+            case ProdStatus::Scheduled :
+            {
+                ProdMultiScheduling ProdMultiScheduling;
+
+                ProdMultiScheduling = ProdMultiScheduling::construct(ProdSchedMethod::JobScheduling);
+                RunBaseMultiParm::initParm(ProdMultiScheduling);
+                ProdMultiScheduling.insert(_ProdTable, ProdMultiScheduling.defaultParmBuffer());
+                ProdMultiScheduling.run();
+
+                break;
+            }
+            case ProdStatus::StartedUp :
+            {
+                ProdMultiStartUp prodMultiStartUp;
+                ProdParmStartUp prodParmStartUp;
+                ProdParmStartUp prodParmStartUpUpd;
+
+                //ttsbegin;
+                prodMultiStartUp = ProdMultiStartUp::construct(new Args());
+                RunBaseMultiParm::initParm(prodMultiStartUp);
+                prodParmStartUp = prodMultiStartUp.defaultParmBuffer();
+                prodMultiStartUp.insert(_ProdTable, prodParmStartUp);
+                /*
+                // Overwrite parameters using hardcoded settings
+                prodParmStartUpUpd = ProdParmStartUp::find(prodParmStartUp.ParmId, prodParmStartUp.ProdId, true);
+                prodParmStartUpUpd.RouteAutoConsump = RouteAutoConsump::Never;
+                prodParmStartUpUpd.bomAutoConsump   = BOMAutoConsump::Never;
+                prodParmStartUpUpd.update();
+                */
+                prodMultiStartUp.run();
+                //ttscommit;
+                
+                break;
+            }
+
+            case ProdStatus::ReportedFinished :
+            {
+                ProdMultiReportFinished ProdMultiReportFinished;
+                prodParmreportFinished prodParmreportFinished,prodParmreportFinishedUPD;
+                Boolean RAF,Ended;
+                
+                ProdMultiReportFinished = ProdMultiReportFinished::construct(new Args());
+                RunBaseMultiParm::initParm(ProdMultiReportFinished);
+                prodParmreportFinished = ProdMultiReportFinished.defaultParmBuffer();
+                ProdMultiReportFinished.insert(_ProdTable,prodParmreportFinished);
+                /*
+                prodParmreportFinishedUPD = prodParmreportFinished::find(prodParmreportFinished.ParmId,prodParmreportFinished.ProdId,True);
+                if(prodParmreportFinishedUPD)
+                {
+                    //prodParmreportFinishedUPD.QtyGood = SchedQty;
+                    prodParmreportFinishedUPD.EndRouteCard = NoYes::Yes;
+                    prodParmreportFinishedUPD.RouteAutoConsump = RouteAutoConsump::Always;
+                    prodParmreportFinishedUPD.BOMAutoConsump =          BomAutoConsump::FlushingPrincip;
+                    prodParmreportFinishedUPD.EndPicklist = NoYes::Yes;
+                    prodParmreportFinishedUPD.EndJob = NoYes::Yes;
+                    prodParmreportFinishedUPD.AcceptError = Noyes::Yes;
+                    prodParmreportFinishedUPD.update();
+                }
+                */
+                ProdMultiReportFinished.run();                    
+                
+                break;
+            }
+
+            case ProdStatus::Completed :
+            {
+                ProdMultiHistoricalCost ProdMultiHistoricalCost;
+
+                ProdMultiHistoricalCost = ProdMultiHistoricalCost::construct(new args());
+                RunBaseMultiParm::initParm(ProdMultiHistoricalCost);
+                ProdMultiHistoricalCost.insert(_ProdTable, ProdMultiHistoricalCost.defaultParmBuffer());
+                ProdMultiHistoricalCost.run();
+
+                break;
+            }
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
