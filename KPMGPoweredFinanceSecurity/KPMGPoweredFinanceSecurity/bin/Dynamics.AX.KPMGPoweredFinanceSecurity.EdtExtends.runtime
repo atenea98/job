@@ -1,0 +1,6 @@
+﻿KPSDocumentIsSigned	NoYesId
+KPSSignatureDateTime	SysUtcDateTime
+KPSAuditLogRef	RefRecId
+KPSRefRecId	RefRecId
+KPSSignedId	UserId
+KPSRefTableId	RefTableId

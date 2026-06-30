@@ -1,0 +1,233 @@
+Private class __Persister__
+extends SysDataEntityPersister
+{
+    // Data source ID macros
+    #define.KPHRetentionPotential_ID(1)
+    
+    // Data source buffers
+    KPHRetentionPotential m_KPHRetentionPotential;
+    
+    protected void mapEntityToDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        this.validateFieldFailed = false;
+        this.mapEntityToDataSource(_entityCtx, _entityCtx.getRuntimeContextByName('KPHRetentionPotential'));
+        this.mapEntityToDataSourcesExtensions(_entityCtx);
+        if(this.validateFieldFailed)
+        {
+            throw Exception::ViewDataSourceValidation;
+        }
+    }
+    protected boolean saveDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        boolean rtrn = true;
+        DataEntityDataSourceRuntimeContext _dataSourceCtx = null;
+        // save data sources in topological order.
+        {
+            // handle datasources which are part of extensions and need to be saved before [KPHRetentionPotential]
+            if(!this.preSaveDataSource(_entityCtx, 'KPHRetentionPotential'))
+            {
+                return false;
+            }
+            _dataSourceCtx = _entityCtx.getRuntimeContextByName('KPHRetentionPotential');
+            // propagates foreign key values from referenced data sources which are part of extensions.
+            this.foreignKeyPropagationExtensions(_entityCtx, _dataSourceCtx);
+            // inserts/updates data source [KPHRetentionPotential].
+            if(!this.saveDataSource(_entityCtx, _dataSourceCtx))
+            {
+                // returns from here if the root data source fails to be saved.
+                return false;
+            }
+            this.postSaveDataSource();
+        }
+        // handle datasources which are part of extensions and need to be saved in last 
+        this.preSaveDataSource(_entityCtx, '');
+        return rtrn;
+    }
+    protected boolean deleteDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        boolean rtrn = true;
+        DataEntityDataSourceRuntimeContext _dataSourceCtx = null;
+        // delete data sources in reverse topological order.
+        {
+            // handle datasources which are part of extensions and need to be saved before [KPHRetentionPotential]
+            if(!this.preSaveDataSource(_entityCtx, 'KPHRetentionPotential'))
+            {
+                return false;
+            }
+            _dataSourceCtx = _entityCtx.getRuntimeContextByName('KPHRetentionPotential');
+            // deletes data source [KPHRetentionPotential].
+            if(!this.saveDataSource(_entityCtx, _dataSourceCtx))
+            {
+                // returns from here if the root data source fails to be saved.
+                return false;
+            }
+            this.postSaveDataSource();
+        }
+        // handle datasources which are part of extensions and need to be saved in last 
+        this.preSaveDataSource(_entityCtx, '');
+        return rtrn;
+    }
+    private void mapToDataSource_DS1(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx, KPHRetentionPotential _kPHRetentionPotential, KPHRetentionPotentialEntity _kPHRetentionPotentialEntity)
+    {
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHRetentionPotentialEntity, fieldnum(KPHRetentionPotentialEntity, RetentionPotential), _kPHRetentionPotential, fieldnum(KPHRetentionPotential, RetentionPotential), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHRetentionPotentialEntity, fieldnum(KPHRetentionPotentialEntity, Description), _kPHRetentionPotential, fieldnum(KPHRetentionPotential, Description), 1);
+        
+        this.mapToDataSourceExtensions(_dataSourceCtx, _kPHRetentionPotential, _kPHRetentionPotentialEntity);
+        _kPHRetentionPotential.trackFieldExternallySet(false);
+    }
+    protected void doMapEntityToDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHRetentionPotential_ID:
+                this.mapToDataSource_DS1(_entityCtx, _dataSourceCtx, _dataSourceCtx.getBuffer(), _entityCtx.getEntityRecord());
+                break;
+            default :
+                this.doMapEntityToDataSourceExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+    }
+    private void mapFromDataSource_DS1(DataEntityDataSourceRuntimeContext _dataSourceCtx, KPHRetentionPotential _kPHRetentionPotential, KPHRetentionPotentialEntity _kPHRetentionPotentialEntity)
+    {
+        this.mapDataSourceFieldToEntityField(_kPHRetentionPotential, fieldnum(KPHRetentionPotential, RetentionPotential), _kPHRetentionPotentialEntity, fieldnum(KPHRetentionPotentialEntity, RetentionPotential), false);
+        this.mapDataSourceFieldToEntityField(_kPHRetentionPotential, fieldnum(KPHRetentionPotential, Description), _kPHRetentionPotentialEntity, fieldnum(KPHRetentionPotentialEntity, Description), false);
+        this.mapDataSourceFieldToEntityField(_kPHRetentionPotential, fieldnum(KPHRetentionPotential, DataAreaId), _kPHRetentionPotentialEntity, fieldnum(KPHRetentionPotentialEntity, LegalEntity), true);
+        this.mapFromDataSourceExtensions(_dataSourceCtx, _kPHRetentionPotential, _kPHRetentionPotentialEntity);
+        // map system fields (e.g. recid and recversion) from data source buffer to view record.
+        _kPHRetentionPotentialEntity.fromViewDataSource(_dataSourceCtx.id(), _kPHRetentionPotential);
+    }
+    protected void doMapDataSourceToEntity(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHRetentionPotential_ID:
+                this.mapFromDataSource_DS1(_dataSourceCtx, _dataSourceCtx.getBuffer(), _entityCtx.getEntityRecord());
+                break;
+            default :
+                this.doMapDataSourceToEntityExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+    }
+    protected Common doFindDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        Common rtrn = null;
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHRetentionPotential_ID:
+                rtrn = this.LookForUniqueKeyMatch_DS1(_entityCtx.getEntityRecord(), _dataSourceCtx.getBuffer());
+                break;
+            default :
+                rtrn = this.doFindDataSourceExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    protected boolean isAnyMappedDataSourceFieldSet_DS1(KPHRetentionPotentialEntity _kPHRetentionPotentialEntity, str disabledConfigKey = null)
+    {
+        boolean rtrn = false;
+        if(_kPHRetentionPotentialEntity.isFieldSet(fieldnum(KPHRetentionPotentialEntity, RetentionPotential)))
+        {
+            return true;
+        }
+        if(_kPHRetentionPotentialEntity.isFieldSet(fieldnum(KPHRetentionPotentialEntity, Description)))
+        {
+            return true;
+        }
+        if(_kPHRetentionPotentialEntity.isFieldSet(fieldnum(KPHRetentionPotentialEntity, LegalEntity)))
+        {
+            return true;
+        }
+        rtrn = this.isAnyMappedDataSourceExtensionFieldSet(_kPHRetentionPotentialEntity, 'KPHRetentionPotential', disabledConfigKey);
+        return rtrn;
+    }
+    protected boolean isAnyMappedDataSourceFieldSet(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        boolean rtrn = false;
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHRetentionPotential_ID:
+                rtrn = this.isAnyMappedDataSourceFieldSet_DS1(_entityCtx.getEntityRecord());
+                break;
+            default :
+                rtrn = this.isAnyMappedDataSourceFieldSet_DSExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    private boolean validateDataSource_DS1(DataEntityRuntimeContext _entityCtx, KPHRetentionPotentialEntity _kPHRetentionPotentialEntity, DataEntityDataSourceRuntimeContext _dataSourceCtx, KPHRetentionPotential _kPHRetentionPotential)
+    {
+        boolean rtrn = true;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, '', '', conNull(), _kPHRetentionPotentialEntity, fieldnum(KPHRetentionPotentialEntity, RetentionPotential), 'KPHRetentionPotentialEntity.RetentionPotential', _kPHRetentionPotential, fieldnum(KPHRetentionPotential, RetentionPotential), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, '', '', conNull(), _kPHRetentionPotentialEntity, fieldnum(KPHRetentionPotentialEntity, Description), 'KPHRetentionPotentialEntity.Description', _kPHRetentionPotential, fieldnum(KPHRetentionPotential, Description), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateDataSourceExtensions(_entityCtx, _kPHRetentionPotentialEntity, _dataSourceCtx, _kPHRetentionPotential) ? rtrn : false;
+        return rtrn;
+    }
+    protected boolean validateDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        boolean rtrn = true;
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHRetentionPotential_ID:
+                rtrn = this.validateDataSource_DS1(_entityCtx,_entityCtx.getEntityRecord(),_dataSourceCtx,_dataSourceCtx.getBuffer());
+                break;
+            default :
+                rtrn = this.validateDataSourceExtensions_DSExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    private void mapToMatchingRecord_DS1(DataEntityDataSourceRuntimeContext _dataSourceCtx, KPHRetentionPotential _kPHRetentionPotential, KPHRetentionPotential _matchingRecord)
+    {
+        // map data changes in bound fields.
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHRetentionPotential, fieldnum(KPHRetentionPotential, RetentionPotential), _matchingRecord, fieldnum(KPHRetentionPotential, RetentionPotential), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHRetentionPotential, fieldnum(KPHRetentionPotential, Description), _matchingRecord, fieldnum(KPHRetentionPotential, Description), 1);
+        this.mapToMatchingRecordExtensions(_dataSourceCtx, tablestr(KPHRetentionPotentialEntity), _kPHRetentionPotential, _matchingRecord);
+    }
+    protected void mapDataSourceToMatchingRecord(DataEntityDataSourceRuntimeContext _dataSourceCtx, Common _matchingRecord)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHRetentionPotential_ID:
+                this.mapToMatchingRecord_DS1(_dataSourceCtx, _dataSourceCtx.getBuffer(), _matchingRecord);
+                break;
+            default :
+                this.mapDataSourceToMatchingRecordExtensions(_dataSourceCtx, _matchingRecord);
+                break;
+        }
+    }
+    protected void validateConfigurationKeys(DataEntityRuntimeContext _entityCtx)
+    {
+        // Ensure that the entity configuration key is enabled
+        if(!isConfigurationKeyEnabled(configurationKeyName2Id('KPHSuccessionPlanning')))
+        {
+            // Entity configuration key is disabled
+            throw error(strfmt("@ApplicationPlatform:DataEntityConfigKeyDisabled",'KPHSuccessionPlanning'));
+        }
+    }
+    protected void initializeDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        this.initializeDataSource(_entityCtx, 'KPHRetentionPotential', m_KPHRetentionPotential, this.getDataSourceId('KPHRetentionPotential'), this.getDataSourceRuntimeId('KPHRetentionPotential'), false/* optional */, false/* readonly */, false/* oneToMany */, false/* dateEffective */, false/* applyDateFilter */);
+        this.initializeDataSourcesExtensions(_entityCtx);
+    }
+    private KPHRetentionPotential LookForUniqueKeyMatch_DS1(KPHRetentionPotentialEntity _kPHRetentionPotentialEntity, KPHRetentionPotential _kPHRetentionPotential)
+    {
+        KPHRetentionPotential kPHRetentionPotential_ = null;
+        
+        select
+            forUpdate
+            firstOnly
+                kPHRetentionPotential_
+        where
+            kPHRetentionPotential_.RetentionPotential == _kPHRetentionPotential.RetentionPotential
+        ;
+        
+        if (kPHRetentionPotential_)
+        {
+            return kPHRetentionPotential_;
+        }
+        
+        return kPHRetentionPotential_;
+    }
+
+}
+

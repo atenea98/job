@@ -1,0 +1,239 @@
+Private class __Persister__
+extends SysDataEntityPersister
+{
+    // Data source ID macros
+    #define.LedgerPeriodCloseArea_ID(1)
+    
+    // Data source buffers
+    LedgerPeriodCloseArea m_LedgerPeriodCloseArea;
+    
+    protected void mapEntityToDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        this.validateFieldFailed = false;
+        this.mapEntityToDataSource(_entityCtx, _entityCtx.getRuntimeContextByName('LedgerPeriodCloseArea'));
+        this.mapEntityToDataSourcesExtensions(_entityCtx);
+        if(this.validateFieldFailed)
+        {
+            throw Exception::ViewDataSourceValidation;
+        }
+    }
+    protected boolean saveDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        boolean rtrn = true;
+        DataEntityDataSourceRuntimeContext _dataSourceCtx = null;
+        // save data sources in topological order.
+        {
+            // handle datasources which are part of extensions and need to be saved before [LedgerPeriodCloseArea]
+            if(!this.preSaveDataSource(_entityCtx, 'LedgerPeriodCloseArea'))
+            {
+                return false;
+            }
+            _dataSourceCtx = _entityCtx.getRuntimeContextByName('LedgerPeriodCloseArea');
+            // propagates foreign key values from referenced data sources which are part of extensions.
+            this.foreignKeyPropagationExtensions(_entityCtx, _dataSourceCtx);
+            // inserts/updates data source [LedgerPeriodCloseArea].
+            if(!this.saveDataSource(_entityCtx, _dataSourceCtx))
+            {
+                // returns from here if the root data source fails to be saved.
+                return false;
+            }
+            this.postSaveDataSource();
+        }
+        // handle datasources which are part of extensions and need to be saved in last 
+        this.preSaveDataSource(_entityCtx, '');
+        return rtrn;
+    }
+    protected boolean deleteDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        boolean rtrn = true;
+        DataEntityDataSourceRuntimeContext _dataSourceCtx = null;
+        // delete data sources in reverse topological order.
+        {
+            // handle datasources which are part of extensions and need to be saved before [LedgerPeriodCloseArea]
+            if(!this.preSaveDataSource(_entityCtx, 'LedgerPeriodCloseArea'))
+            {
+                return false;
+            }
+            _dataSourceCtx = _entityCtx.getRuntimeContextByName('LedgerPeriodCloseArea');
+            // deletes data source [LedgerPeriodCloseArea].
+            if(!this.saveDataSource(_entityCtx, _dataSourceCtx))
+            {
+                // returns from here if the root data source fails to be saved.
+                return false;
+            }
+            this.postSaveDataSource();
+        }
+        // handle datasources which are part of extensions and need to be saved in last 
+        this.preSaveDataSource(_entityCtx, '');
+        return rtrn;
+    }
+    private void mapToDataSource_DS1(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx, LedgerPeriodCloseArea _ledgerPeriodCloseArea, KPFLedgerPeriodCloseAreaEntity _kPFLedgerPeriodCloseAreaEntity)
+    {
+        if(isConfigurationKeyEnabled(configurationKeyName2Id('LedgerBasic')))
+        {
+            this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPFLedgerPeriodCloseAreaEntity, fieldnum(KPFLedgerPeriodCloseAreaEntity, Name), _ledgerPeriodCloseArea, fieldnum(LedgerPeriodCloseArea, Name), 1);
+            this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPFLedgerPeriodCloseAreaEntity, fieldnum(KPFLedgerPeriodCloseAreaEntity, Description), _ledgerPeriodCloseArea, fieldnum(LedgerPeriodCloseArea, Description), 1);
+            
+            this.mapToDataSourceExtensions(_dataSourceCtx, _ledgerPeriodCloseArea, _kPFLedgerPeriodCloseAreaEntity);
+            _ledgerPeriodCloseArea.trackFieldExternallySet(false);
+        }
+    }
+    protected void doMapEntityToDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #LedgerPeriodCloseArea_ID:
+                this.mapToDataSource_DS1(_entityCtx, _dataSourceCtx, _dataSourceCtx.getBuffer(), _entityCtx.getEntityRecord());
+                break;
+            default :
+                this.doMapEntityToDataSourceExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+    }
+    private void mapFromDataSource_DS1(DataEntityDataSourceRuntimeContext _dataSourceCtx, LedgerPeriodCloseArea _ledgerPeriodCloseArea, KPFLedgerPeriodCloseAreaEntity _kPFLedgerPeriodCloseAreaEntity)
+    {
+        this.mapDataSourceFieldToEntityField(_ledgerPeriodCloseArea, fieldnum(LedgerPeriodCloseArea, Name), _kPFLedgerPeriodCloseAreaEntity, fieldnum(KPFLedgerPeriodCloseAreaEntity, Name), false);
+        this.mapDataSourceFieldToEntityField(_ledgerPeriodCloseArea, fieldnum(LedgerPeriodCloseArea, Description), _kPFLedgerPeriodCloseAreaEntity, fieldnum(KPFLedgerPeriodCloseAreaEntity, Description), false);
+        this.mapFromDataSourceExtensions(_dataSourceCtx, _ledgerPeriodCloseArea, _kPFLedgerPeriodCloseAreaEntity);
+        // map system fields (e.g. recid and recversion) from data source buffer to view record.
+        _kPFLedgerPeriodCloseAreaEntity.fromViewDataSource(_dataSourceCtx.id(), _ledgerPeriodCloseArea);
+    }
+    protected void doMapDataSourceToEntity(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #LedgerPeriodCloseArea_ID:
+                this.mapFromDataSource_DS1(_dataSourceCtx, _dataSourceCtx.getBuffer(), _entityCtx.getEntityRecord());
+                break;
+            default :
+                this.doMapDataSourceToEntityExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+    }
+    protected Common doFindDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        Common rtrn = null;
+        switch(_dataSourceCtx.id())
+        {
+            case #LedgerPeriodCloseArea_ID:
+                rtrn = this.LookForUniqueKeyMatch_DS1(_entityCtx.getEntityRecord(), _dataSourceCtx.getBuffer());
+                break;
+            default :
+                rtrn = this.doFindDataSourceExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    protected boolean isAnyMappedDataSourceFieldSet_DS1(KPFLedgerPeriodCloseAreaEntity _kPFLedgerPeriodCloseAreaEntity, str disabledConfigKey = null)
+    {
+        boolean rtrn = false;
+        if(_kPFLedgerPeriodCloseAreaEntity.isFieldSet(fieldnum(KPFLedgerPeriodCloseAreaEntity, Name)))
+        {
+            return true;
+        }
+        if(_kPFLedgerPeriodCloseAreaEntity.isFieldSet(fieldnum(KPFLedgerPeriodCloseAreaEntity, Description)))
+        {
+            return true;
+        }
+        rtrn = this.isAnyMappedDataSourceExtensionFieldSet(_kPFLedgerPeriodCloseAreaEntity, 'LedgerPeriodCloseArea', disabledConfigKey);
+        return rtrn;
+    }
+    protected boolean isAnyMappedDataSourceFieldSet(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        boolean rtrn = false;
+        switch(_dataSourceCtx.id())
+        {
+            case #LedgerPeriodCloseArea_ID:
+                rtrn = this.isAnyMappedDataSourceFieldSet_DS1(_entityCtx.getEntityRecord());
+                break;
+            default :
+                rtrn = this.isAnyMappedDataSourceFieldSet_DSExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    private boolean validateDataSource_DS1(DataEntityRuntimeContext _entityCtx, KPFLedgerPeriodCloseAreaEntity _kPFLedgerPeriodCloseAreaEntity, DataEntityDataSourceRuntimeContext _dataSourceCtx, LedgerPeriodCloseArea _ledgerPeriodCloseArea)
+    {
+        boolean rtrn = true;
+        if(isConfigurationKeyEnabled(configurationKeyName2Id('LedgerBasic')))
+        {
+            rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPFLedgerPeriodCloseAreaEntity, fieldnum(KPFLedgerPeriodCloseAreaEntity, Name), 'KPFLedgerPeriodCloseAreaEntity.Name', _ledgerPeriodCloseArea, fieldnum(LedgerPeriodCloseArea, Name), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+            rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPFLedgerPeriodCloseAreaEntity, fieldnum(KPFLedgerPeriodCloseAreaEntity, Description), 'KPFLedgerPeriodCloseAreaEntity.Description', _ledgerPeriodCloseArea, fieldnum(LedgerPeriodCloseArea, Description), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+            rtrn = this.validateDataSourceExtensions(_entityCtx, _kPFLedgerPeriodCloseAreaEntity, _dataSourceCtx, _ledgerPeriodCloseArea) ? rtrn : false;
+        }
+        return rtrn;
+    }
+    protected boolean validateDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        boolean rtrn = true;
+        switch(_dataSourceCtx.id())
+        {
+            case #LedgerPeriodCloseArea_ID:
+                rtrn = this.validateDataSource_DS1(_entityCtx,_entityCtx.getEntityRecord(),_dataSourceCtx,_dataSourceCtx.getBuffer());
+                break;
+            default :
+                rtrn = this.validateDataSourceExtensions_DSExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    private void mapToMatchingRecord_DS1(DataEntityDataSourceRuntimeContext _dataSourceCtx, LedgerPeriodCloseArea _ledgerPeriodCloseArea, LedgerPeriodCloseArea _matchingRecord)
+    {
+        // map data changes in bound fields.
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _ledgerPeriodCloseArea, fieldnum(LedgerPeriodCloseArea, Name), _matchingRecord, fieldnum(LedgerPeriodCloseArea, Name), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _ledgerPeriodCloseArea, fieldnum(LedgerPeriodCloseArea, Description), _matchingRecord, fieldnum(LedgerPeriodCloseArea, Description), 1);
+        this.mapToMatchingRecordExtensions(_dataSourceCtx, tablestr(KPFLedgerPeriodCloseAreaEntity), _ledgerPeriodCloseArea, _matchingRecord);
+    }
+    protected void mapDataSourceToMatchingRecord(DataEntityDataSourceRuntimeContext _dataSourceCtx, Common _matchingRecord)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #LedgerPeriodCloseArea_ID:
+                this.mapToMatchingRecord_DS1(_dataSourceCtx, _dataSourceCtx.getBuffer(), _matchingRecord);
+                break;
+            default :
+                this.mapDataSourceToMatchingRecordExtensions(_dataSourceCtx, _matchingRecord);
+                break;
+        }
+    }
+    protected void validateConfigurationKeys(DataEntityRuntimeContext _entityCtx)
+    {
+        // Ensure that the entity configuration key is enabled
+        if(!isConfigurationKeyEnabled(configurationKeyName2Id('KPEPoweredFinance')))
+        {
+            // Entity configuration key is disabled
+            throw error(strfmt("@ApplicationPlatform:DataEntityConfigKeyDisabled",'KPEPoweredFinance'));
+        }
+        if(!isConfigurationKeyEnabled(configurationKeyName2Id('LedgerBasic')))
+        {
+            // Root data source configuration key is disabled
+            throw error(strfmt("@ApplicationPlatform:DataEntityDataSourceConfigKeyDisabled",'LedgerPeriodCloseArea','LedgerBasic'));
+        }
+    }
+    protected void initializeDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        this.initializeDataSource(_entityCtx, 'LedgerPeriodCloseArea', m_LedgerPeriodCloseArea, this.getDataSourceId('LedgerPeriodCloseArea'), this.getDataSourceRuntimeId('LedgerPeriodCloseArea'), false/* optional */, false/* readonly */, false/* oneToMany */, false/* dateEffective */, false/* applyDateFilter */);
+        this.initializeDataSourcesExtensions(_entityCtx);
+    }
+    private LedgerPeriodCloseArea LookForUniqueKeyMatch_DS1(KPFLedgerPeriodCloseAreaEntity _kPFLedgerPeriodCloseAreaEntity, LedgerPeriodCloseArea _ledgerPeriodCloseArea)
+    {
+        LedgerPeriodCloseArea ledgerPeriodCloseArea_ = null;
+        
+        select
+            forUpdate
+            firstOnly
+                ledgerPeriodCloseArea_
+        where
+            ledgerPeriodCloseArea_.Name == _ledgerPeriodCloseArea.Name
+        ;
+        
+        if (ledgerPeriodCloseArea_)
+        {
+            return ledgerPeriodCloseArea_;
+        }
+        
+        return ledgerPeriodCloseArea_;
+    }
+
+}
+

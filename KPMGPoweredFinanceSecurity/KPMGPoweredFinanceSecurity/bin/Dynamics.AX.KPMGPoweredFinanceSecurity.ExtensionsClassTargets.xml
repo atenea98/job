@@ -1,0 +1,7 @@
+<ExtensionClasses>
+  <ExtensionClass ExtensionClassName="KPSSysDatabaseLogForm_TabChangedControl_Extension" ExtensionTargetName="SysDataBaseLog" ExtensionTargetTypeId="FormControlTypeId" ExtensionNestedTargetName="Tab" />
+  <ExtensionClass ExtensionClassName="KPSSysDatabaseLogForm_KPSRoleAuditSecurityTable_Extension" ExtensionTargetName="SysDataBaseLog" ExtensionTargetTypeId="FormControlTypeId" ExtensionNestedTargetName="KPSRoleAuditSecurityTable" />
+  <ExtensionClass ExtensionClassName="KPSSysDatabaseLogForm_Extension" ExtensionTargetName="SysDatabaseLog" ExtensionTargetTypeId="FormTypeId" ExtensionNestedTargetName="" />
+  <ExtensionClass ExtensionClassName="KPSSysDatabaseLogForm_KPSDBSignatureLogDataSource_Extension" ExtensionTargetName="SysDataBaseLog" ExtensionTargetTypeId="FormDataSourceTypeId" ExtensionNestedTargetName="KPSDBSignatureLog" />
+  <ExtensionClass ExtensionClassName="KPSSysDatabaseLog_Extension" ExtensionTargetName="SysDataBaseLog" ExtensionTargetTypeId="TableTypeId" ExtensionNestedTargetName="" />
+</ExtensionClasses>

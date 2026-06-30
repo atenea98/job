@@ -1,0 +1,241 @@
+Private class __Persister__
+extends SysDataEntityPersister
+{
+    // Data source ID macros
+    #define.KPHPotentialScale_ID(1)
+    
+    // Data source buffers
+    KPHPotentialScale m_KPHPotentialScale;
+    
+    protected void mapEntityToDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        this.validateFieldFailed = false;
+        this.mapEntityToDataSource(_entityCtx, _entityCtx.getRuntimeContextByName('KPHPotentialScale'));
+        this.mapEntityToDataSourcesExtensions(_entityCtx);
+        if(this.validateFieldFailed)
+        {
+            throw Exception::ViewDataSourceValidation;
+        }
+    }
+    protected boolean saveDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        boolean rtrn = true;
+        DataEntityDataSourceRuntimeContext _dataSourceCtx = null;
+        // save data sources in topological order.
+        {
+            // handle datasources which are part of extensions and need to be saved before [KPHPotentialScale]
+            if(!this.preSaveDataSource(_entityCtx, 'KPHPotentialScale'))
+            {
+                return false;
+            }
+            _dataSourceCtx = _entityCtx.getRuntimeContextByName('KPHPotentialScale');
+            // propagates foreign key values from referenced data sources which are part of extensions.
+            this.foreignKeyPropagationExtensions(_entityCtx, _dataSourceCtx);
+            // inserts/updates data source [KPHPotentialScale].
+            if(!this.saveDataSource(_entityCtx, _dataSourceCtx))
+            {
+                // returns from here if the root data source fails to be saved.
+                return false;
+            }
+            this.postSaveDataSource();
+        }
+        // handle datasources which are part of extensions and need to be saved in last 
+        this.preSaveDataSource(_entityCtx, '');
+        return rtrn;
+    }
+    protected boolean deleteDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        boolean rtrn = true;
+        DataEntityDataSourceRuntimeContext _dataSourceCtx = null;
+        // delete data sources in reverse topological order.
+        {
+            // handle datasources which are part of extensions and need to be saved before [KPHPotentialScale]
+            if(!this.preSaveDataSource(_entityCtx, 'KPHPotentialScale'))
+            {
+                return false;
+            }
+            _dataSourceCtx = _entityCtx.getRuntimeContextByName('KPHPotentialScale');
+            // deletes data source [KPHPotentialScale].
+            if(!this.saveDataSource(_entityCtx, _dataSourceCtx))
+            {
+                // returns from here if the root data source fails to be saved.
+                return false;
+            }
+            this.postSaveDataSource();
+        }
+        // handle datasources which are part of extensions and need to be saved in last 
+        this.preSaveDataSource(_entityCtx, '');
+        return rtrn;
+    }
+    private void mapToDataSource_DS1(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx, KPHPotentialScale _kPHPotentialScale, KPHPotentialScaleEntity _kPHPotentialScaleEntity)
+    {
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHPotentialScaleEntity, fieldnum(KPHPotentialScaleEntity, PotentialRating), _kPHPotentialScale, fieldnum(KPHPotentialScale, PotentialRating), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHPotentialScaleEntity, fieldnum(KPHPotentialScaleEntity, Description), _kPHPotentialScale, fieldnum(KPHPotentialScale, Description), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHPotentialScaleEntity, fieldnum(KPHPotentialScaleEntity, NumberBIGrid), _kPHPotentialScale, fieldnum(KPHPotentialScale, NumberBIGrid), 1);
+        
+        this.mapToDataSourceExtensions(_dataSourceCtx, _kPHPotentialScale, _kPHPotentialScaleEntity);
+        _kPHPotentialScale.trackFieldExternallySet(false);
+    }
+    protected void doMapEntityToDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHPotentialScale_ID:
+                this.mapToDataSource_DS1(_entityCtx, _dataSourceCtx, _dataSourceCtx.getBuffer(), _entityCtx.getEntityRecord());
+                break;
+            default :
+                this.doMapEntityToDataSourceExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+    }
+    private void mapFromDataSource_DS1(DataEntityDataSourceRuntimeContext _dataSourceCtx, KPHPotentialScale _kPHPotentialScale, KPHPotentialScaleEntity _kPHPotentialScaleEntity)
+    {
+        this.mapDataSourceFieldToEntityField(_kPHPotentialScale, fieldnum(KPHPotentialScale, PotentialRating), _kPHPotentialScaleEntity, fieldnum(KPHPotentialScaleEntity, PotentialRating), false);
+        this.mapDataSourceFieldToEntityField(_kPHPotentialScale, fieldnum(KPHPotentialScale, Description), _kPHPotentialScaleEntity, fieldnum(KPHPotentialScaleEntity, Description), false);
+        this.mapDataSourceFieldToEntityField(_kPHPotentialScale, fieldnum(KPHPotentialScale, NumberBIGrid), _kPHPotentialScaleEntity, fieldnum(KPHPotentialScaleEntity, NumberBIGrid), false);
+        this.mapDataSourceFieldToEntityField(_kPHPotentialScale, fieldnum(KPHPotentialScale, DataAreaId), _kPHPotentialScaleEntity, fieldnum(KPHPotentialScaleEntity, LegalEntity), true);
+        this.mapFromDataSourceExtensions(_dataSourceCtx, _kPHPotentialScale, _kPHPotentialScaleEntity);
+        // map system fields (e.g. recid and recversion) from data source buffer to view record.
+        _kPHPotentialScaleEntity.fromViewDataSource(_dataSourceCtx.id(), _kPHPotentialScale);
+    }
+    protected void doMapDataSourceToEntity(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHPotentialScale_ID:
+                this.mapFromDataSource_DS1(_dataSourceCtx, _dataSourceCtx.getBuffer(), _entityCtx.getEntityRecord());
+                break;
+            default :
+                this.doMapDataSourceToEntityExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+    }
+    protected Common doFindDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        Common rtrn = null;
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHPotentialScale_ID:
+                rtrn = this.LookForUniqueKeyMatch_DS1(_entityCtx.getEntityRecord(), _dataSourceCtx.getBuffer());
+                break;
+            default :
+                rtrn = this.doFindDataSourceExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    protected boolean isAnyMappedDataSourceFieldSet_DS1(KPHPotentialScaleEntity _kPHPotentialScaleEntity, str disabledConfigKey = null)
+    {
+        boolean rtrn = false;
+        if(_kPHPotentialScaleEntity.isFieldSet(fieldnum(KPHPotentialScaleEntity, PotentialRating)))
+        {
+            return true;
+        }
+        if(_kPHPotentialScaleEntity.isFieldSet(fieldnum(KPHPotentialScaleEntity, Description)))
+        {
+            return true;
+        }
+        if(_kPHPotentialScaleEntity.isFieldSet(fieldnum(KPHPotentialScaleEntity, NumberBIGrid)))
+        {
+            return true;
+        }
+        if(_kPHPotentialScaleEntity.isFieldSet(fieldnum(KPHPotentialScaleEntity, LegalEntity)))
+        {
+            return true;
+        }
+        rtrn = this.isAnyMappedDataSourceExtensionFieldSet(_kPHPotentialScaleEntity, 'KPHPotentialScale', disabledConfigKey);
+        return rtrn;
+    }
+    protected boolean isAnyMappedDataSourceFieldSet(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        boolean rtrn = false;
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHPotentialScale_ID:
+                rtrn = this.isAnyMappedDataSourceFieldSet_DS1(_entityCtx.getEntityRecord());
+                break;
+            default :
+                rtrn = this.isAnyMappedDataSourceFieldSet_DSExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    private boolean validateDataSource_DS1(DataEntityRuntimeContext _entityCtx, KPHPotentialScaleEntity _kPHPotentialScaleEntity, DataEntityDataSourceRuntimeContext _dataSourceCtx, KPHPotentialScale _kPHPotentialScale)
+    {
+        boolean rtrn = true;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, '', '', conNull(), _kPHPotentialScaleEntity, fieldnum(KPHPotentialScaleEntity, PotentialRating), 'KPHPotentialScaleEntity.PotentialRating', _kPHPotentialScale, fieldnum(KPHPotentialScale, PotentialRating), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, '', '', conNull(), _kPHPotentialScaleEntity, fieldnum(KPHPotentialScaleEntity, Description), 'KPHPotentialScaleEntity.Description', _kPHPotentialScale, fieldnum(KPHPotentialScale, Description), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, '', '', conNull(), _kPHPotentialScaleEntity, fieldnum(KPHPotentialScaleEntity, NumberBIGrid), 'KPHPotentialScaleEntity.NumberBIGrid', _kPHPotentialScale, fieldnum(KPHPotentialScale, NumberBIGrid), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateDataSourceExtensions(_entityCtx, _kPHPotentialScaleEntity, _dataSourceCtx, _kPHPotentialScale) ? rtrn : false;
+        return rtrn;
+    }
+    protected boolean validateDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        boolean rtrn = true;
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHPotentialScale_ID:
+                rtrn = this.validateDataSource_DS1(_entityCtx,_entityCtx.getEntityRecord(),_dataSourceCtx,_dataSourceCtx.getBuffer());
+                break;
+            default :
+                rtrn = this.validateDataSourceExtensions_DSExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    private void mapToMatchingRecord_DS1(DataEntityDataSourceRuntimeContext _dataSourceCtx, KPHPotentialScale _kPHPotentialScale, KPHPotentialScale _matchingRecord)
+    {
+        // map data changes in bound fields.
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHPotentialScale, fieldnum(KPHPotentialScale, PotentialRating), _matchingRecord, fieldnum(KPHPotentialScale, PotentialRating), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHPotentialScale, fieldnum(KPHPotentialScale, Description), _matchingRecord, fieldnum(KPHPotentialScale, Description), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHPotentialScale, fieldnum(KPHPotentialScale, NumberBIGrid), _matchingRecord, fieldnum(KPHPotentialScale, NumberBIGrid), 1);
+        this.mapToMatchingRecordExtensions(_dataSourceCtx, tablestr(KPHPotentialScaleEntity), _kPHPotentialScale, _matchingRecord);
+    }
+    protected void mapDataSourceToMatchingRecord(DataEntityDataSourceRuntimeContext _dataSourceCtx, Common _matchingRecord)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHPotentialScale_ID:
+                this.mapToMatchingRecord_DS1(_dataSourceCtx, _dataSourceCtx.getBuffer(), _matchingRecord);
+                break;
+            default :
+                this.mapDataSourceToMatchingRecordExtensions(_dataSourceCtx, _matchingRecord);
+                break;
+        }
+    }
+    protected void validateConfigurationKeys(DataEntityRuntimeContext _entityCtx)
+    {
+        // Ensure that the entity configuration key is enabled
+        if(!isConfigurationKeyEnabled(configurationKeyName2Id('KPHSuccessionPlanning')))
+        {
+            // Entity configuration key is disabled
+            throw error(strfmt("@ApplicationPlatform:DataEntityConfigKeyDisabled",'KPHSuccessionPlanning'));
+        }
+    }
+    protected void initializeDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        this.initializeDataSource(_entityCtx, 'KPHPotentialScale', m_KPHPotentialScale, this.getDataSourceId('KPHPotentialScale'), this.getDataSourceRuntimeId('KPHPotentialScale'), false/* optional */, false/* readonly */, false/* oneToMany */, false/* dateEffective */, false/* applyDateFilter */);
+        this.initializeDataSourcesExtensions(_entityCtx);
+    }
+    private KPHPotentialScale LookForUniqueKeyMatch_DS1(KPHPotentialScaleEntity _kPHPotentialScaleEntity, KPHPotentialScale _kPHPotentialScale)
+    {
+        KPHPotentialScale kPHPotentialScale_ = null;
+        
+        select
+            forUpdate
+            firstOnly
+                kPHPotentialScale_
+        where
+            kPHPotentialScale_.PotentialRating == _kPHPotentialScale.PotentialRating
+        ;
+        
+        if (kPHPotentialScale_)
+        {
+            return kPHPotentialScale_;
+        }
+        
+        return kPHPotentialScale_;
+    }
+
+}
+

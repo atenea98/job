@@ -1,0 +1,4 @@
+<ExtensionClasses>
+  <ExtensionClass ExtensionClassName="KPHHcmSharedParameters_Extension" ExtensionTargetName="HcmSharedParameters" ExtensionTargetTypeId="FormTypeId" ExtensionNestedTargetName="" />
+  <ExtensionClass ExtensionClassName="KPHEssWorkspace_Extension" ExtensionTargetName="EssWorkspace" ExtensionTargetTypeId="FormTypeId" ExtensionNestedTargetName="" />
+</ExtensionClasses>

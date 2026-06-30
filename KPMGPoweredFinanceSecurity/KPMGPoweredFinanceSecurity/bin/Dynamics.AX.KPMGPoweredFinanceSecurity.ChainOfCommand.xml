@@ -1,0 +1,14 @@
+<ChainOfCommand>
+  <ExtensionClass Name="KPSSysDatabaseLogForm_TabChangedControl_Extension" ExtensionTarget="Tab" ExtensionTargetType="ClassTypeId">
+    <Method ActualExtensionTarget="Tab" IsStatic="False" CocMethodDelegateElementOwner="FormTabControl" IsFormNestedTargetConcept="True" CoCRootFormName="SysDataBaseLog" CoCNestedElementKind="FormControl" IsCommonBaseMethodTarget="False" SupportsLazyInit="False">tabChanged</Method>
+  </ExtensionClass>
+  <ExtensionClass Name="KPSSysDatabaseLogForm_KPSRoleAuditSecurityTable_Extension" ExtensionTarget="KPSRoleAuditSecurityTable" ExtensionTargetType="ClassTypeId">
+    <Method ActualExtensionTarget="KPSRoleAuditSecurityTable" IsStatic="False" CocMethodDelegateElementOwner="FormComboBoxControl" IsFormNestedTargetConcept="True" CoCRootFormName="SysDataBaseLog" CoCNestedElementKind="FormControl" IsCommonBaseMethodTarget="False" SupportsLazyInit="False">modified</Method>
+  </ExtensionClass>
+  <ExtensionClass Name="KPSSysDatabaseLogForm_Extension" ExtensionTarget="Form.SysDatabaseLog" ExtensionTargetType="FormTypeId">
+    <Method ActualExtensionTarget="Form.SysDatabaseLog" IsStatic="False" CocMethodDelegateElementOwner="SysDatabaseLog" IsFormNestedTargetConcept="False" CoCRootFormName="" CoCNestedElementKind="Class" IsCommonBaseMethodTarget="False" SupportsLazyInit="False">init</Method>
+  </ExtensionClass>
+  <ExtensionClass Name="KPSSysDatabaseLogForm_KPSDBSignatureLogDataSource_Extension" ExtensionTarget="KPSDBSignatureLog" ExtensionTargetType="ClassTypeId">
+    <Method ActualExtensionTarget="KPSDBSignatureLog" IsStatic="False" CocMethodDelegateElementOwner="FormDataSource" IsFormNestedTargetConcept="True" CoCRootFormName="SysDataBaseLog" CoCNestedElementKind="FormDataSource" IsCommonBaseMethodTarget="False" SupportsLazyInit="False">executeQuery</Method>
+  </ExtensionClass>
+</ChainOfCommand>

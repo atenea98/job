@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Diagnostics
+  GenerationTime="2026-02-05T16:39:35.2919157+00:00">
+  <Items>
+    <Diagnostic>
+      <DiagnosticType>Compile</DiagnosticType>
+      <Severity>Error</Severity>
+      <Path>dynamics://Class/KPMGCommon_JobPurchaseOrderChangeApprovalStatus/Method/`main</Path>
+      <ElementType>Class Method</ElementType>
+      <Moniker>AssemblyMustBeReferenced</Moniker>
+      <Line>8</Line>
+      <Column>5</Column>
+      <EndLine>8</EndLine>
+      <EndColumn>28</EndColumn>
+      <Message>A reference to 'Dynamics.AX.ContactPerson, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null' is required to compile this module.</Message>
+    </Diagnostic>
+  </Items>
+  <Aliases />
+</Diagnostics>

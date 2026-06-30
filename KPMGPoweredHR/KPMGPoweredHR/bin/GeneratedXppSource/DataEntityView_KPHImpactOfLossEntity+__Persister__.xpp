@@ -1,0 +1,233 @@
+Private class __Persister__
+extends SysDataEntityPersister
+{
+    // Data source ID macros
+    #define.KPHImpactOfLoss_ID(1)
+    
+    // Data source buffers
+    KPHImpactOfLoss m_KPHImpactOfLoss;
+    
+    protected void mapEntityToDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        this.validateFieldFailed = false;
+        this.mapEntityToDataSource(_entityCtx, _entityCtx.getRuntimeContextByName('KPHImpactOfLoss'));
+        this.mapEntityToDataSourcesExtensions(_entityCtx);
+        if(this.validateFieldFailed)
+        {
+            throw Exception::ViewDataSourceValidation;
+        }
+    }
+    protected boolean saveDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        boolean rtrn = true;
+        DataEntityDataSourceRuntimeContext _dataSourceCtx = null;
+        // save data sources in topological order.
+        {
+            // handle datasources which are part of extensions and need to be saved before [KPHImpactOfLoss]
+            if(!this.preSaveDataSource(_entityCtx, 'KPHImpactOfLoss'))
+            {
+                return false;
+            }
+            _dataSourceCtx = _entityCtx.getRuntimeContextByName('KPHImpactOfLoss');
+            // propagates foreign key values from referenced data sources which are part of extensions.
+            this.foreignKeyPropagationExtensions(_entityCtx, _dataSourceCtx);
+            // inserts/updates data source [KPHImpactOfLoss].
+            if(!this.saveDataSource(_entityCtx, _dataSourceCtx))
+            {
+                // returns from here if the root data source fails to be saved.
+                return false;
+            }
+            this.postSaveDataSource();
+        }
+        // handle datasources which are part of extensions and need to be saved in last 
+        this.preSaveDataSource(_entityCtx, '');
+        return rtrn;
+    }
+    protected boolean deleteDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        boolean rtrn = true;
+        DataEntityDataSourceRuntimeContext _dataSourceCtx = null;
+        // delete data sources in reverse topological order.
+        {
+            // handle datasources which are part of extensions and need to be saved before [KPHImpactOfLoss]
+            if(!this.preSaveDataSource(_entityCtx, 'KPHImpactOfLoss'))
+            {
+                return false;
+            }
+            _dataSourceCtx = _entityCtx.getRuntimeContextByName('KPHImpactOfLoss');
+            // deletes data source [KPHImpactOfLoss].
+            if(!this.saveDataSource(_entityCtx, _dataSourceCtx))
+            {
+                // returns from here if the root data source fails to be saved.
+                return false;
+            }
+            this.postSaveDataSource();
+        }
+        // handle datasources which are part of extensions and need to be saved in last 
+        this.preSaveDataSource(_entityCtx, '');
+        return rtrn;
+    }
+    private void mapToDataSource_DS1(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx, KPHImpactOfLoss _kPHImpactOfLoss, KPHImpactOfLossEntity _kPHImpactOfLossEntity)
+    {
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHImpactOfLossEntity, fieldnum(KPHImpactOfLossEntity, ImpactOfLoss), _kPHImpactOfLoss, fieldnum(KPHImpactOfLoss, ImpactOfLoss), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHImpactOfLossEntity, fieldnum(KPHImpactOfLossEntity, Description), _kPHImpactOfLoss, fieldnum(KPHImpactOfLoss, Description), 1);
+        
+        this.mapToDataSourceExtensions(_dataSourceCtx, _kPHImpactOfLoss, _kPHImpactOfLossEntity);
+        _kPHImpactOfLoss.trackFieldExternallySet(false);
+    }
+    protected void doMapEntityToDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHImpactOfLoss_ID:
+                this.mapToDataSource_DS1(_entityCtx, _dataSourceCtx, _dataSourceCtx.getBuffer(), _entityCtx.getEntityRecord());
+                break;
+            default :
+                this.doMapEntityToDataSourceExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+    }
+    private void mapFromDataSource_DS1(DataEntityDataSourceRuntimeContext _dataSourceCtx, KPHImpactOfLoss _kPHImpactOfLoss, KPHImpactOfLossEntity _kPHImpactOfLossEntity)
+    {
+        this.mapDataSourceFieldToEntityField(_kPHImpactOfLoss, fieldnum(KPHImpactOfLoss, ImpactOfLoss), _kPHImpactOfLossEntity, fieldnum(KPHImpactOfLossEntity, ImpactOfLoss), false);
+        this.mapDataSourceFieldToEntityField(_kPHImpactOfLoss, fieldnum(KPHImpactOfLoss, Description), _kPHImpactOfLossEntity, fieldnum(KPHImpactOfLossEntity, Description), false);
+        this.mapDataSourceFieldToEntityField(_kPHImpactOfLoss, fieldnum(KPHImpactOfLoss, DataAreaId), _kPHImpactOfLossEntity, fieldnum(KPHImpactOfLossEntity, LegalEntity), true);
+        this.mapFromDataSourceExtensions(_dataSourceCtx, _kPHImpactOfLoss, _kPHImpactOfLossEntity);
+        // map system fields (e.g. recid and recversion) from data source buffer to view record.
+        _kPHImpactOfLossEntity.fromViewDataSource(_dataSourceCtx.id(), _kPHImpactOfLoss);
+    }
+    protected void doMapDataSourceToEntity(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHImpactOfLoss_ID:
+                this.mapFromDataSource_DS1(_dataSourceCtx, _dataSourceCtx.getBuffer(), _entityCtx.getEntityRecord());
+                break;
+            default :
+                this.doMapDataSourceToEntityExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+    }
+    protected Common doFindDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        Common rtrn = null;
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHImpactOfLoss_ID:
+                rtrn = this.LookForUniqueKeyMatch_DS1(_entityCtx.getEntityRecord(), _dataSourceCtx.getBuffer());
+                break;
+            default :
+                rtrn = this.doFindDataSourceExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    protected boolean isAnyMappedDataSourceFieldSet_DS1(KPHImpactOfLossEntity _kPHImpactOfLossEntity, str disabledConfigKey = null)
+    {
+        boolean rtrn = false;
+        if(_kPHImpactOfLossEntity.isFieldSet(fieldnum(KPHImpactOfLossEntity, ImpactOfLoss)))
+        {
+            return true;
+        }
+        if(_kPHImpactOfLossEntity.isFieldSet(fieldnum(KPHImpactOfLossEntity, Description)))
+        {
+            return true;
+        }
+        if(_kPHImpactOfLossEntity.isFieldSet(fieldnum(KPHImpactOfLossEntity, LegalEntity)))
+        {
+            return true;
+        }
+        rtrn = this.isAnyMappedDataSourceExtensionFieldSet(_kPHImpactOfLossEntity, 'KPHImpactOfLoss', disabledConfigKey);
+        return rtrn;
+    }
+    protected boolean isAnyMappedDataSourceFieldSet(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        boolean rtrn = false;
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHImpactOfLoss_ID:
+                rtrn = this.isAnyMappedDataSourceFieldSet_DS1(_entityCtx.getEntityRecord());
+                break;
+            default :
+                rtrn = this.isAnyMappedDataSourceFieldSet_DSExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    private boolean validateDataSource_DS1(DataEntityRuntimeContext _entityCtx, KPHImpactOfLossEntity _kPHImpactOfLossEntity, DataEntityDataSourceRuntimeContext _dataSourceCtx, KPHImpactOfLoss _kPHImpactOfLoss)
+    {
+        boolean rtrn = true;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, '', '', conNull(), _kPHImpactOfLossEntity, fieldnum(KPHImpactOfLossEntity, ImpactOfLoss), 'KPHImpactOfLossEntity.ImpactOfLoss', _kPHImpactOfLoss, fieldnum(KPHImpactOfLoss, ImpactOfLoss), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, '', '', conNull(), _kPHImpactOfLossEntity, fieldnum(KPHImpactOfLossEntity, Description), 'KPHImpactOfLossEntity.Description', _kPHImpactOfLoss, fieldnum(KPHImpactOfLoss, Description), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateDataSourceExtensions(_entityCtx, _kPHImpactOfLossEntity, _dataSourceCtx, _kPHImpactOfLoss) ? rtrn : false;
+        return rtrn;
+    }
+    protected boolean validateDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        boolean rtrn = true;
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHImpactOfLoss_ID:
+                rtrn = this.validateDataSource_DS1(_entityCtx,_entityCtx.getEntityRecord(),_dataSourceCtx,_dataSourceCtx.getBuffer());
+                break;
+            default :
+                rtrn = this.validateDataSourceExtensions_DSExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    private void mapToMatchingRecord_DS1(DataEntityDataSourceRuntimeContext _dataSourceCtx, KPHImpactOfLoss _kPHImpactOfLoss, KPHImpactOfLoss _matchingRecord)
+    {
+        // map data changes in bound fields.
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHImpactOfLoss, fieldnum(KPHImpactOfLoss, ImpactOfLoss), _matchingRecord, fieldnum(KPHImpactOfLoss, ImpactOfLoss), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPHImpactOfLoss, fieldnum(KPHImpactOfLoss, Description), _matchingRecord, fieldnum(KPHImpactOfLoss, Description), 1);
+        this.mapToMatchingRecordExtensions(_dataSourceCtx, tablestr(KPHImpactOfLossEntity), _kPHImpactOfLoss, _matchingRecord);
+    }
+    protected void mapDataSourceToMatchingRecord(DataEntityDataSourceRuntimeContext _dataSourceCtx, Common _matchingRecord)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #KPHImpactOfLoss_ID:
+                this.mapToMatchingRecord_DS1(_dataSourceCtx, _dataSourceCtx.getBuffer(), _matchingRecord);
+                break;
+            default :
+                this.mapDataSourceToMatchingRecordExtensions(_dataSourceCtx, _matchingRecord);
+                break;
+        }
+    }
+    protected void validateConfigurationKeys(DataEntityRuntimeContext _entityCtx)
+    {
+        // Ensure that the entity configuration key is enabled
+        if(!isConfigurationKeyEnabled(configurationKeyName2Id('KPHSuccessionPlanning')))
+        {
+            // Entity configuration key is disabled
+            throw error(strfmt("@ApplicationPlatform:DataEntityConfigKeyDisabled",'KPHSuccessionPlanning'));
+        }
+    }
+    protected void initializeDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        this.initializeDataSource(_entityCtx, 'KPHImpactOfLoss', m_KPHImpactOfLoss, this.getDataSourceId('KPHImpactOfLoss'), this.getDataSourceRuntimeId('KPHImpactOfLoss'), false/* optional */, false/* readonly */, false/* oneToMany */, false/* dateEffective */, false/* applyDateFilter */);
+        this.initializeDataSourcesExtensions(_entityCtx);
+    }
+    private KPHImpactOfLoss LookForUniqueKeyMatch_DS1(KPHImpactOfLossEntity _kPHImpactOfLossEntity, KPHImpactOfLoss _kPHImpactOfLoss)
+    {
+        KPHImpactOfLoss kPHImpactOfLoss_ = null;
+        
+        select
+            forUpdate
+            firstOnly
+                kPHImpactOfLoss_
+        where
+            kPHImpactOfLoss_.ImpactOfLoss == _kPHImpactOfLoss.ImpactOfLoss
+        ;
+        
+        if (kPHImpactOfLoss_)
+        {
+            return kPHImpactOfLoss_;
+        }
+        
+        return kPHImpactOfLoss_;
+    }
+
+}
+

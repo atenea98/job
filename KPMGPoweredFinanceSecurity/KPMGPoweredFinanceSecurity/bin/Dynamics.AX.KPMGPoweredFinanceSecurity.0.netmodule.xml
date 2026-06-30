@@ -1,0 +1,10 @@
+<EventHandlers>
+  <BusinessEventHandlers>
+    <EventHandler delegateElementName="SysDataBaseLog" delegateElementTypeId="TableTypeId" delegateMethodName="postInsert" eventHandlerElementName="KPSDBSignature" eventHandlerElementTypeId="ClassTypeId" eventHandlerMethodName="postInsert_SysDataBaseLog" delegateTypeId="DelegateTypeId" />
+  </BusinessEventHandlers>
+  <DataEventHandlers />
+  <FormEventHandlers />
+  <FormControlEventHandlers />
+  <FormDataSourceEventHandler />
+  <FormDataFieldEventHandler />
+</EventHandlers>

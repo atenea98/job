@@ -1,0 +1,8 @@
+<ChainOfCommand>
+  <ExtensionClass Name="KPHHcmSharedParameters_Extension" ExtensionTarget="Form.HcmSharedParameters" ExtensionTargetType="FormTypeId">
+    <Method ActualExtensionTarget="Form.HcmSharedParameters" IsStatic="False" CocMethodDelegateElementOwner="HcmSharedParameters" IsFormNestedTargetConcept="False" CoCRootFormName="" CoCNestedElementKind="Class" IsCommonBaseMethodTarget="False" SupportsLazyInit="False">init</Method>
+  </ExtensionClass>
+  <ExtensionClass Name="KPHEssWorkspace_Extension" ExtensionTarget="Form.EssWorkspace" ExtensionTargetType="FormTypeId">
+    <Method ActualExtensionTarget="Form.EssWorkspace" IsStatic="False" CocMethodDelegateElementOwner="EssWorkspace" IsFormNestedTargetConcept="False" CoCRootFormName="" CoCNestedElementKind="Class" IsCommonBaseMethodTarget="False" SupportsLazyInit="False">init</Method>
+  </ExtensionClass>
+</ChainOfCommand>

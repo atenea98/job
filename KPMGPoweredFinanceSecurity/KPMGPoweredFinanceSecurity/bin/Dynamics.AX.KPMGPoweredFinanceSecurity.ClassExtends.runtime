@@ -1,0 +1,8 @@
+﻿KPSSetupDatabaseLogging	RunBaseBatch
+KPSSysDatabaseLogForm_TabChangedControl_Extension	
+KPSDBSignature	
+KPSSecurityConfigBuilder	RunBaseBatch
+KPSSysDatabaseLogForm_KPSRoleAuditSecurityTable_Extension	
+KPSSysDatabaseLogForm_Extension	
+KPSSysDatabaseLogForm_KPSDBSignatureLogDataSource_Extension	
+KPSSysDatabaseLog_Extension	

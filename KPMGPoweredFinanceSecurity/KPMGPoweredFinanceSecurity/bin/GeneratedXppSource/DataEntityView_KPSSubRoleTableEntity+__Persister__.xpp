@@ -1,0 +1,324 @@
+Private class __Persister__
+extends SysDataEntityPersister
+{
+    // Data source ID macros
+    #define.KPSSubRoleTable_ID(1)
+    
+    // Data source buffers
+    KPSSubRoleTable m_KPSSubRoleTable;
+    
+    protected void mapEntityToDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        this.validateFieldFailed = false;
+        this.mapEntityToDataSource(_entityCtx, _entityCtx.getRuntimeContextByName('KPSSubRoleTable'));
+        this.mapEntityToDataSourcesExtensions(_entityCtx);
+        if(this.validateFieldFailed)
+        {
+            throw Exception::ViewDataSourceValidation;
+        }
+    }
+    protected boolean saveDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        boolean rtrn = true;
+        DataEntityDataSourceRuntimeContext _dataSourceCtx = null;
+        // save data sources in topological order.
+        {
+            // handle datasources which are part of extensions and need to be saved before [KPSSubRoleTable]
+            if(!this.preSaveDataSource(_entityCtx, 'KPSSubRoleTable'))
+            {
+                return false;
+            }
+            _dataSourceCtx = _entityCtx.getRuntimeContextByName('KPSSubRoleTable');
+            // propagates foreign key values from referenced data sources which are part of extensions.
+            this.foreignKeyPropagationExtensions(_entityCtx, _dataSourceCtx);
+            // inserts/updates data source [KPSSubRoleTable].
+            if(!this.saveDataSource(_entityCtx, _dataSourceCtx))
+            {
+                // returns from here if the root data source fails to be saved.
+                return false;
+            }
+            this.postSaveDataSource();
+        }
+        // handle datasources which are part of extensions and need to be saved in last 
+        this.preSaveDataSource(_entityCtx, '');
+        return rtrn;
+    }
+    protected boolean deleteDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        boolean rtrn = true;
+        DataEntityDataSourceRuntimeContext _dataSourceCtx = null;
+        // delete data sources in reverse topological order.
+        {
+            // handle datasources which are part of extensions and need to be saved before [KPSSubRoleTable]
+            if(!this.preSaveDataSource(_entityCtx, 'KPSSubRoleTable'))
+            {
+                return false;
+            }
+            _dataSourceCtx = _entityCtx.getRuntimeContextByName('KPSSubRoleTable');
+            // deletes data source [KPSSubRoleTable].
+            if(!this.saveDataSource(_entityCtx, _dataSourceCtx))
+            {
+                // returns from here if the root data source fails to be saved.
+                return false;
+            }
+            this.postSaveDataSource();
+        }
+        // handle datasources which are part of extensions and need to be saved in last 
+        this.preSaveDataSource(_entityCtx, '');
+        return rtrn;
+    }
+    private void mapToDataSource_DS1(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx, KPSSubRoleTable _kPSSubRoleTable, KPSSubRoleTableEntity _kPSSubRoleTableEntity)
+    {
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Duty), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Duty), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, MenuItem), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, MenuItem), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Privilege), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Privilege), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, SubRole), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, SubRole), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Correct), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Correct), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Create), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Create), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Delete), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Delete), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Invoke), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Invoke), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Read), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Read), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Update), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Update), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, ResourceType), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, ResourceType), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Description), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Description), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, LineNum), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, LineNum), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, PrivilegeType), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, PrivilegeType), 1);
+        
+        this.mapToDataSourceExtensions(_dataSourceCtx, _kPSSubRoleTable, _kPSSubRoleTableEntity);
+        _kPSSubRoleTable.trackFieldExternallySet(false);
+    }
+    protected void doMapEntityToDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #KPSSubRoleTable_ID:
+                this.mapToDataSource_DS1(_entityCtx, _dataSourceCtx, _dataSourceCtx.getBuffer(), _entityCtx.getEntityRecord());
+                break;
+            default :
+                this.doMapEntityToDataSourceExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+    }
+    private void mapFromDataSource_DS1(DataEntityDataSourceRuntimeContext _dataSourceCtx, KPSSubRoleTable _kPSSubRoleTable, KPSSubRoleTableEntity _kPSSubRoleTableEntity)
+    {
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, Duty), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Duty), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, MenuItem), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, MenuItem), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, Privilege), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Privilege), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, SubRole), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, SubRole), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, Correct), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Correct), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, Create), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Create), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, Delete), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Delete), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, Invoke), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Invoke), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, Read), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Read), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, Update), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Update), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, ResourceType), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, ResourceType), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, Description), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Description), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, LineNum), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, LineNum), false);
+        this.mapDataSourceFieldToEntityField(_kPSSubRoleTable, fieldnum(KPSSubRoleTable, PrivilegeType), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, PrivilegeType), false);
+        this.mapFromDataSourceExtensions(_dataSourceCtx, _kPSSubRoleTable, _kPSSubRoleTableEntity);
+        // map system fields (e.g. recid and recversion) from data source buffer to view record.
+        _kPSSubRoleTableEntity.fromViewDataSource(_dataSourceCtx.id(), _kPSSubRoleTable);
+    }
+    protected void doMapDataSourceToEntity(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #KPSSubRoleTable_ID:
+                this.mapFromDataSource_DS1(_dataSourceCtx, _dataSourceCtx.getBuffer(), _entityCtx.getEntityRecord());
+                break;
+            default :
+                this.doMapDataSourceToEntityExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+    }
+    protected Common doFindDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        Common rtrn = null;
+        switch(_dataSourceCtx.id())
+        {
+            case #KPSSubRoleTable_ID:
+                rtrn = this.LookForUniqueKeyMatch_DS1(_entityCtx.getEntityRecord(), _dataSourceCtx.getBuffer());
+                break;
+            default :
+                rtrn = this.doFindDataSourceExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    protected boolean isAnyMappedDataSourceFieldSet_DS1(KPSSubRoleTableEntity _kPSSubRoleTableEntity, str disabledConfigKey = null)
+    {
+        boolean rtrn = false;
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, Duty)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, MenuItem)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, Privilege)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, SubRole)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, Correct)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, Create)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, Delete)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, Invoke)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, Read)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, Update)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, ResourceType)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, Description)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, LineNum)))
+        {
+            return true;
+        }
+        if(_kPSSubRoleTableEntity.isFieldSet(fieldnum(KPSSubRoleTableEntity, PrivilegeType)))
+        {
+            return true;
+        }
+        rtrn = this.isAnyMappedDataSourceExtensionFieldSet(_kPSSubRoleTableEntity, 'KPSSubRoleTable', disabledConfigKey);
+        return rtrn;
+    }
+    protected boolean isAnyMappedDataSourceFieldSet(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        boolean rtrn = false;
+        switch(_dataSourceCtx.id())
+        {
+            case #KPSSubRoleTable_ID:
+                rtrn = this.isAnyMappedDataSourceFieldSet_DS1(_entityCtx.getEntityRecord());
+                break;
+            default :
+                rtrn = this.isAnyMappedDataSourceFieldSet_DSExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    private boolean validateDataSource_DS1(DataEntityRuntimeContext _entityCtx, KPSSubRoleTableEntity _kPSSubRoleTableEntity, DataEntityDataSourceRuntimeContext _dataSourceCtx, KPSSubRoleTable _kPSSubRoleTable)
+    {
+        boolean rtrn = true;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Duty), 'KPSSubRoleTableEntity.Duty', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Duty), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, MenuItem), 'KPSSubRoleTableEntity.MenuItem', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, MenuItem), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Privilege), 'KPSSubRoleTableEntity.Privilege', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Privilege), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, SubRole), 'KPSSubRoleTableEntity.SubRole', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, SubRole), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Correct), 'KPSSubRoleTableEntity.Correct', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Correct), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Create), 'KPSSubRoleTableEntity.Create', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Create), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Delete), 'KPSSubRoleTableEntity.Delete', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Delete), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Invoke), 'KPSSubRoleTableEntity.Invoke', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Invoke), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Read), 'KPSSubRoleTableEntity.Read', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Read), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Update), 'KPSSubRoleTableEntity.Update', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Update), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, ResourceType), 'KPSSubRoleTableEntity.ResourceType', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, ResourceType), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, Description), 'KPSSubRoleTableEntity.Description', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Description), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, LineNum), 'KPSSubRoleTableEntity.LineNum', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, LineNum), false/*disallowEditOnCreate*/, true/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateMappedDataSourceField(_entityCtx, _dataSourceCtx, _dataSourceCtx.getCompany(), '', conNull(), _kPSSubRoleTableEntity, fieldnum(KPSSubRoleTableEntity, PrivilegeType), 'KPSSubRoleTableEntity.PrivilegeType', _kPSSubRoleTable, fieldnum(KPSSubRoleTable, PrivilegeType), false/*disallowEditOnCreate*/, false/*disallowEdit*/, true/*callValidateField*/, 1) ? rtrn : false;
+        rtrn = this.validateDataSourceExtensions(_entityCtx, _kPSSubRoleTableEntity, _dataSourceCtx, _kPSSubRoleTable) ? rtrn : false;
+        return rtrn;
+    }
+    protected boolean validateDataSource(DataEntityRuntimeContext _entityCtx, DataEntityDataSourceRuntimeContext _dataSourceCtx)
+    {
+        boolean rtrn = true;
+        switch(_dataSourceCtx.id())
+        {
+            case #KPSSubRoleTable_ID:
+                rtrn = this.validateDataSource_DS1(_entityCtx,_entityCtx.getEntityRecord(),_dataSourceCtx,_dataSourceCtx.getBuffer());
+                break;
+            default :
+                rtrn = this.validateDataSourceExtensions_DSExtensions(_entityCtx, _dataSourceCtx);
+                break;
+        }
+        return rtrn;
+    }
+    private void mapToMatchingRecord_DS1(DataEntityDataSourceRuntimeContext _dataSourceCtx, KPSSubRoleTable _kPSSubRoleTable, KPSSubRoleTable _matchingRecord)
+    {
+        // map data changes in bound fields.
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Duty), _matchingRecord, fieldnum(KPSSubRoleTable, Duty), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, MenuItem), _matchingRecord, fieldnum(KPSSubRoleTable, MenuItem), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Privilege), _matchingRecord, fieldnum(KPSSubRoleTable, Privilege), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, SubRole), _matchingRecord, fieldnum(KPSSubRoleTable, SubRole), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Correct), _matchingRecord, fieldnum(KPSSubRoleTable, Correct), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Create), _matchingRecord, fieldnum(KPSSubRoleTable, Create), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Delete), _matchingRecord, fieldnum(KPSSubRoleTable, Delete), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Invoke), _matchingRecord, fieldnum(KPSSubRoleTable, Invoke), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Read), _matchingRecord, fieldnum(KPSSubRoleTable, Read), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Update), _matchingRecord, fieldnum(KPSSubRoleTable, Update), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, ResourceType), _matchingRecord, fieldnum(KPSSubRoleTable, ResourceType), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, Description), _matchingRecord, fieldnum(KPSSubRoleTable, Description), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, LineNum), _matchingRecord, fieldnum(KPSSubRoleTable, LineNum), 1);
+        this.mapEntityFieldToDataSourceField(_dataSourceCtx.getDatabaseOperation(), _kPSSubRoleTable, fieldnum(KPSSubRoleTable, PrivilegeType), _matchingRecord, fieldnum(KPSSubRoleTable, PrivilegeType), 1);
+        this.mapToMatchingRecordExtensions(_dataSourceCtx, tablestr(KPSSubRoleTableEntity), _kPSSubRoleTable, _matchingRecord);
+    }
+    protected void mapDataSourceToMatchingRecord(DataEntityDataSourceRuntimeContext _dataSourceCtx, Common _matchingRecord)
+    {
+        switch(_dataSourceCtx.id())
+        {
+            case #KPSSubRoleTable_ID:
+                this.mapToMatchingRecord_DS1(_dataSourceCtx, _dataSourceCtx.getBuffer(), _matchingRecord);
+                break;
+            default :
+                this.mapDataSourceToMatchingRecordExtensions(_dataSourceCtx, _matchingRecord);
+                break;
+        }
+    }
+    protected void validateConfigurationKeys(DataEntityRuntimeContext _entityCtx)
+    {
+        // Ensure that the entity configuration key is enabled
+        if(!isConfigurationKeyEnabled(configurationKeyName2Id('KPSPoweredFinanceSecurityRolesPermission')))
+        {
+            // Entity configuration key is disabled
+            throw error(strfmt("@ApplicationPlatform:DataEntityConfigKeyDisabled",'KPSPoweredFinanceSecurityRolesPermission'));
+        }
+    }
+    protected void initializeDataSources(DataEntityRuntimeContext _entityCtx)
+    {
+        this.initializeDataSource(_entityCtx, 'KPSSubRoleTable', m_KPSSubRoleTable, this.getDataSourceId('KPSSubRoleTable'), this.getDataSourceRuntimeId('KPSSubRoleTable'), false/* optional */, false/* readonly */, false/* oneToMany */, false/* dateEffective */, false/* applyDateFilter */);
+        this.initializeDataSourcesExtensions(_entityCtx);
+    }
+    private KPSSubRoleTable LookForUniqueKeyMatch_DS1(KPSSubRoleTableEntity _kPSSubRoleTableEntity, KPSSubRoleTable _kPSSubRoleTable)
+    {
+        KPSSubRoleTable kPSSubRoleTable_ = null;
+        
+        select
+            forUpdate
+            firstOnly
+                kPSSubRoleTable_
+        where
+            kPSSubRoleTable_.SubRole == _kPSSubRoleTable.SubRole && kPSSubRoleTable_.Duty == _kPSSubRoleTable.Duty && kPSSubRoleTable_.PrivilegeType == _kPSSubRoleTable.PrivilegeType && kPSSubRoleTable_.Privilege == _kPSSubRoleTable.Privilege && kPSSubRoleTable_.ResourceType == _kPSSubRoleTable.ResourceType && kPSSubRoleTable_.MenuItem == _kPSSubRoleTable.MenuItem
+        ;
+        
+        if (kPSSubRoleTable_)
+        {
+            return kPSSubRoleTable_;
+        }
+        
+        return kPSSubRoleTable_;
+    }
+
+}
+
